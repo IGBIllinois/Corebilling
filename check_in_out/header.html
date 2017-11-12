@@ -1,0 +1,95 @@
+<?php
+ob_start();
+@session_start();
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="../instigb.css">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>IGB Instrument Usage Page</title>
+
+
+</head>
+
+<body>
+<?php
+
+// setting up the web root and server root for
+
+// this shopping cart application
+
+$thisFile = str_replace('\\', '/', __FILE__);
+$docRoot = $_SERVER['DOCUMENT_ROOT'];
+$webRoot  = str_replace(array($docRoot, 'library/config.php'), '', $thisFile);
+$srvRoot  = str_replace('library/config.php', '', $thisFile);
+define('WEB_ROOT', $webRoot);
+define('SRV_ROOT', $srvRoot);
+$logonerror=" ";
+	
+	if (isset($_POST['submitCheckin']) OR isset($_POST['submitCheckout'])){
+		require_once ("../includes/mysql_connect.php"); 
+		@$pass_word = $_POST['pwd']; 
+		@$user_name = $_POST['login_name']; 
+	 	
+		if (empty($_POST['login_name'])){
+		$user_name = FALSE; 
+		$logonerror= $logonerror."<b class=b>Username field cannot be empty</b><br />"; 
+		}
+	
+		if (empty($_POST['pwd'])){
+		$pass_word = FALSE; 
+		$logonerror=$logonerror." <b class=b>Password field cannot be empty</b>"; 
+		}
+		echo "<p>"; 
+		if ($pass_word && $user_name){
+		
+		$ldaphost = "auth.igb.uiuc.edu";
+		$ds = ldap_connect($ldaphost);
+	
+			if ($ds) {
+				$user_name = htmlspecialchars($_POST['login_name'], ENT_QUOTES);
+				$pass_word = htmlspecialchars($_POST['pwd'], ENT_QUOTES);
+				$binddn = "uid=$user_name,ou=people,dc=igb,dc=uiuc,dc=edu";
+				$ldapbind = @ldap_bind($ds, $binddn, $pass_word);
+							   
+			   if ($ldapbind) {				
+					$queryuserid=mysql_query("SELECT ID FROM users WHERE username='$user_name'");
+				if(isset($_POST['submitCheckin'])) {		
+					if(mysql_num_rows($queryuserid)) {
+						$uid=mysql_result($queryuserid,0,"ID");					
+						$did=$_POST['selectDevice'];
+						$description=htmlspecialchars($_POST['description'], ENT_QUOTES);		
+						mysql_query("INSERT into session (userid, start, status, deviceid, description) values ('$uid',Now(),1,'$did','$description')");
+						header('Location: http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+					}	
+					else {
+						$logonerror=$logonerror."Your account wasn't activated for this website, please contact <b><a href=\"mailto:lheil@uiuc.edu\"><font color=\"red\" size=2>Lori Heil</font></a></b> to be activated.";
+					} 
+				}
+				if(isset($_POST['submitCheckout'])) {
+					$sessionID=$_POST['sessionID'];
+					mysql_query("UPDATE session SET stop=NOW(), status=0, elapsed=round(TIME_TO_SEC(TIMEDIFF(NOW(),start))/60,2) WHERE ID=$sessionID AND status=1");
+					header('Location: http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);	
+				}	
+			   }  
+			   else{
+				$logonerror=$logonerror."<b class=b>No match was found.<br />Please try again!</b>"; 
+	  		   }
+	  		} 
+		}
+	}
+echo $logonerror;
+?> 
+
+<!--	<div id="logo">
+		<img src="../top_logo2.jpg" />	
+	</div>
+	
+	<div id="bg_top">
+	<div id="logon">
+	</div>
+	
+	</div> -->
+	

@@ -1,0 +1,62 @@
+<?php
+ob_start();
+@session_start();
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="./instigb.css">
+<script src="js/sorttable.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>IGB Instrument Usage Page</title>
+
+
+</head>
+
+<body>
+<?php
+//Initialize all classes and load configuration
+include('includes/initializer.php');
+?> 
+
+<div id="container">
+	<div id="logo">
+		<img src="./top_logo2.jpg" />	
+	</div>
+	
+	<div id="bg_top">
+	
+		<div id="logon">
+			<span id="logon_form">
+			<?php
+			if(isset($_SESSION['userid']) || isset($_SESSION['newuser'])) {
+			echo "<form action=\"./index.php\" method=POST>";
+			echo "<font size=\"4\">Welcome ".$_SESSION['username'].".    </font>";
+			echo "<input name=\"logout\" type=\"submit\" class=\"grey\" id=\"Logout\" value=\"Logout\" >";
+			echo "</form>";
+			}
+			else {
+			echo "<form action=\"./index.php\" method=POST>";
+			echo "User: <input name=\"username\" type=\"text\"  size=\"12\" maxlength=\"20\" height=\"12\" >";
+			echo "Password: <input name=\"password\" type=\"password\" size=\"12\" maxlength=\"20\" height=\"12\" >";
+			echo "<input name=\"Login\" type=\"submit\" class=\"grey\" id=\"Login\" value=\"Login\" >";
+			echo "</form>";
+			}
+			?>
+			</span>			
+		</div>
+	</div>
+		<div id="main_nav">
+		<a href="./index.php?subm=1">Home</a> 
+		<a href="./profiles.php?subm=1">Profiles</a> 
+		<a href="./billing.php?subm=1">Billing</a>
+		<?php 
+		if(isset($_SESSION['usertype'])) {
+			if($_SESSION['usertype']==$userTypeAdmin) {
+				echo "<a href=\"./administration.php?subm=13\">Admininstration</a>";	
+			}
+		}
+		?>
+	</div>
+	

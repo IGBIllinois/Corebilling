@@ -1,0 +1,26 @@
+<?php
+
+//LDAP Settings
+@define ('LDAP_HOST','');
+@define ('LDAP_PEOPLE_DN', '');
+@define ('LDAP_GROUP_DN', '');
+@define ('LDAP_SSL','0');
+@define ('LDAP_PORT','389');
+
+//MySQL settings
+@define ('DB_USER','');
+@define ('DB_PASSWORD','');
+@define ('DB_HOST','');
+@define ('DB_NAME','');
+
+//UIUC LDAP SETTINGS
+@define('UIUC_LDAP_USER','');
+@define('UIUC_LDAP_PASSWORD','');
+
+//Tracker Settings
+@define ('TRACKER_PASSWORD', '');
+
+//Records path
+@define ('RECORDS_PATH', '');
+
+?>
