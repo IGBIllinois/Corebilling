@@ -1,5 +1,7 @@
 IGB Core Facilities Instrument Tracking
 ====================
+[![Build Status](https://www.travis-ci.com/IGBIllinois/CoreBilling.svg?branch=master)](https://www.travis-ci.com/IGBIllinois/CoreBilling)
+
 * Web interface to schedule, track, and bill IGB Core Facilities instrument usage by tracking user logins and session times.
 * Features:
  * Instrument scheduling (Using the [Full Calendar](http://fullcalendar.io/) plugin)
