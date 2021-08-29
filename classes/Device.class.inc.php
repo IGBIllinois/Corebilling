@@ -49,7 +49,8 @@ class Device
 		$queryAddDevice = "INSERT INTO device (device_name,location,description,full_device_name,status_id,device_token) VALUES(:device_name,:location,:description,:full_device_name,:status_id,:device_token)";
         $addDevicePrep = $this->db->prepare($queryAddDevice);
         $addDevicePrep->execute(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken));
-        
+        error_log(print_r(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken), true));
+        error_log(print_r($addDevicePrep->errorInfo(), true));
 		$this->deviceId = $this->db->lastInsertId();
 
         //Add device rates rows to device rates table with default value of 0 for all values

@@ -48,4 +48,4 @@ config.php
 * Migration SQL files
 new_db.sql
 old_db.sql
-/log/*.log
+/log/*.txt
