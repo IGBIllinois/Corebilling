@@ -14,28 +14,20 @@
 		<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
 		<link href="css/fullcalendar.css" rel='stylesheet' />
 		<link href="css/fullcalendar.print.css" rel='stylesheet' media='print' />
-<!-- 		<link href="css/jquery.dataTables.css" rel='stylesheet' /> -->
 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.1/b-colvis-1.2.1/b-html5-1.2.1/b-print-1.2.1/r-2.1.0/se-1.2.0/datatables.min.css"/>
 
 		<link rel="stylesheet" href="includes/select2/css/select2.css" type="text/css" />
 		<link rel="stylesheet" href="includes/select2/css/select2-bootstrap.css" type="text/css" />
-<!-- 		<link href="css/dataTables.tableTools.min.css" rel='stylesheet' /> -->
 		<link href="css/jquery.timepicker.css" rel="stylesheet" />
 		<link href="css/jquery-ui.css" rel="stylesheet" />
 		<link href="css/jquery-ui.theme.css" rel="stylesheet" />
-<!-- 		<link href="css/jquery.dataTables.css"  rel="stylesheet" /> -->
-<!-- 		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs/jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,b-1.0.3,b-html5-1.0.3,b-print-1.0.3/datatables.css"/> -->
-<!-- 		<link href="css/dataTables.tableTools.min.css"  rel="stylesheet" /> -->
 		<link href="css/main.inc.css" rel="stylesheet" />
 		
 		<script src='js/jquery/jquery-1.11.1.min.js' type="text/javascript"></script>
 		<script src='js/jquery-ui.js' type="text/javascript"></script>
 		<script type="text/javascript" src="includes/select2/js/select2.full.js"></script>
-<!-- 		<script src='js/jquery/jquery.dataTables.min.js'></script> -->
-<!-- 		<script type="text/javascript" src="https://cdn.datatables.net/r/bs/jszip-2.5.0,pdfmake-0.1.18,dt-1.10.9,b-1.0.3,b-html5-1.0.3,b-print-1.0.3/datatables.js"></script> -->
 		<script type="text/javascript" src="https://cdn.datatables.net/v/bs/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.12/b-1.2.1/b-colvis-1.2.1/b-html5-1.2.1/b-print-1.2.1/r-2.1.0/se-1.2.0/datatables.min.js"></script>
 		<script type="text/javascript" src="js/jquery.timepicker.js"></script>
-<!-- 		<script src='js/jquery/dataTables.tableTools.min.js'></script> -->
 		<script src='js/jquery/fnDisplayRow.js' type="text/javascript"></script>
 		<script src='js/full_calendar/moment.min.js' type="text/javascript"></script>
 		<script src='js/full_calendar/fullcalendar.min.js' type="text/javascript"></script>
