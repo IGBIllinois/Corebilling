@@ -79,10 +79,11 @@ class User
         $this->dateAdded = date('Y-m-d H:i:s');
         $this->certified = $certified;
         if ( User::exists($this->db, $this->username) == 0 ) {
-            $queryAddUser = "insert into users (user_name, first,last,email,department_id,rate_id,status_id,date_added,secure_key,user_role_id,certified)
+		$queryAddUser = "insert into users (user_name, first,last,email,department_id,rate_id,status_id,date_added,secure_key,user_role_id,certified)
 								   values(:user_name,:first,:last,:email,:department_id,:rate_id,:status_id,NOW(), MD5(RAND()),:user_role_id,:certified)";
+		try {
             $addUserPrepare = $this->db->prepare($queryAddUser);
-            $addUserPrepare->execute(
+            $result = $addUserPrepare->execute(
                 array(
                     ':user_name' => $this->username,
                     ':first' => $this->first,
@@ -95,6 +96,10 @@ class User
                     ':certified' => $this->certified ? 1 : 0,
                 ));
             $this->userId = $this->db->lastInsertId();
+		}
+		catch (PDOException $e) {
+			echo "Database Error: " . $e->getMessage();
+		}
             log::log_message("Added user '$username'");
         }
     }

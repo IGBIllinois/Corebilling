@@ -93,7 +93,7 @@ if (isset($_POST['CreateNewDevice'])) {
 					</label>
 					<div class="col-sm-9">
 						<input name="device_id" type="hidden" value="<?php echo $device->getId(); ?>">
-						<input name="dnsName" type="text" value="<?php echo $device->getShortName(); ?>" class="form-control">
+						<input name="dnsName" type="text" value="<?php echo $device->getShortName(); ?>" class="form-control" <?php if($device->getId()){ echo 'readonly'; }?>>
 					</div>
 				</div>
 				<div class="form-group">

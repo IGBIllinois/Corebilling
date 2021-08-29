@@ -52,7 +52,6 @@ class Reservation
         $this->training = $training;
         $this->masterReservationId = $masterReservationId;
 
-
         if (self::checkEventConflicts($this->db, $this->deviceId, $this->userId, $this->start, $this->stop) == 1) {
             $queryCreateReservation = "INSERT INTO reservation_info (device_id,user_id,start,stop,description,training,date_created,master_reservation_id)
 										VALUES(:device_id,:user_id,:start,:stop,:description,:training,NOW(),:master)";

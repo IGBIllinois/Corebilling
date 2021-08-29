@@ -24,9 +24,9 @@ class Department {
      */
     public function create($departmentName, $description)
     {
-        $queryAddDepartment= "INSERT INTO departments (department_name, description)VALUES(:department_name,:description)";
+        $queryAddDepartment= "INSERT INTO departments (department_name, description, department_code)VALUES(:department,:description, '')";
         $addDepartmentPrep = $this->db->prepare($queryAddDepartment);
-        $addDepartmentPrep->execute(array(':department_name'=>$departmentName,':description'=>$description));
+        $addDepartmentPrep->execute(array(':department'=>$departmentName,':description'=>$description));
         $departmentId = $this->db->lastInsertId();
         $this->departmentName = $departmentName;
         $this->description = $description;

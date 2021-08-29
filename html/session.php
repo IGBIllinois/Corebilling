@@ -28,5 +28,4 @@ if (isset($_POST['username']) && $_POST['username']!="" && isset($_POST['key']))
     }
 }
 
-
 ?>	

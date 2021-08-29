@@ -178,6 +178,7 @@ class Group
             if(LDAPMAN_API_ENABLED){
                 if($netid != null){
                     $gid = LDAPMAN_PI_PREFIX . $netid;
+                    $ldapman->addGroup($gid, "Core $netid PI group");
                     $ldapman->addGroupMember($gid, $netid);
                     $coreserverman->createDirectory($gid, $netid, $netid);
                     foreach($this->getMembers() as $member) {
