@@ -2,8 +2,8 @@ IGB Core Facilities Instrument Tracking
 ====================
 [![Build Status](https://www.travis-ci.com/IGBIllinois/CoreBilling.svg?branch=master)](https://www.travis-ci.com/IGBIllinois/CoreBilling)
 
-* Web interface to schedule, track, and bill IGB Core Facilities instrument usage by tracking user logins and session times.
-* Features:
+* Web interface to schedule, track, and bill instrument usage by tracking user logins and session times.
+## Features 
  * Instrument scheduling (Using the [Full Calendar](http://fullcalendar.io/) plugin)
  ...Users can reserve time on instruments and keep track of their own reservations
  * Permissions (Pages,Instrument Schedules)
@@ -24,3 +24,41 @@ IGB Core Facilities Instrument Tracking
  ...Admins can view all billing events within a period of time, filter by name, netid, instrument, or group, and export to spreadsheet.
  * News Page
  * Used with [https://github.com/IGBIllinois/CoreBillingService](https://github.com/IGBIllinois/CoreBillingService) to retrieve logged in users on Window Machines
+
+## Requirements
+* Apache
+* PHP 7.2 or higher
+* MySQL/MariaDB >= 5.5
+
+## Installation
+* Git clone repository or download a tag released at [https://github.com/IGBIllinois/Corebilling/releases](https://github.com/IGBIllinois/Corebilling/releases)
+```
+git clone https://github.com/IGBIllinois/Corebilling.git
+```
+* Create mysql database
+```
+CREATE DATABASE corebilling CHARACTER SET utf8;
+```
+* Create mysql user with insert,update,select,delete privileges on the database
+```
+CREATE USER 'posting_log'@'localhost' IDENTIFIED BY 'STRONG_PASSWORD';
+GRANT SELECT,INSERT,DELETE,UPDATE ON corebilling.* to 'corebilling'@'localhost';
+```
+* Import database structure
+```
+mysql -u root -p corebilling < sql/corebilling.sql
+```
+* Add apache config to point to html directory
+```
+Alias /corebilling /var/www/corebilling/html
+<Directory /var/www/corebilling/html>
+	Allowoverride none
+	Require all granted
+</Directory>
+```
+* Copy html/includes/config.default.php to html/includes/config.php
+```
+cp html/includes/config.default.php html/includes/config.php
+```
+* Edit html/includes/config.php for your setup
+* Done
