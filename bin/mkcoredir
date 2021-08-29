@@ -1,0 +1,93 @@
+#! /bin/bash
+
+group=""
+pi_username=""
+username=""
+verbose=0
+args_valid=1
+
+while getopts ":hvg:p:u:" opt; do
+  case $opt in
+    h)
+      echo "Usage: mkcoredir -g <group> -p <pi_username> -u <username>"
+      exit 0
+      ;;
+    g)
+      group=$OPTARG
+      ;;
+    p)
+      pi_username=$OPTARG
+      ;;
+    u)
+      username=$OPTARG
+      ;;
+    v)
+      ((verbose++))
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ -z $group ]; then
+  args_valid=0
+  echo "Missing required argument: -g"
+fi
+if [ -z $pi_username ]; then
+  args_valid=0
+  echo "Missing required argument: -p"
+fi
+if [ -z $username ]; then
+  args_valid=0
+  echo "Missing required argument: -u"
+fi
+if [ $args_valid -eq 0 ]; then
+  exit 1
+fi
+
+# Check if group exists
+getent group $group > /dev/null
+if [ $? -ne 0 ]; then
+  echo "Group $group does not exist."
+  exit 1
+fi
+
+# Create the directories
+pi_directory="/core-server/groups/$pi_username"
+user_directory="$pi_directory/$username"
+
+if [ $verbose -gt 0 ]; then
+  echo "Creating directories..."
+fi
+mkdir -p $user_directory
+
+# Set permissions (assume the PI directory was just created, it won't hurt anything)
+if [ $verbose -gt 0 ]; then
+  echo "Setting group to $group..."
+fi
+chgrp -R $group $pi_directory
+if [ $verbose -gt 0 ]; then
+  echo "Setting $pi_directory permissions..."
+fi
+chmod 750 $pi_directory
+chmod -R g+s $pi_directory
+if [ $verbose -gt 0 ]; then
+  echo "Setting $pi_directory ACL..."
+fi
+setfacl -m g:core_admins:rx $pi_directory
+if [ $verbose -gt 0 ]; then
+  echo "Setting $user_directory permissions..."
+fi
+chmod -R 770 $user_directory
+setfacl -m g:core_admins:rwx $user_directory
+setfacl -d -m g:core_admins:rwx $user_directory
+
+if [ $verbose -gt 0 ]; then
+  echo "Done."
+fi
