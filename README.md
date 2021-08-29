@@ -23,3 +23,4 @@ IGB Core Facilities Instrument Tracking
  * Facility Billing
  ...Admins can view all billing events within a period of time, filter by name, netid, instrument, or group, and export to spreadsheet.
  * News Page
+ * Used with [https://github.com/IGBIllinois/CoreBillingService](https://github.com/IGBIllinois/CoreBillingService) to retrieve logged in users on Window Machines
