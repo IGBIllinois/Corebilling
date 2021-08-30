@@ -29,7 +29,7 @@ class Rate {
         $this->rateId = $this->db->lastInsertId();
 
         $device = new Device($this->db);
-        $devicesArr = Device::getAllDevices($db);
+        $devicesArr = Device::getAllDevices($this->db);
 
 
         foreach($devicesArr as $id=>$rateDevice)

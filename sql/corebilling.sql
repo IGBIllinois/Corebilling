@@ -2,7 +2,7 @@ CREATE TABLE `access_control` (
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,
   `device_id` int(11) NOT NULL,
   PRIMARY KEY (`user_id`,`device_id`)
-);
+)\p;
 
 CREATE TABLE `articles` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -11,7 +11,7 @@ CREATE TABLE `articles` (
   `title` text NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `departments` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -19,7 +19,7 @@ CREATE TABLE `departments` (
   `description` varchar(45) NOT NULL,
   `department_code` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `device` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -34,7 +34,7 @@ CREATE TABLE `device` (
   `device_token` varchar(32) DEFAULT NULL,
   `ldap_group` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `device_rate` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -44,7 +44,7 @@ CREATE TABLE `device_rate` (
   `min_use_time` int(11) NOT NULL,
   `rate_type_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `groups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -53,20 +53,20 @@ CREATE TABLE `groups` (
   `department_id` int(10) unsigned DEFAULT NULL,
   `netid` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 
 CREATE TABLE `rate_types` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rate_type_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `rates` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `rate_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `reservation_info` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -82,7 +82,7 @@ CREATE TABLE `reservation_info` (
   `master_reservation_id` int(10) unsigned DEFAULT NULL,
   `staff_notes` text DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `session` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -100,14 +100,14 @@ CREATE TABLE `session` (
   `rate_id` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`,`stop`)
-);
+)\p;
 
 CREATE TABLE `status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `statusname` varchar(45) NOT NULL,
   `type` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `user_cfop` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -119,28 +119,19 @@ CREATE TABLE `user_cfop` (
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `created` (`created`)
-);
-
-CREATE TABLE `user_demographics` (
-  `user_id` int(11) unsigned NOT NULL,
-  `edu_level` varchar(128) DEFAULT NULL,
-  `gender` varchar(64) DEFAULT NULL,
-  `underrepresented` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  CONSTRAINT `user_demographics_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-);
+)\p;
 
 CREATE TABLE `user_groups` (
   `user_id` int(10) unsigned NOT NULL,
   `group_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`user_id`,`group_id`)
-);
+)\p;
 
 CREATE TABLE `user_roles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+)\p;
 
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -155,8 +146,36 @@ CREATE TABLE `users` (
   `department_id` int(11) DEFAULT NULL,
   `status_id` int(11) DEFAULT NULL,
   `user_role_id` int(11) DEFAULT NULL,
-  `date_added` datetime NOT NULL,
+  `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `secure_key` varchar(45) DEFAULT NULL,
   `certified` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-);
+)\p;
+
+CREATE TABLE `user_demographics` (
+  `user_id` int(11) unsigned NOT NULL,
+  `edu_level` varchar(128) DEFAULT NULL,
+  `gender` varchar(64) DEFAULT NULL,
+  `underrepresented` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  CONSTRAINT `user_demographics_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+)\p;
+
+CREATE VIEW access_control_hr AS
+SELECT `users`.`user_name` AS `user_name`,`device`.`full_device_name` AS `full_device_name` from ((`access_control` join `users` on(`users`.`id` = `access_control`.`user_id`)) join `device` on(`device`.`id` = `access_control`.`device_id`))\p;
+
+INSERT INTO rate_types(rate_type_name) VALUES('Continuous')\p;
+INSERT INTO rate_types(rate_type_name) VALUES('Monthly')\p;
+INSERT INTO status(statusname,type) VALUES('Online',1)\p;
+INSERT INTO status(statusname,type) VALUES('Repair',1)\p;
+INSERT INTO status(statusname,type) VALUES('Do Not Track',1)\p;
+INSERT INTO status(statusname,type) VALUES('Offline',1)\p;
+INSERT INTO status(statusname,type) VALUES('Active',2)\p;
+INSERT INTO status(statusname,type) VALUES('Hidden',2)\p;
+INSERT INTO status(statusname,type) VALUES('Disabled',2)\p;
+
+INSERT INTO user_roles(role_name) VALUES('Admin')\p;
+INSERT INTO user_roles(role_name) VALUES('Supervisor')\p;
+INSERT INTO user_roles(role_name) VALUES('User')\p;
+
+
