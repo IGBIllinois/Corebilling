@@ -48,6 +48,10 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON corebilling.* to 'corebilling'@'localhost';
 ```
 mysql -u root -p corebilling < sql/corebilling.sql
 ```
+* Add initial Admin User
+```
+INSERT INTO users(user_name,user_role_id) VALUES('<USERNAME>',1);
+```
 * Add apache config to point to html directory
 ```
 Alias /corebilling /var/www/corebilling/html
@@ -61,4 +65,8 @@ Alias /corebilling /var/www/corebilling/html
 cp html/includes/config.default.php html/includes/config.php
 ```
 * Edit html/includes/config.php for your setup
+* If enabling log file, set permissions on the log folder for the apache user to read/write.
+```
+chown apache.apache log
+```
 * Done
