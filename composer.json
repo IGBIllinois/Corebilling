@@ -1,0 +1,14 @@
+{
+	"repositories" : [
+	{
+		"type": "vcs",
+		"url": "https://www.github.com/IGBIllinois/IGBIllinois-php"
+	}
+	],
+	"require": {
+		"php": ">=7.2",
+		"igbillinois/igbillinois-php": "1.2"
+	}
+}
+
+
