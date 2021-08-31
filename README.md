@@ -29,6 +29,7 @@ IGB Core Facilities Instrument Tracking
 * Apache
 * PHP 7.2 or higher
 * MySQL/MariaDB >= 5.5
+* PHP Composer
 
 ## Installation
 * Git clone repository or download a tag released at [https://github.com/IGBIllinois/Corebilling/releases](https://github.com/IGBIllinois/Corebilling/releases)
@@ -68,5 +69,9 @@ cp html/includes/config.default.php html/includes/config.php
 * If enabling log file, set permissions on the log folder for the apache user to read/write.
 ```
 chown apache.apache log
+```
+* Install composer packages
+```
+composer install
 ```
 * Done
