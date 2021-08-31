@@ -34,7 +34,6 @@ if (isset ($_POST ['deviceSelected'])) {
 			<input type="hidden" name="device_id" value="<?php echo $device->getId(); ?>"/>
 			<input type="hidden" name="training" value="<?php echo isset($_POST['filterTraining'])?1:0; ?>"/>
 			<select name="report_type" class="form-control">
-				<option value="xls">Excel 2003</option>
 				<option value="xlsx" selected>Excel 2007</option>
 				<option value="csv">CSV</option>
 			</select>

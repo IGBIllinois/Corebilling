@@ -2,9 +2,25 @@
 ob_start();
 @session_start();
 // setting up the web root and server root for
-include('config.php');
-include('auto_load_classes.php');
-include('mysql_connect.php');
+require_once(__DIR__ . '/../../conf/app.inc.php');
+require_once(__DIR__ . '/../../conf/config.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
+
+set_include_path(get_include_path().":../libs");
+function my_autoloader($class_name) {
+        if(file_exists('../libs/' . $class_name . '.class.inc.php'))
+        {
+                require_once $class_name . '.class.inc.php';
+        }
+}
+spl_autoload_register('my_autoloader');
+
+try {
+    $db = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASSWORD);
+} catch (PDOException $e) {
+    die("Error initializing PDO: " . $e->getMessage());
+}
+
 
 //Sets up ldap connection
 $authen = new LdapAuth ( LDAP_HOST, LDAP_PEOPLE_DN, LDAP_GROUP_DN,LDAP_PORT);

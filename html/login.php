@@ -1,7 +1,6 @@
 <?php
 	require_once 'includes/initializer.php';
 
-//	phpinfo();
 	if(isset($_POST['login'])) {
 		$username = trim(rtrim($_POST['user_name']));
 		$password = $_POST['password'];
@@ -14,9 +13,11 @@
 		}
 	}
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="en">
 	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
 		
 		<script src='js/jquery/jquery-1.11.1.min.js'></script>
@@ -25,7 +26,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<title>IGB Instrument Usage Page</title>
 	</head>
-	<body>
+	<body OnLoad="document.login.user_name.focus();">
 		<nav class="navbar navbar-inverse navbar-static-top">
 			<div class="container-fluid">
 				<div class="navbar-header">
@@ -39,7 +40,7 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-4 col-md-offset-4">
-					<form role="form" class="form-signin" action="./login.php" method="POST"  style="margin-bottom:1em">
+					<form role="form" class="form-signin" action="./login.php" method="POST"  style="margin-bottom:1em" name='login'>
 						<div class="form-group">
 							<label for="username">Username: </label>
 							<div class="input-group">
@@ -66,7 +67,8 @@
 			</div>
 			<div class="row">
 				<div class='col-sm-12' style='text-align: center; padding: 15px 0'>
-					&copy 2015-2019 University of Illinois Board of Trustees
+					<br><em><a href='https://www.vpaa.uillinois.edu/resources/web_privacy'>University of Illinois System Web Privacy Notice</a></em>
+					<br><em>&copy 2015-<?php echo date('Y'); ?> University of Illinois Board of Trustees</em>
 				</div>
 			</div>
 		</div>

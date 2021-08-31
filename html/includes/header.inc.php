@@ -4,9 +4,9 @@
 	error_reporting(E_ALL);
 
 	
-	include('initializer.php');
+	require_once('initializer.php');
 	
-	include 'authenticate.php';
+	require_once 'authenticate.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,8 +36,8 @@
 		<script src='js/highcharts/exporting.js' type="text/javascript"></script>
 		<script src='js/excel/excellentexport.min.js' type="text/javascript"></script>
 		<script src='js/main.inc.js' type="text/javascript"></script>
-		
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	
+		<meta charset='utf-8'>	
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 		<title>IGB Core Facilities Billing</title>
 	</head>

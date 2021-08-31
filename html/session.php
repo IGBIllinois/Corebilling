@@ -3,7 +3,7 @@
 //Check if the proper get inputs are set
 // error_log("session attempt",0);
 if (isset($_POST['username']) && $_POST['username']!="" && isset($_POST['key'])) {
-    include('includes/initializer.php');
+    require_once('includes/initializer.php');
     $deviceInfo = new Device($db);
     $deviceInfo->load(0, $_POST['key']);
     //check if device token matches

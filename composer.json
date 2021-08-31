@@ -7,7 +7,7 @@
 	],
 	"require": {
 		"php": ">=7.2",
-		"igbillinois/igbillinois-php": "1.2"
+		"igbillinois/igbillinois-php": "dev-main"
 	}
 }
 

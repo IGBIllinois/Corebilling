@@ -1,4 +1,4 @@
 <?php
-include('includes/initializer.php');
+require_once('includes/initializer.php');
 
 header('location:news.php');

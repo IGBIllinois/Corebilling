@@ -1,6 +1,6 @@
 <?php
 
-include_once 'includes/initializer.php';
+require_once 'includes/initializer.php';
 
 if (isset($_POST['create_cal_report'])) {
     $user = new User ($db);
@@ -33,13 +33,10 @@ if (isset($_POST['create_cal_report'])) {
 
     switch ($type) {
         case 'csv':
-            report::create_csv_report($events, $filename);
-            break;
-        case 'xls':
-            report::create_xls_report($events, $filename);
+            \IGBIllinois\report::create_csv_report($events, $filename);
             break;
         case 'xlsx':
-            report::create_xlsx_report($events, $filename);
+            \IGBIllinois\report::create_excel_2007_report($events, $filename);
             break;
     }
 }

@@ -1,3 +1,4 @@
+#!/usr/bin/env/php
 <?php
 // setting up the web root and server root for
 include('../html/includes/config.php');
