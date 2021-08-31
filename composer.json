@@ -7,7 +7,14 @@
 	],
 	"require": {
 		"php": ">=7.2",
+		"twbs/bootstrap": "v3.4.1",
 		"igbillinois/igbillinois-php": "dev-main"
+	},
+	"scripts": {
+		"post-update-cmd": [
+		"mkdir -p html/vendor/twbs",
+		"cp -R vendor/twbs/bootstrap html/vendor/twbs"
+		]
 	}
 }
 

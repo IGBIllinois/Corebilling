@@ -18,20 +18,20 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+		<link rel='stylesheet' types='text/css' href='vendor/twbs/bootstrap/dist/css/bootstrap.min.css'>
 		
 		<script src='js/jquery/jquery-1.11.1.min.js'></script>
-		<script src='js/bootstrap/bootstrap.min.js'></script>
+		<script type='text/javascript' src='vendor/twbs/bootstrap/dist/js/bootstrap.min.js'></script>
 			
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<title>IGB Instrument Usage Page</title>
+		<title><?php echo settings::get_title(); ?></title>
 	</head>
 	<body OnLoad="document.login.user_name.focus();">
 		<nav class="navbar navbar-inverse navbar-static-top">
 			<div class="container-fluid">
 				<div class="navbar-header">
 					<div class="navbar-brand">
-						<?php echo PAGE_TITLE; ?>
+						<?php echo settings::get_title(); ?>
 					</div>
 				</div>
 			</div>
@@ -44,7 +44,7 @@
 						<div class="form-group">
 							<label for="username">Username: </label>
 							<div class="input-group">
-								<input class='form-control' type='text' name='user_name' id="username" tabindex='1' placeholder='Username' value='<?php if (isset($username)) { echo $username; } ?>'> 
+								<input class='form-control' type='text' name='user_name' id="username" tabindex='1' placeholder='Username' value='<?php if (isset($username)) { echo $username; } ?>' autocapitalize='off'> 
 								<span class="input-group-addon"><span class='glyphicon glyphicon-user'></span></span>
 							</div>
 						</div>

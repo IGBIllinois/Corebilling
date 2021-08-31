@@ -53,7 +53,7 @@
 						<span class="icon-bar"></span>
 					</button>
 					<div class="navbar-brand">
-						<?php echo PAGE_TITLE; ?>
+						<?php echo settings::get_title(); ?>
 					</div>
 <!--
 					<?php if ($login_user->isAdmin()) { ?>

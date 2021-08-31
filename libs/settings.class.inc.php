@@ -2,6 +2,8 @@
 
 class settings {
 
+	private const TITLE = "Core Billing";
+
 	public static function get_version() {
 		return VERSION;
 	}
@@ -10,6 +12,11 @@ class settings {
 		return CODEWEBSITE_URL;
 	}
 
-
+	public static function get_title() {
+		if (defined("TITLE") && (TITLE != "")) {
+			return TITLE; 
+		}
+		return self::TITLE;
+	}
 }
 ?>
