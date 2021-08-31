@@ -3,7 +3,7 @@ ob_start();
 @session_start();
 // setting up the web root and server root for
 require_once(__DIR__ . '/../../conf/app.inc.php');
-require_once(__DIR__ . '/../../conf/config.php');
+require_once(__DIR__ . '/../../conf/config.inc.php');
 require_once(__DIR__ . '/../../vendor/autoload.php');
 
 set_include_path(get_include_path().":../libs");
