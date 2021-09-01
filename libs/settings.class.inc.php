@@ -18,5 +18,11 @@ class settings {
 		}
 		return self::TITLE;
 	}
+
+	public static function get_log_dir() {
+		return self::LOG_DIR;
+
+	}
+
 }
 ?>

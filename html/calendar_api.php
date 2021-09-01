@@ -1,6 +1,7 @@
 <?php
 set_time_limit(20);
-include('includes/initializer.php');
+include('includes/main.inc.php');
+
 if (isset($_REQUEST['action']) && isset($_REQUEST['user_id']) && isset($_REQUEST['key'])) {
     //Load User information for user_id
     $user = new User ($db);

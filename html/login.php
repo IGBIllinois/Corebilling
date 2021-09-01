@@ -1,5 +1,5 @@
 <?php
-	require_once 'includes/initializer.php';
+	require_once 'includes/main.inc.php';
 
 	if(isset($_POST['login'])) {
 		$username = trim(rtrim($_POST['user_name']));
@@ -65,12 +65,4 @@
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class='col-sm-12' style='text-align: center; padding: 15px 0'>
-					<br><em><a href='https://www.vpaa.uillinois.edu/resources/web_privacy'>University of Illinois System Web Privacy Notice</a></em>
-					<br><em>&copy 2015-<?php echo date('Y'); ?> University of Illinois Board of Trustees</em>
-				</div>
-			</div>
-		</div>
-	</body>
-</html>
+<?php require_once 'includes/footer.inc.php'; ?>

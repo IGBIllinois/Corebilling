@@ -1,6 +1,6 @@
 <?php
 
-require_once 'includes/initializer.php';
+require_once 'includes/main.inc.php';
 
 if (isset($_POST['create_cal_report'])) {
     $user = new User ($db);

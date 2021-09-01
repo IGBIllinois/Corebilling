@@ -8,12 +8,20 @@
 	"require": {
 		"php": ">=7.2",
 		"twbs/bootstrap": "v3.4.1",
+		"components/jquery": "1.11.1",
+		"components/jqueryui": "1.11.1",
+		"select2/select2": "4.0.2",
 		"igbillinois/igbillinois-php": "dev-main"
 	},
 	"scripts": {
 		"post-update-cmd": [
 		"mkdir -p html/vendor/twbs",
-		"cp -R vendor/twbs/bootstrap html/vendor/twbs"
+		"mkdir -p html/vendor/select2",
+		"mkdir -p html/vendor/components",
+		"cp -R vendor/twbs/bootstrap html/vendor/twbs",
+		"cp -R vendor/select2/select2 html/vendor/select2",
+		"cp -R vendor/components/jquery html/vendor/components",
+		"cp -R vendor/components/jqueryui html/vendor/components"
 		]
 	}
 }

@@ -33,8 +33,9 @@ foreach ($articlesList as $id => $articleInfo) {
 		?>
 	</div>
 </div>
-	<?php
-	}
+
+<?php
+}
 	
 require_once 'includes/footer.inc.php';
 ?>
