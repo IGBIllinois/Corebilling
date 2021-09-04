@@ -1,4 +1,4 @@
-/log/*.txt
+/log/*.log
 /vendor
 /html/vendor
 composer.lock
