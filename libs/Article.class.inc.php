@@ -35,7 +35,7 @@ class Article
         $this->title = $title;
         $this->description = $description;
 
-        $queryAddArticle = "INSERT INTO articles (created,text,title,user_id)VALUES(NOW(),:description, :title, :user_id)";
+        $queryAddArticle = "INSERT INTO articles (text,title,user_id)VALUES(:description, :title, :user_id)";
 
         $addArticle = $this->db->prepare($queryAddArticle);
         $addArticle->execute(array(':description' => $description, ':title' => $title, ':user_id' => $userId));
@@ -64,7 +64,7 @@ class Article
      */
     public static function removeArticle($db, $articleId)
     {
-        $queryDeleteArticle = "DELETE FROM articles WHERE id=:article_id limit 1";
+        $queryDeleteArticle = "UPDATE articles SET enabled='0' WHERE id=:article_id limit 1";
         $deleteArticle = $db->prepare($queryDeleteArticle);
         $deleteArticle->execute(array('article_id' => $articleId));
     }
@@ -84,7 +84,7 @@ class Article
      */
     public static function getAllArticles($db)
     {
-        $queryArticleList = "SELECT * FROM articles ORDER BY created DESC";
+        $queryArticleList = "SELECT * FROM articles WHERE enabled='1' ORDER BY created DESC";
         $articleListArr = $db->query($queryArticleList);
 
         return $articleListArr;

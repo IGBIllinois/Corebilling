@@ -49,22 +49,23 @@ class Device
 		$this->deviceToken = md5(uniqid(mt_rand(), true));
 		// TODO this sql query is not running
 		$queryAddDevice = "INSERT INTO device (device_name,location,description,full_device_name,status_id,device_token) VALUES(:device_name,:location,:description,:full_device_name,:status_id,:device_token)";
-        $addDevicePrep = $this->db->prepare($queryAddDevice);
-        $addDevicePrep->execute(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken));
-	$this->log_file->send_log("Created Device - " . print_r(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken)));
-	$this->deviceId = $this->db->lastInsertId();
+        	$addDevicePrep = $this->db->prepare($queryAddDevice);
+	        $addDevicePrep->execute(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken));
+		$this->log_file->send_log("Created Device - " . $dn . " in location " . $location);
+		$this->deviceId = $this->db->lastInsertId();
 
-        //Add device rates rows to device rates table with default value of 0 for all values
-        $ratesArr = Rate::getAllRates($this->db);
-        foreach ($ratesArr as $id => $rateInfo) {
-            $queryAddRates = "INSERT INTO device_rate (rate,device_id,rate_id, min_use_time, rate_type_id)VALUES(0,:device_id,:rate_id,0,0)";
-            $addRatesPrep = $this->db->prepare($queryAddRates);
-            $addRatesPrep->execute(array(":device_id"=>$this->deviceId,":rate_id"=>$rateInfo["id"]));
-        }
+        	//Add device rates rows to device rates table with default value of 0 for all values
+	        $ratesArr = Rate::getAllRates($this->db);
+        	foreach ($ratesArr as $id => $rateInfo) {
+	            $queryAddRates = "INSERT INTO device_rate (rate,device_id,rate_id, min_use_time, rate_type_id)VALUES(0,:device_id,:rate_id,0,0)";
+        	    $addRatesPrep = $this->db->prepare($queryAddRates);
+	            $addRatesPrep->execute(array(":device_id"=>$this->deviceId,":rate_id"=>$rateInfo["id"]));
+        	}
         
-        $this->log_file->send_log("Created device '$dn'");
-	}
+		$this->log_file->send_log("Created device '$dn'");
+		return true;
 
+	}
     /** Load device from database into object given an authKey or id
      * @param $id
      * @param int $authKey

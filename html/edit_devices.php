@@ -9,7 +9,7 @@ if(!$login_user->isAdmin()){
 $device = new Device($db);
 $rate = new Rate($db);
 $rateTypes = Rate::getAllRateTypes($db);
-
+$message = "";
 if (isset($_POST['device_option'])) {
 	$device_option = $_POST['device_option'];
 	if ($device_option != 'new') {
@@ -43,7 +43,27 @@ if (isset($_POST['add_rate'])) {
 }
 
 if (isset($_POST['CreateNewDevice'])) {
-	$device->create($_POST['dnsName'], $_POST['deviceName'], $_POST['location'], $_POST['description'], $_POST['status']);
+	$error = false;
+	foreach ($_POST as $var) {
+		$var = trim(rtrim($var));
+	}
+	if ($_POST['deviceName'] == "") {
+		$error = true;
+		$message .= "<div class='alert alert-danger'>Please enter a device name</div>";
+	}
+	if ($_POST['dnsName'] == "") {
+		$error = true;
+		$message .= "<div class='alert alert-danger'>Please enter a device ID</div>";
+	}
+	if ($_POST['location'] == "") {
+		$error = true;
+		$message .= "<div class='alert alert-danger'>Please enter a device location</div>";
+	}
+	if (!$error) {
+		if ($device->create($_POST['dnsName'], $_POST['deviceName'], $_POST['location'], $_POST['description'], $_POST['status'])) {
+			$message .= "<div class='alert alert-success'>Device " . $_POST['deviceName'] . " succssfully created";
+		}
+	}
 
 }
 
@@ -227,4 +247,8 @@ if (isset($_POST['CreateNewDevice'])) {
 	</div>
 </form>
 <?php
+	if (isset($message)) {
+		echo $message;
+	}
+
 	require_once 'includes/footer.inc.php';

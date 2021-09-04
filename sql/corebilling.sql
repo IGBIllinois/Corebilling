@@ -6,10 +6,11 @@ CREATE TABLE `access_control` (
 
 CREATE TABLE `articles` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `created` date DEFAULT NULL,
+  `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `text` text NOT NULL,
   `title` text NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
+  `enabled` BOOLEAN DEFAULT 1,
   PRIMARY KEY (`id`)
 )\p;
 
@@ -23,16 +24,17 @@ CREATE TABLE `departments` (
 
 CREATE TABLE `device` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `device_name` varchar(255) DEFAULT NULL,
+  `device_name` varchar(255) NOT NULL,
   `location` varchar(255) NOT NULL DEFAULT '',
   `description` varchar(255) NOT NULL DEFAULT '',
-  `full_device_name` varchar(255) DEFAULT '',
+  `full_device_name` varchar(255) NOT NULL,
   `status_id` int(11) DEFAULT NULL,
   `loggeduser` int(10) NOT NULL DEFAULT 0,
   `lasttick` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `unauthorized` varchar(45) DEFAULT NULL,
   `device_token` varchar(32) DEFAULT NULL,
   `ldap_group` varchar(64) DEFAULT NULL,
+  `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )\p;
 

@@ -19,7 +19,7 @@ if (isset($_GET['edit'])) {
 
 if (isset($_GET['delete']) && $login_user->isAdmin()) {
 	Article::removeArticle($db,$_GET['delete']);
-	header('location: news.php');
+	header('location: index.php');
 	exit();
 }
 
@@ -33,7 +33,7 @@ if (isset($_POST['applyEdit']) && $login_user->isAdmin()) {
 	$article->setDescription($bodyText);
 	$article->setUserid($authenticate->getAuthenticatedUser()->getId());
 	$article->update();
-	header('location: news.php');
+	header('location: index.php');
 	exit();
 }
 
@@ -41,7 +41,7 @@ if (isset($_POST['createNew']) && $login_user->isAdmin()) {
 	$title = $_POST['title'];
 	$bodyText = $_POST['text'];
 	$article->create($authenticate->getAuthenticatedUser()->getId(), $title, $bodyText);
-	header('location: news.php');
+	header('location: index.php');
 	exit();
 }
 $articlesList = Article::getAllArticles($db);

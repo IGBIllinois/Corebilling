@@ -29,7 +29,7 @@ foreach ($articlesList as $id => $articleInfo) {
 			echo "<a href=\"edit_news.php?edit=" . $articleInfo['id'] . "\">Edit</a> | <a href=\"edit_news.php?delete=" . $articleInfo['id'] . "\">Delete</a> | ";
 		}
 		$user->load($articleInfo['user_id']);
-		echo "<small>".$user->getFirstName() . " " . $user->getLastName() . " | " . $user->getEmail() . " | " . $articleInfo['created'] . "</small>";
+		echo "<small>".$user->getFirstName() . " " . $user->getLastName() . " | " . $user->getEmail() . " | " . date("Y-m-d",strtotime($articleInfo['created'])) . "</small>";
 		?>
 	</div>
 </div>
