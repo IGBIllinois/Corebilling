@@ -34,6 +34,7 @@ CREATE TABLE `device` (
   `unauthorized` varchar(45) DEFAULT NULL,
   `device_token` varchar(32) DEFAULT NULL,
   `ldap_group` varchar(64) DEFAULT NULL,
+  `ipaddress` VARCHAR(15) DEFAULT '000.000.000.000',
   `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )\p;
@@ -45,6 +46,7 @@ CREATE TABLE `device_rate` (
   `rate_id` int(11) DEFAULT NULL,
   `min_use_time` int(11) NOT NULL,
   `rate_type_id` int(11) NOT NULL,
+  `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )\p;
 
@@ -54,6 +56,7 @@ CREATE TABLE `groups` (
   `description` text NOT NULL,
   `department_id` int(10) unsigned DEFAULT NULL,
   `netid` varchar(255) DEFAULT NULL,
+  `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )\p;
 
@@ -118,7 +121,7 @@ CREATE TABLE `user_cfop` (
   `description` text NOT NULL,
   `active` int(11) NOT NULL,
   `default_cfop` int(11) DEFAULT NULL,
-  `created` datetime NOT NULL,
+  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `created` (`created`)
 )\p;

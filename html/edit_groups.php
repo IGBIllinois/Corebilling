@@ -74,7 +74,7 @@ if (isset($_POST['Select'])) {
 				<div class="form-group">
 					<label class="col-sm-3 control-label">Group Name</label>
 					<div class="col-sm-9">
-						<input name="group_name" type="text" value="<?php echo $group->getName(); ?>" class="form-control">
+						<input name="group_name" type="text" value="<?php echo $group->getName(); ?>" class="form-control" placeholer='New Group'>
 					</div>
 				</div>
 				<div class="form-group">

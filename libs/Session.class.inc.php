@@ -44,7 +44,7 @@ class Session
      * @param $deviceId
      * @param $userId
      */
-    public static function trackSession($db, $deviceId, $userId) {
+    public static function trackSession($db, $deviceId, $userId,$ipaddress) {
         if ( $userId > 0 ) {
             $queryOpenSession = "select id from session where user_id=:user_id and device_id=:device_id and (TIMESTAMPDIFF(minute,stop,NOW()) < 15) order by id desc";
 
@@ -82,9 +82,9 @@ class Session
                 $sessionId = $db->lastInsertId();
             }
 
-            $queryUpdateDeviceUser = "update device set loggeduser=:loggeduser, lasttick=NOW() where id=:id";
+            $queryUpdateDeviceUser = "update device set loggeduser=:loggeduser, lasttick=NOW(), ipaddress=:ipaddress where id=:id";
             $updateDeviceUser = $db->prepare($queryUpdateDeviceUser);
-            $updateDeviceUser->execute(array(':loggeduser' => $userId, ':id' => $deviceId));
+            $updateDeviceUser->execute(array(':loggeduser' => $userId, ':id' => $deviceId, ':ipaddress' => $ipaddress));
 
         } else {
             $queryUpdateDeviceNonUser = "update device set loggeduser=0, lasttick=NOW() where id=:id";

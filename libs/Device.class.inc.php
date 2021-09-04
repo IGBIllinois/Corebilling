@@ -14,6 +14,7 @@ class Device
 	private $unauthorizedUser;
     private $loggedUser;
     private $ldap_group;
+	private $ipaddress;
     private $log_file = null;
 
 	public function __construct(PDO $db)
@@ -62,7 +63,6 @@ class Device
 	            $addRatesPrep->execute(array(":device_id"=>$this->deviceId,":rate_id"=>$rateInfo["id"]));
         	}
         
-		$this->log_file->send_log("Created device '$dn'");
 		return true;
 
 	}
@@ -87,6 +87,7 @@ class Device
             $this->unauthorizedUser = $deviceInfoArr["unauthorized"];
             $this->deviceId = $deviceInfoArr['id'];
             $this->ldap_group = $deviceInfoArr['ldap_group'];
+	    $this->ipaddress = $deviceInfoArr['ipaddress'];
         }
 	}
 
@@ -160,7 +161,7 @@ class Device
 
     public static function getAllDevicesStatus($db)
     {
-        $queryDevicesUse = "SELECT d.full_device_name, d.location, u.user_name, d.loggeduser,u.first, u.last, TIMESTAMPDIFF(SECOND, lasttick, NOW()) AS lastseen , unauthorized FROM users u RIGHT JOIN device d ON u.id=d.loggeduser WHERE d.status_id=1 OR d.status_id=2 order by d.full_device_name";
+        $queryDevicesUse = "SELECT d.full_device_name, d.ipaddress, d.location, u.user_name, d.loggeduser,u.first, u.last, TIMESTAMPDIFF(SECOND, lasttick, NOW()) AS lastseen , unauthorized FROM users u RIGHT JOIN device d ON u.id=d.loggeduser WHERE d.status_id=1 OR d.status_id=2 order by d.full_device_name";
         $devicesUse = $db->prepare($queryDevicesUse);
         $devicesUse->execute();
         $devicesUseArr = $devicesUse->fetchAll(PDO::FETCH_ASSOC);
@@ -227,6 +228,9 @@ class Device
 		return $this->shortName;
 	}
 
+	public function getIPAddress() {
+		return $this->ipaddress;
+	}
 	public function getLDAPGroup(){
 		return $this->ldap_group;
 	}

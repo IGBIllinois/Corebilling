@@ -14,7 +14,6 @@ class Group
 		$this->db = $db;
 		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 
-        $this->groupName="New Group";
 	}
 	
 	public function __destruct()

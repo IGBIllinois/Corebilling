@@ -5,6 +5,8 @@ require_once 'includes/header.inc.php';
 <table class="table table-striped table-bordered">
 	<tr class="title">
 		<th>Device Name</th>
+		<th>IP Address</th>
+		<th>Hostname</th>
 		<th>User Name</th>	
 		<th>Location</th>
 		<th>Status</th>
@@ -29,7 +31,18 @@ require_once 'includes/header.inc.php';
 		} else {
 			$loggedUser = $deviceUseInfo['first']." ".$deviceUseInfo['last']." (".$deviceUseInfo['user_name'].")";
 		}
-		echo "<tr><td align=\"center\">".$deviceUseInfo['full_device_name']."</td><td align=\"center\">".$loggedUser."</td><td align=\"center\">".$deviceUseInfo['location']."</td><td align=\"center\">".$lastSeen."</td></tr>";
+		$ipaddress = "";
+		$hostname = "";
+		if ($deviceUseInfo['ipaddress'] != "000.000.000.000") {
+			$ipaddress = $deviceUseInfo['ipaddress'];
+			$hostname = gethostbyaddr($ipaddress);
+		}
+		echo "<tr><td align=\"center\">".$deviceUseInfo['full_device_name']."</td>";
+		echo "<td align=\"center\"> " . $ipaddress . "</td>";
+		echo "<td align=\"center\"> " . $hostname . "</td>";
+		echo "<td align=\"center\">".$loggedUser."</td>";
+		echo "<td align=\"center\">".$deviceUseInfo['location']."</td>";
+		echo "<td align=\"center\">".$lastSeen."</td></tr>";
 	}
 	?>
 </table>

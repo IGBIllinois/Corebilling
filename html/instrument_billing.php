@@ -106,7 +106,7 @@ if ($sessionIdSelected > 0) {
 ?>
 <h4>Facility Billing</h4>
 
-<form name="verifyForm" method="post" action="facility_billing.php" class="form-inline">
+<form name="verifyForm" method="post" action="instrument_billing.php" class="form-inline">
 	<div class="well">
 		<div class="form-group">
 			<label>Start: </label>
@@ -236,7 +236,7 @@ if ($sessionIdSelected > 0) {
 			$monthlyUsage[$rowId]['min_use_time'] = round(($monthSession['min_use_time'] / 60), 2);
 
 			//Show Edit under Options
-			$monthlyUsage[$rowId]['options'] = "<a id=" . $monthSession['id'] . " href=\"facility_billing.php?session_id=" . $monthSession['id'] . "&rowid=" . $rowId . "\">Edit</a>";
+			$monthlyUsage[$rowId]['options'] = "<a id=" . $monthSession['id'] . " href=\"instrument_billing.php?session_id=" . $monthSession['id'] . "&rowid=" . $rowId . "\">Edit</a>";
 
 			//Total String
 			$monthlyUsage[$rowId]['total'] = "$" . number_format($bills->CalcTotal($monthSession['elapsed'], $rateTypeSelected, $rate, $monthSession['min_use_time']), 2);

@@ -37,7 +37,7 @@ class UserCfop {
         $this->cfop = $cfop;
         $this->description = $description;
 
-        $insertUserCfopl = "INSERT INTO user_cfop (user_id,cfop,description,active,default_cfop,created)VALUES(:user_id,:cfop,:description,:active,:default_cfop,NOW())";
+        $insertUserCfopl = "INSERT INTO user_cfop (user_id,cfop,description,active,default_cfop)VALUES(:user_id,:cfop,:description,:active,:default_cfop)";
         $userCfoplInfo = $this->db->prepare($insertUserCfopl);
         $userCfoplInfo->execute(array(':user_id'=>$this->userId,':cfop'=>$this->cfop,':description'=>$this->description,':active'=>$this->active,':default_cfop'=>UserCfop::DEFAULT_CFOP));
         $this->userCfopId =$this->db->lastInsertId();
