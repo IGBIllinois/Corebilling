@@ -31,7 +31,6 @@
 		<script type="text/javascript" src="includes/select2/js/select2.full.js"></script>
 		<script type='text/javascript' src='js/datatables.min.js'></script>
 		<script type="text/javascript" src="js/jquery.timepicker.js"></script>
-		<script src='js/jquery/fnDisplayRow.js' type="text/javascript"></script>
 		<script src='js/full_calendar/moment.min.js' type="text/javascript"></script>
 		<script src='js/full_calendar/fullcalendar.min.js' type="text/javascript"></script>
 		<script type='text/javascript' src='vendor/twbs/bootstrap/dist/js/bootstrap.min.js'></script>
@@ -55,13 +54,6 @@
 					<div class="navbar-brand">
 						<?php echo settings::get_title(); ?>
 					</div>
-<!--
-					<?php if ($login_user->isAdmin()) { ?>
-					<p class="navbar-text">
-						Last activity: <?php echo strftime("%m/%d/%Y %H:%M:%S",$authenticate->lastActivity); ?>, session method: <?php echo $authenticate->sessMethod; ?>
-					</p>
-					<?php } ?>
--->
 				</div>
 				<div class="collapse navbar-collapse" id="archive-accounting-nav-collapse">
 					<a type="button" class="btn btn-danger btn-sm navbar-btn navbar-right hidden-xs" style="margin-right:0" href="logout.php">Logout</a>
