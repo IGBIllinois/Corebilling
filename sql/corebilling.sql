@@ -34,7 +34,7 @@ CREATE TABLE `device` (
   `unauthorized` varchar(45) DEFAULT NULL,
   `device_token` varchar(32) DEFAULT NULL,
   `ldap_group` varchar(64) DEFAULT NULL,
-  `ipaddress` VARCHAR(15) DEFAULT '000.000.000.000',
+  `ipaddress` VARCHAR(15) DEFAULT "",
   `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 )\p;

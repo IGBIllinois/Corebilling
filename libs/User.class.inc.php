@@ -103,7 +103,7 @@ class User
 		catch (PDOException $e) {
 			echo "Database Error: " . $e->getMessage();
 		}
-            $this->log_file->send_log("Added user '$username'");
+            $this->log_file->send_log("Added user " . $username);
         }
     }
 
@@ -193,7 +193,7 @@ class User
     }
 
     public function giveAccessTo($deviceId) {
-        $query = "insert into access_control (user_id, device_id) values (:userid,:deviceid)";
+        $query = "insert into access_control (user_id, device_id) values (:userid,:deviceid) LIMIT 1";
         $stmt = $this->db->prepare($query);
         if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
             $this->log_file->send_log("Gave user '" . $this->getUsername() . "' access to device $deviceId");
@@ -337,6 +337,13 @@ class User
         return $userRoles->fetchAll(PDO::FETCH_ASSOC);
     }
 
+	public static function getUserRoleById($db,$id) {
+		$sql = "SELECT * FROM user_roles WHERE id=:id LIMIT 1";
+		$query = $db->prepare($sql);
+		$query->execute(array(':id'=>$id));
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+
+	}
     /**
      * @param PDO $db
      * @return mixed
@@ -472,7 +479,7 @@ class User
 				$group = new Group($this->db);
 				$group->load($id);
                 $addStmt->execute([':user' => $this->getId(), ':group' => $id]);
-                $this->log_file->send_log("Added user '" . $this->getUsername() . "' to group '" . $group->getName() . "'");
+                $this->log_file->send_log("Added user " . $this->getUsername() . " to group " . $group->getName());
                 if(LDAPMAN_API_ENABLED){
                 	if($group->getNetid() != null) {
                 	    $gid = LDAPMAN_PI_PREFIX . $group->getNetid();
@@ -490,7 +497,7 @@ class User
                 $group = new Group($this->db);
                 $group->load($oldId);
                 $deleteStmt->execute([':user' => $this->getId(), ':group' => $oldId]);
-                $this->log_file->send_log("Removed user '" . $this->getUsername() . "' from group '" . $oldId . "'");
+                $this->log_file->send_log("Removed user " . $this->getUsername() . " from group " . $group->getName());
 				if(LDAPMAN_API_ENABLED){
 					if($group->getNetid() != null) {
 						$ldapman->removeGroupMember(LDAPMAN_PI_PREFIX . $group->getNetid(), $this->getUsername());
@@ -526,11 +533,12 @@ class User
         return $this->userRoleId;
     }
 
-    public function setRoleId($usertypeid) {
-        if ( $this->userRoleId != $usertypeid ) {
-            $this->userRoleId = $usertypeid;
-            $this->log_file->send_log("Set role of user '" . $this->username . "' to '$usertypeid'");
-        }
+	 public function setRoleId($usertypeid) {
+		if ( $this->userRoleId != $usertypeid ) {
+			$this->userRoleId = $usertypeid;
+			$role = self::getUserRoleById($this->db,$usertypeid);
+			$this->log_file->send_log("Set role of user " . $this->username . " to " . $role[0]['role_name']);
+		}
     }
 
     public function getDateAdded() {

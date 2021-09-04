@@ -2,7 +2,7 @@
 require_once 'includes/header.inc.php';
 ?>
 <h3>Devices In Use</h3>
-<table class="table table-striped table-bordered">
+<table class="table table-striped table-bordered table-condensed">
 	<tr class="title">
 		<th>Device Name</th>
 		<th>IP Address</th>
@@ -33,7 +33,7 @@ require_once 'includes/header.inc.php';
 		}
 		$ipaddress = "";
 		$hostname = "";
-		if ($deviceUseInfo['ipaddress'] != "000.000.000.000") {
+		if ($deviceUseInfo['ipaddress'] != "") {
 			$ipaddress = $deviceUseInfo['ipaddress'];
 			$hostname = gethostbyaddr($ipaddress);
 		}

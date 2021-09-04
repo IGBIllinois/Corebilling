@@ -19,8 +19,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel='stylesheet' types='text/css' href='vendor/twbs/bootstrap/dist/css/bootstrap.min.css'>
-		
-		<script src='js/jquery/jquery-1.11.1.min.js'></script>
+		<script type='text/javascript' src='vendor/components/jquery/jquery.min.js'></script>	
 		<script type='text/javascript' src='vendor/twbs/bootstrap/dist/js/bootstrap.min.js'></script>
 			
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
