@@ -50,5 +50,4 @@ $ADMIN_EMAIL = array();
 $USER_EXCEPTIONS_ARRAY = array();
 
 @define('ENABLE_LOG',false);
-@define('__LOG_FILE__','');
 @define('PASSWORD_RESET_URL','');
