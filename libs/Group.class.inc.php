@@ -8,10 +8,12 @@ class Group
     private $description;
     private $departmentId;
     private $netid;
-
+	private $log_file = null;
 	public function __construct(PDO $db)
 	{
 		$this->db = $db;
+		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
+
         $this->groupName="New Group";
 	}
 	
@@ -35,7 +37,7 @@ class Group
         $this->description = $description;
         $this->departmentId = $departmentId;
         $this->groupId = $groupId;
-        log::log_message("Added group '$groupName'");
+        $this->log_file->send_log("Added group '$groupName'");
 	}
 
     /**Load a group into object from database given a group ID
@@ -126,7 +128,7 @@ class Group
     {
 	    if($this->departmentId != $departmentId){
 	        $this->departmentId = $departmentId;
-	        log::log_message("Set department id for group '".$this->groupName."' to $departmentId");
+	        $this->log_file->send_log("Set department id for group '".$this->groupName."' to $departmentId");
 	    }
     }
 
@@ -145,7 +147,7 @@ class Group
     {
 	    if($this->description != $description){
 	        $this->description = $description;
-	        log::log_message("Set description for group '".$this->groupName."' to '$description'");
+	        $this->log_file->send_log("Set description for group '".$this->groupName."' to '$description'");
 	    }
     }
 
@@ -174,7 +176,7 @@ class Group
         global $coreserverman;
         if($this->netid != $netid) {
             $this->netid = $netid;
-            log::log_message("Set owner netid for group '".$this->groupName."' to '$netid'");
+            $this->log_file->send_log("Set owner netid for group '".$this->groupName."' to '$netid'");
             if(LDAPMAN_API_ENABLED){
                 if($netid != null){
                     $gid = LDAPMAN_PI_PREFIX . $netid;
@@ -201,7 +203,7 @@ class Group
     {
 	    if($this->groupId != $groupId){
 	        $this->groupId = $groupId;
-	        log::log_message("Set id for group '".$this->groupName."' to $groupId");
+	        $this->log_file->send_log("Set id for group '".$this->groupName."' to $groupId");
 	    }
     }
 
@@ -219,7 +221,7 @@ class Group
     public function setName($groupName)
     {
 	    if($this->groupName != $groupName){
-	    	log::log_message("Set name for group '".$this->groupName."' to $groupName");
+	    	$this->log_file->send_log("Set name for group '".$this->groupName."' to $groupName");
 	        $this->groupName = $groupName;
 	    }
     }

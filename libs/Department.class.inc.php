@@ -6,11 +6,12 @@ class Department {
     private $departmentName;
     private $departmentId;
     private $description;
-
+    private $log_file = null;
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
+	$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
     }
 
     public function __destruct()
@@ -31,7 +32,7 @@ class Department {
         $this->departmentName = $departmentName;
         $this->description = $description;
         $this->departmentId = $departmentId;
-		log::log_message("Added department '$departmentName'");
+		$this->log_file->send_log("Added department '$departmentName'");
     }
 
     /**
@@ -111,7 +112,7 @@ class Department {
     {
 	    if($this->description != $description){
 	        $this->description = $description;
-	        log::log_message("Set description of department '".$this->departmentName."' to '$description'");
+	        $this->log_file->send_log("Set description of department '".$this->departmentName."' to '$description'");
 	    }
     }
 
@@ -130,7 +131,7 @@ class Department {
     {
 	    if($this->departmentId != $departmentId){
 	        $this->departmentId = $departmentId;
-	        log::log_message("Set id of department '".$this->departmentName."' to $departmentId");
+	        $this->log_file->send_log("Set id of department '".$this->departmentName."' to $departmentId");
 	    }
     }
 
@@ -148,7 +149,7 @@ class Department {
     public function setDepartmentName($departmentName)
     {
 	    if($this->departmentName != $departmentName){
-		    log::log_message("Set name of department '".$this->departmentName."' to '$departmentName'");
+		    $this->log_file->send_log("Set name of department '".$this->departmentName."' to '$departmentName'");
 			$this->departmentName = $departmentName;
 		}
     }

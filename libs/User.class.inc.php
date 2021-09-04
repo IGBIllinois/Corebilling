@@ -24,6 +24,8 @@ class User
 
     private $demographics = null;
 
+	private $log_file = null;
+
     public function __construct(PDO $db) {
         $this->db = $db;
         $this->userId = 0;
@@ -40,6 +42,7 @@ class User
         $this->userCfop = new UserCfop($this->db);
         $this->certified = 0;
         $this->userRoleId = 3;
+	$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
     }
 
     public function __destruct() {
@@ -100,7 +103,7 @@ class User
 		catch (PDOException $e) {
 			echo "Database Error: " . $e->getMessage();
 		}
-            log::log_message("Added user '$username'");
+            $this->log_file->send_log("Added user '$username'");
         }
     }
 
@@ -193,7 +196,7 @@ class User
         $query = "insert into access_control (user_id, device_id) values (:userid,:deviceid)";
         $stmt = $this->db->prepare($query);
         if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
-            log::log_message("Gave user '" . $this->getUsername() . "' access to device $deviceId");
+            $this->log_file->send_log("Gave user '" . $this->getUsername() . "' access to device $deviceId");
         }
     }
 
@@ -201,7 +204,7 @@ class User
         $query = "delete from access_control where user_id=:userid and device_id=:deviceid limit 1";
         $stmt = $this->db->prepare($query);
         if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
-            log::log_message("Removed access to device $deviceId for user '" . $this->getUsername() . "'");
+            $this->log_file->send_log("Removed access to device $deviceId for user '" . $this->getUsername() . "'");
         }
     }
 
@@ -392,7 +395,7 @@ class User
 
     public function setUsername($username) {
         if ( $this->username != $username ) {
-            log::log_message("Set username of user '" . $this->username . "' to '$username'");
+            $this->log_file->send_log("Set username of user '" . $this->username . "' to '$username'");
             $this->username = $username;
         }
     }
@@ -404,7 +407,7 @@ class User
     public function setFirstName($first) {
         if ( $this->first != $first ) {
             $this->first = $first;
-            log::log_message("Set first name of user '" . $this->username . "' to '$first'");
+            $this->log_file->send_log("Set first name of user '" . $this->username . "' to '$first'");
         }
     }
 
@@ -415,7 +418,7 @@ class User
     public function setLastName($last) {
         if ( $this->last != $last ) {
             $this->last = $last;
-            log::log_message("Set last name of user '" . $this->username . "' to '$last'");
+            $this->log_file->send_log("Set last name of user '" . $this->username . "' to '$last'");
         }
     }
 
@@ -426,7 +429,7 @@ class User
     public function setEmail($email) {
         if ( $this->email != $email ) {
             $this->email = $email;
-            log::log_message("Set email of user '" . $this->username . "' to '$email'");
+            $this->log_file->send_log("Set email of user '" . $this->username . "' to '$email'");
         }
     }
 
@@ -437,7 +440,7 @@ class User
     public function setDepartmentId($departmentId) {
         if ( $this->departmentId != $departmentId ) {
             $this->departmentId = $departmentId;
-            log::log_message("Set department of user '" . $this->username . "' to '$departmentId'");
+            $this->log_file->send_log("Set department of user '" . $this->username . "' to '$departmentId'");
         }
     }
 
@@ -469,7 +472,7 @@ class User
 				$group = new Group($this->db);
 				$group->load($id);
                 $addStmt->execute([':user' => $this->getId(), ':group' => $id]);
-                log::log_message("Added user '" . $this->getUsername() . "' to group '" . $group->getName() . "'");
+                $this->log_file->send_log("Added user '" . $this->getUsername() . "' to group '" . $group->getName() . "'");
                 if(LDAPMAN_API_ENABLED){
                 	if($group->getNetid() != null) {
                 	    $gid = LDAPMAN_PI_PREFIX . $group->getNetid();
@@ -487,7 +490,7 @@ class User
                 $group = new Group($this->db);
                 $group->load($oldId);
                 $deleteStmt->execute([':user' => $this->getId(), ':group' => $oldId]);
-                log::log_message("Removed user '" . $this->getUsername() . "' from group '" . $oldId . "'");
+                $this->log_file->send_log("Removed user '" . $this->getUsername() . "' from group '" . $oldId . "'");
 				if(LDAPMAN_API_ENABLED){
 					if($group->getNetid() != null) {
 						$ldapman->removeGroupMember(LDAPMAN_PI_PREFIX . $group->getNetid(), $this->getUsername());
@@ -504,7 +507,7 @@ class User
     public function setRateId($rateId) {
         if ( $this->rateid != $rateId ) {
             $this->rateid = $rateId;
-            log::log_message("Set rate of user '" . $this->username . "' to '$rateId'");
+            $this->log_file->send_log("Set rate of user '" . $this->username . "' to '$rateId'");
         }
     }
 
@@ -515,7 +518,7 @@ class User
     public function setStatusId($statusid) {
         if ( $this->statusid != $statusid ) {
             $this->statusid = $statusid;
-            log::log_message("Set status of user '" . $this->username . "' to '$statusid'");
+            $this->log_file->send_log("Set status of user '" . $this->username . "' to '$statusid'");
         }
     }
 
@@ -526,7 +529,7 @@ class User
     public function setRoleId($usertypeid) {
         if ( $this->userRoleId != $usertypeid ) {
             $this->userRoleId = $usertypeid;
-            log::log_message("Set role of user '" . $this->username . "' to '$usertypeid'");
+            $this->log_file->send_log("Set role of user '" . $this->username . "' to '$usertypeid'");
         }
     }
 
@@ -554,9 +557,9 @@ class User
         if ( $this->certified != $certified ) {
             $this->certified = $certified;
             if ( $certified ) {
-                log::log_message("Certified user '" . $this->username . "'");
+                $this->log_file->send_log("Certified user '" . $this->username . "'");
             } else {
-                log::log_message("Un-certified user '" . $this->username . "'");
+                $this->log_file->send_log("Un-certified user '" . $this->username . "'");
             }
         }
     }

@@ -6,11 +6,13 @@
 		
 		var $code;
 		var $msg;
-		
+		private $log_file = null;
+	
 		function __construct($apiUrl,$username="",$password=""){
 			$this->apiUrl = $apiUrl;
 			$this->username = $username;
 			$this->password = $password;
+			$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 		}
 		
 		private function queryPOST($data){
@@ -78,11 +80,11 @@
             );
             $result = self::queryPOST($data);
             if($result->code == 200){
-                log::log_message("Added ldap group '$gid'");
+                $this->log_file->send_log("Added ldap group '$gid'");
                 return true;
             } else {
                 var_dump($result);
-                log::log_message("Failed trying to add ldap group '$gid'");
+                $this->log_file->send_log("Failed trying to add ldap group '$gid'");
                 return false;
             }
         }
@@ -125,10 +127,10 @@
 			);
 			$result = self::queryPOST($data);
 			if($result->code == 200){
-				log::log_message("Added user '$uid' to ldap group '$gid'");
+				$this->log_file->send_log("Added user '$uid' to ldap group '$gid'");
 				return true;
 			} else {
-				log::log_message("Failed trying to add user '$uid' to ldap group '$gid' with error ".$result->code.": '".$result->msg."'");
+				$this->log_file->send_log("Failed trying to add user '$uid' to ldap group '$gid' with error ".$result->code.": '".$result->msg."'");
 				return false;
 			}
 		}
@@ -143,10 +145,10 @@
 			);
 			$result = self::queryPOST($data);
 			if($result->code == 200){
-				log::log_message("Removed user '$uid' from ldap group '$gid'");
+				$this->log_file->send_log("Removed user '$uid' from ldap group '$gid'");
 				return true;
 			} else {
-				log::log_message("Failed trying to remove user '$uid' from ldap group '$gid' with error ".$result->code.": '".$result->msg."'");
+				$this->log_file->send_log("Failed trying to remove user '$uid' from ldap group '$gid' with error ".$result->code.": '".$result->msg."'");
 				return false;
 			}
 		}

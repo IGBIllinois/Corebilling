@@ -1,7 +1,6 @@
 <?php
 
 //Check if the proper get inputs are set
-// error_log("session attempt",0);
 if (isset($_POST['username']) && $_POST['username']!="" && isset($_POST['key'])) {
     require_once('includes/main.inc.php');
     $deviceInfo = new Device($db);

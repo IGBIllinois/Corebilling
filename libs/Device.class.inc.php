@@ -14,6 +14,7 @@ class Device
 	private $unauthorizedUser;
     private $loggedUser;
     private $ldap_group;
+    private $log_file = null;
 
 	public function __construct(PDO $db)
 	{
@@ -24,6 +25,7 @@ class Device
 		$this->description= "";
 		$this->deviceId = 0;
 		$this->status = 1;
+		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 	}
 	
 	public function __destruct()
@@ -49,9 +51,8 @@ class Device
 		$queryAddDevice = "INSERT INTO device (device_name,location,description,full_device_name,status_id,device_token) VALUES(:device_name,:location,:description,:full_device_name,:status_id,:device_token)";
         $addDevicePrep = $this->db->prepare($queryAddDevice);
         $addDevicePrep->execute(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken));
-        error_log(print_r(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken), true));
-        error_log(print_r($addDevicePrep->errorInfo(), true));
-		$this->deviceId = $this->db->lastInsertId();
+	$this->log_file->send_log("Created Device - " . print_r(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken)));
+	$this->deviceId = $this->db->lastInsertId();
 
         //Add device rates rows to device rates table with default value of 0 for all values
         $ratesArr = Rate::getAllRates($this->db);
@@ -61,7 +62,7 @@ class Device
             $addRatesPrep->execute(array(":device_id"=>$this->deviceId,":rate_id"=>$rateInfo["id"]));
         }
         
-        log::log_message("Created device '$dn'");
+        $this->log_file->send_log("Created device '$dn'");
 	}
 
     /** Load device from database into object given an authKey or id
@@ -204,7 +205,7 @@ class Device
     public function setDeviceId($id){
 	    if($this->deviceId != $id){
 		    $this->deviceId = $id;
-			log::log_message("Set id of device '".$this->shortName."' to $id");
+			$this->log_file->send_log("Set id of device '".$this->shortName."' to $id");
 		}
     }
     public function getId()
@@ -215,7 +216,7 @@ class Device
 	public function setShortName($dn)
 	{
 		if($this->shortName != $dn){
-			log::log_message("Set short name of device '".$this->shortName."' to '$dn'");
+			$this->log_file->send_log("Set short name of device '".$this->shortName."' to '$dn'");
 			$this->shortName = $dn;
 		}
 	}
@@ -231,7 +232,7 @@ class Device
 	public function setLDAPGroup($ldap_group){
 		if($this->ldap_group != $ldap_group){
 			$this->ldap_group = $ldap_group;
-			log::log_message("Set LDAP group of device '".$this->shortName."' to $ldap_group");
+			$this->log_file->send_log("Set LDAP group of device '".$this->shortName."' to $ldap_group");
 		}
 	}
 
@@ -239,7 +240,7 @@ class Device
 	{
 		if($this->full_name != $name){
 			$this->full_name = $name;
-			log::log_message("Set full name of device '".$this->shortName."' to '$name'");
+			$this->log_file->send_log("Set full name of device '".$this->shortName."' to '$name'");
 		}
 	}
 	
@@ -252,7 +253,7 @@ class Device
 	{
 		if($this->location != $location){
 			$this->location = $location;
-			log::log_message("Set location of device '".$this->shortName."' to $location");
+			$this->log_file->send_log("Set location of device '".$this->shortName."' to $location");
 		}
 	}
 
@@ -270,7 +271,7 @@ class Device
 	{
 		if($this->status != $status){
 			$this->status = $status;
-			log::log_message("Set status of device '".$this->shortName."' to $status");
+			$this->log_file->send_log("Set status of device '".$this->shortName."' to $status");
 		}
 	}
 
@@ -278,7 +279,7 @@ class Device
 	{
 		if($this->description != $description){
 			$this->description = $description;
-			log::log_message("Set description of device '".$this->shortName."' to '$description'");
+			$this->log_file->send_log("Set description of device '".$this->shortName."' to '$description'");
 		}
 	}
 

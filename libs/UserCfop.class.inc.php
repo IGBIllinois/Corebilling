@@ -10,6 +10,7 @@ class UserCfop {
     private $default;
     private $createdDate;
     private $db;
+    private $log_file = null;
 
     public function __construct(PDO $db)
     {
@@ -17,6 +18,7 @@ class UserCfop {
             $this->userCfopId = 0;
             $this->default = 1;
             $this->active = 1;
+            $this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
     }
 
     public function __destruct()
@@ -41,7 +43,7 @@ class UserCfop {
         $this->userCfopId =$this->db->lastInsertId();
         $this->load($this->userCfopId);
         $this->setAsDefaultCFOP();
-        log::log_message("Added CFOP '$cfop' for user $userId");
+        $this->log_file->send_log("Added CFOP '$cfop' for user $userId");
     }
 
     /**Load User CFOP from cfop id
@@ -66,7 +68,7 @@ class UserCfop {
     public function setAsDefaultCFOP()
     {
 	    if(!$this->default){
-		    log::log_message("Set default CFOP for user ".$this->userId." to '".$this->cfop."'");
+		    $this->log_file->send_log("Set default CFOP for user ".$this->userId." to '".$this->cfop."'");
 	    }
         //mark all other user cfopls as not default
         $queryRemoveDefault = "UPDATE user_cfop SET default_cfop=".UserCfop::NON_DEFAULT_CFOP." WHERE user_id=:user_id";

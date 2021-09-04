@@ -52,14 +52,19 @@ class Session
             $openSession->execute(array(':device_id' => $deviceId, ':user_id' => $userId));
             $openSessionArr = $openSession->fetch(PDO::FETCH_ASSOC);
 
+		$device = new Device($db);
+                $device->load($deviceId);
+                $user = new User($db);
+                $user->load($userId);
+		$device_log = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_device_log());
 
             if ( $openSessionArr ) {
-// 				error_log("Open session detected updating".$userId,0);
                 $queryUpdateSession = "update session set stop=NOW(), elapsed=TIMESTAMPDIFF(minute,start,NOW()) where id =:id";
                 $updateSession = $db->prepare($queryUpdateSession);
                 $updateSession->execute(array(':id' => $openSessionArr['id']));
             } else {
-                error_log("Opening session for user " . $userId . " on device " . $deviceId, 0);
+			
+		$device_log->send_log("Device: " . $device->getFullName() . " - Opening session for user " . $user->getUsername());
                 $userCfop = new UserCfop($db);
                 $defaultCfopId = $userCfop->loadDefaultCfop($userId);
                 $queryStartSession = "insert into session (user_id,device_id,start,stop,rate,rate_type_id,min_use_time,cfop_id,rate_id)
@@ -71,7 +76,6 @@ class Session
 				                          where device_id=:device_id
 				                          and rate_id=(select rate_id from users
 				                          where id=:user_id limit 1)";
-                error_log($userId . " " . $deviceId . " " . $defaultCfopId, 0);
                 $startSession = $db->prepare($queryStartSession);
                 $startSession->execute(
                     array(':user_id' => $userId, ':device_id' => $deviceId, ':default_cfop_id' => $defaultCfopId));

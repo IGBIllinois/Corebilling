@@ -8,7 +8,7 @@ if(!$login_user->isAdmin()){
 }
 ?>
 
-<h1>About</h1>
+<h2>About</h2>
 <div class='row'>
 <div class='col-md-8 col-lg-8 col-xl-8'>
 <table class='table table-bordered table-sm'>

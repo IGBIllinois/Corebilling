@@ -75,7 +75,7 @@
 				<?php if ($authenticate->isVerified()) { ?>
 	                        <div class="col-2 col-md-2">
 					<ul class="nav nav-pills nav-stacked">
-                                        	<li><a href="news.php">News</a></li>
+                                        	<li><a href="index.php">News</a></li>
 	                                        <li><a href="user_billing.php">User Bill</a></li>
         	                                <li><a href="calendar_fullcalendar.php">Calendar</a>
                 	                        <li><a href="in_use.php">Device Status</a></li>
@@ -92,6 +92,7 @@
 	                                        <li><a href="active_users.php">Active Users</a></li>
         	                                <li><a href="reservation_use.php">Reservation Usage Data</a></li>
                 	                        <li><a href="usage_compare.php">Reservation-Usage Comparison</a></li>
+						<li><a href='logs.php'>View Logs</a></li>
                         	                <li><a href='about.php'>About</a></li>
 						<?php } ?>
                                  	</ul>

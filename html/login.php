@@ -61,7 +61,10 @@
 						echo $message;
 					} ?>
 					<div style="text-align: center;">
-						<a href="http://illinoisauth.igb.illinois.edu/password">Forgot password?</a>
+						<?php if (settings::get_password_reset_url()) {
+							echo "<a href=" . settings::get_password_reset_url() . ">Forgot password?</a>";
+						}
+						?>
 					</div>
 				</div>
 			</div>

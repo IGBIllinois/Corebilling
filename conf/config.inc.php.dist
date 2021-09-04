@@ -23,7 +23,6 @@
 
 //Page Settings
 @define ('TITLE', '');
-@define ('DEFAULT_PAGE',"Latest News");
 
 // Authentication timeout
 @define ('LOGIN_TIMEOUT', 8*60*60);
@@ -50,5 +49,6 @@ $ADMIN_EMAIL = array();
 //Session Tracker users to ignore
 $USER_EXCEPTIONS_ARRAY = array();
 
-@define('__ENABLE_LOG__',true);
+@define('ENABLE_LOG',false);
 @define('__LOG_FILE__','');
+@define('PASSWORD_RESET_URL','');
