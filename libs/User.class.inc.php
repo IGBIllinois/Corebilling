@@ -2,28 +2,27 @@
 
 class User
 {
-    private $db;
+	private $db;
 
-    const ACTIVE = 5, HIDDEN = 6, DISABLED = 7;
-    const STATUS_TYPE_USER = 2;
+	const ACTIVE = 5, HIDDEN = 6, DISABLED = 7;
+	const STATUS_TYPE_USER = 2;
 
-    private $userId;
-    private $username;
-    private $first;
-    private $last;
-    private $email;
-    private $departmentId;
-    private $groupIds;
-    private $rateid;
-    private $statusid;
-    private $userRoleId;
-    private $dateAdded;
-    private $secureKey;
-    private $userCfop;
-    private $certified;
-
-    private $demographics = null;
-
+	private $userId;
+	private $username;
+	private $first;
+	private $last;
+	private $email;
+	private $departmentId;
+	private $groupIds;
+	private $rateid;
+	private $statusid;
+	private $userRoleId;
+	private $dateAdded;
+	private $secureKey;
+	private $userCfop;
+	private $certified;
+	private $time_created;
+	private $demographics = null;
 	private $log_file = null;
 
     public function __construct(PDO $db) {
@@ -82,8 +81,8 @@ class User
         $this->dateAdded = date('Y-m-d H:i:s');
         $this->certified = $certified;
         if ( User::exists($this->db, $this->username) == 0 ) {
-		$queryAddUser = "insert into users (user_name, first,last,email,department_id,rate_id,status_id,date_added,secure_key,user_role_id,certified)
-								   values(:user_name,:first,:last,:email,:department_id,:rate_id,:status_id,NOW(), MD5(RAND()),:user_role_id,:certified)";
+		$queryAddUser = "insert into users (user_name, first,last,email,department_id,rate_id,status_id,secure_key,user_role_id,certified)
+								   values(:user_name,:first,:last,:email,:department_id,:rate_id,:status_id,MD5(RAND()),:user_role_id,:certified)";
 		try {
             $addUserPrepare = $this->db->prepare($queryAddUser);
             $result = $addUserPrepare->execute(
@@ -111,7 +110,7 @@ class User
      * @param $id
      */
     public function load($id) {
-        $queryUserInfo = "select * from users where id=:user_id";
+        $queryUserInfo = "select * from users where id=:user_id LIMIT 1";
         $userInfo = $this->db->prepare($queryUserInfo);
         $userInfo->execute(array(":user_id" => $id));
         $userInfoArr = $userInfo->fetch(PDO::FETCH_ASSOC);
@@ -124,7 +123,7 @@ class User
         $this->rateid = $userInfoArr["rate_id"];
         $this->statusid = $userInfoArr["status_id"];
         $this->userRoleId = $userInfoArr["user_role_id"];
-        $this->dateAdded = $userInfoArr["date_added"];
+        $this->dateAdded = $userInfoArr["time_created"];
         $this->secureKey = $userInfoArr['secure_key'];
         $this->certified = $userInfoArr['certified'];
     }

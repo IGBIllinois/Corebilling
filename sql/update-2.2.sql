@@ -1,3 +1,5 @@
+ALTER TABLE users CHANGE date_added time_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER certified;
+
 CREATE TABLE data_cost(
 	data_cost_id INT NOT NULL AUTO_INCREMENT,
 	data_cost_type VARCHAR(255),
