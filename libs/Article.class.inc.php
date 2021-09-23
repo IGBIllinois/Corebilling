@@ -82,12 +82,16 @@ class Article
     /** Get a list of all articles
      * @return PDOStatement
      */
-    public static function getAllArticles($db)
+    public static function getAllArticles($db,$age = 0)
     {
-        $queryArticleList = "SELECT * FROM articles WHERE enabled='1' ORDER BY created DESC";
-        $articleListArr = $db->query($queryArticleList);
-
-        return $articleListArr;
+        $sql = "SELECT * FROM articles WHERE enabled='1' ";
+	if ($age) {
+		$sql .= "AND created >=DATE_SUB(NOW(),INTERVAL :age DAY) ";
+	}
+	$sql .= "ORDER BY created DESC";
+        $query = $db->prepare($sql);
+	$result = $query->execute(array(':age'=>$age));
+        return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**

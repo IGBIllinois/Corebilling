@@ -2,8 +2,7 @@
 require_once 'includes/header.inc.php';
 
 $user = new User($db);
-
-$articlesList = Article::getAllArticles($db);
+$articlesList = Article::getAllArticles($db,settings::get_news_age());
 ?>
 
 <div>
@@ -14,8 +13,7 @@ $articlesList = Article::getAllArticles($db);
 </div>
 
 <?php
-
-foreach ($articlesList as $id => $articleInfo) { 
+foreach ($articlesList as $articleInfo) { 
 	$formattedText = str_replace("\n", "<br/>", $articleInfo['text']);
 ?>
 <div class="panel panel-default">

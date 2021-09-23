@@ -12,7 +12,8 @@ function my_autoloader($class_name) {
 }
 spl_autoload_register('my_autoloader');
 
-require_once '../conf/settings.inc.php';
+require_once '../conf/app.inc.php';
+require_once '../conf/config.inc.php';
 require_once '../vendor/autoload.php';
 
 //Command parameters
@@ -64,8 +65,13 @@ else {
 			$month = $options['month'];
 		}
 	}
-	$db = new db(__MYSQL_HOST__,__MYSQL_DATABASE__,__MYSQL_USER__,__MYSQL_PASSWORD__);
 
+	try {
+		$db = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASSWORD);
+	} catch (PDOException $e) {
+	die("Error initializing PDO: " . $e->getMessage());
+	}
+	$log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 	$directories = data_functions::get_all_directories($db);
         foreach ($directories as $directory) {
                         $data_dir = new data_dir($db,$directory['data_dir_id']);
@@ -77,7 +83,7 @@ else {
 			}
 			$average = round($sum / $count);
 			$result = $data_dir->add_data_bill($month,$year,$average);
-			functions::log($result['MESSAGE']);
+			$log_file->send_log($result['MESSAGE']);
         }
 	
 	

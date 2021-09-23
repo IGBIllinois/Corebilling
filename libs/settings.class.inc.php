@@ -4,6 +4,7 @@ class settings {
 
 	private const TITLE = "Core Billing";
 	private const ENABLE_LOG = false;
+	private const NEWS_AGE = 120;
 	public static function get_version() {
 		return VERSION;
 	}
@@ -43,6 +44,14 @@ class settings {
 			return PASSWORD_RESET_URL;
 		}
 		return false;
+	}
+
+	public static function get_news_age() {
+		if (defined("NEWS_AGE") && (is_int(NEWS_AGE))) {
+                        return NEWS_AGE;
+                }
+                return self::NEWS_AGE;
+
 	}
 }
 ?>

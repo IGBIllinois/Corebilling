@@ -8,7 +8,6 @@ CREATE TABLE data_cost(
 );
 CREATE TABLE data_dir (
         data_dir_id INT NOT NULL AUTO_INCREMENT,
-        data_dir_project_id INT REFERENCES projects(project_id),
         data_dir_path VARCHAR(255),
         data_dir_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         data_dir_enabled BOOLEAN DEFAULT TRUE,
@@ -17,7 +16,6 @@ CREATE TABLE data_dir (
 );
 CREATE TABLE data_usage (
 	data_usage_id INT NOT NULL AUTO_INCREMENT,
-	data_usage_project_id INT REFERENCES projects(project_id),
 	data_usage_data_dir_id INT REFERENCES data_dir(data_dir_id),
 	data_usage_cfop_id INT REFERENCES cfops(cfop_id),
 	data_usage_bytes BIGINT UNSIGNED,
@@ -29,7 +27,6 @@ CREATE TABLE data_bill (
         data_bill_id INT NOT NULL AUTO_INCREMENT,
         data_bill_data_dir_id INT REFERENCES data_dir(data_dir_id),
         data_bill_data_cost_id INT REFERENCES data_cost(data_cost_id),
-        data_bill_project_id INT REFERENCES projects(project_id),
         data_bill_cfop_id INT REFERENCES cfops(cfop_id),
         data_bill_date TIMESTAMP,
         data_bill_avg_bytes BIGINT(20) DEFAULT 0,
