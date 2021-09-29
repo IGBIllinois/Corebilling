@@ -96,6 +96,10 @@ if (isset($_POST['selectedUser'])) {
 				<th>E-Mail:</th>
 				<td><?php echo $userToBill->getEmail();?></td>
 			</tr>
+			<tr>
+				<th>CFOP:</th>
+				<td><?php echo $userToBill->getDefaultCFOP();?></td>
+			</tr>
 		</table>
 	</div>
 </div>
