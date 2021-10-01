@@ -58,17 +58,6 @@ class data_functions {
 		return $result[0]['count'];
 	}
 
-	public static function get_data_costs($db) {
-		$sql = "SELECT data_cost.data_cost_id as id, ";
-		$sql .= "data_cost.data_cost_type as type, ";
-		$sql .= "ROUND(data_cost_value,2) as cost, ";
-		$sql .= "data_cost_time as time ";
-		$sql .= "FROM data_cost ";
-		$sql .= "WHERE data_cost_enabled='1' ";
-		$sql .= "ORDER BY type ";
-		return $db->query($sql);	
-	}
-
 	public static function get_current_data_cost_by_type($db,$type) {
 		 $sql = "SELECT data_cost.data_cost_id as id, ";
                 $sql .= "data_cost.data_cost_type as type, ";
