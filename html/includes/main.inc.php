@@ -29,7 +29,7 @@ if(LDAPMAN_API_ENABLED){
 } else {
 	$ldapman = new LdapManager(LDAPMAN_API_URL);
 }
-if(CORESERVER_ENABLED){
+if(settings::get_coreserver_enabled()){
 	$coreserverman = new CoreServerManager();
 }
 

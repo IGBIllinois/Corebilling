@@ -23,20 +23,24 @@ $url_navigation = html::get_url_navigation($_SERVER['PHP_SELF'],$start_date,$end
 
 $data_bill = data_functions::get_data_bill($db,$month,$year);
 $data_html = "";
-foreach ($data_bill as $value) {
-	if ($value['Billed Cost'] > 0) {
-		$data_html .= "<tr>";
-		$data_html .= "<td>" . $value['Directory'] . "</td>";
-		$data_html .= "<td>" . $value['Project'] . "</td>";
-		$data_html .= "<td>" . $value['Terabytes'] . "</td>";
-		$data_html .= "<td>$" . $value['Total Cost'] . "</td>";
-		$data_html .= "<td>$" . $value['Billed Cost'] . "</td>";
-		$data_html .= "<td>" . $value['CFOP'] . "</td>";
-		$data_html .= "<td>" . $value['Activity Code'] . "</td>";
-		$data_html .= "</tr>";
+if (count($data_bill)) {
+	foreach ($data_bill as $value) {
+		if ($value['Billed Cost'] > 0) {
+			$data_html .= "<tr>";
+			$data_html .= "<td>" . $value['Directory'] . "</td>";
+			$data_html .= "<td>" . $value['Project'] . "</td>";
+			$data_html .= "<td>" . $value['Terabytes'] . "</td>";
+			$data_html .= "<td>$" . $value['Total Cost'] . "</td>";
+			$data_html .= "<td>$" . $value['Billed Cost'] . "</td>";
+			$data_html .= "<td>" . $value['CFOP'] . "</td>";
+			$data_html .= "<td>" . $value['Activity Code'] . "</td>";
+			$data_html .= "</tr>";
+		}
 	}
 }
-
+else {
+	$data_html = "<tr><td colspan='7'>No Billing</td></tr>";
+}
 ?>
 <h3>Data Billing Monthly Report - <?php echo $month_name . " " . $year; ?></h3>
 <ul class='pager'>
@@ -88,8 +92,6 @@ foreach ($data_bill as $value) {
                 <option value='csv'>CSV</option>
         </select> <input class='btn btn-primary' type='submit'
                 name='create_data_report' value='Download Full Report'>
-	<input class='btn btn-primary' type='submit'
-		name='create_data_boa_report' value='Download BOA Report'>
 </form>
 
 <?php

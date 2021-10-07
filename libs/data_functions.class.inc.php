@@ -82,18 +82,23 @@ class data_functions {
 	        $sql .= "data_cost.data_cost_type as 'Data Type', ";
         	$sql .= "ROUND(data_bill.data_bill_total_cost,2) as 'Total Cost', ";
 	        $sql .= "ROUND(data_bill.data_bill_billed_cost,2) as 'Billed Cost', ";
-        	$sql .= "projects.project_name as 'Project', ";
-	        $sql .= "cfops.cfop_value as 'CFOP', cfops.cfop_activity as 'Activity Code' ";
+        	$sql .= "groups.group_name as 'Group', ";
+	        $sql .= "user_cfop.cfop as 'CFOP' ";
         	$sql .= "FROM data_bill ";
-	        $sql .= "LEFT JOIN cfops ON cfops.cfop_id=data_bill.data_bill_cfop_id ";
-        	$sql .= "LEFT JOIN projects ON projects.project_id=data_bill.data_bill_project_id ";
+	        $sql .= "LEFT JOIN user_cfop ON user_cfop.id=data_bill.data_bill_cfop_id ";
+        	$sql .= "LEFT JOIN groups ON groups.id=data_bill.data_bill_group_id ";
 	        $sql .= "LEFT JOIN data_dir ON data_dir.data_dir_id=data_bill.data_bill_data_dir_id ";
         	$sql .= "LEFT JOIN data_cost ON data_cost_id=data_bill_data_cost_id ";
-	        $sql .= "WHERE YEAR(data_bill.data_bill_date)='" . $year . "' ";
-        	$sql .= "AND MONTH(data_bill.data_bill_date)='" . $month . "' ";
-	        $sql .= "AND ROUND(data_bill.data_bill_total_cost,2)>'" . $minimum_bill . "' ";
+	        $sql .= "WHERE YEAR(data_bill.data_bill_date)=':year' ";
+        	$sql .= "AND MONTH(data_bill.data_bill_date)=':month' ";
+	        $sql .= "AND ROUND(data_bill.data_bill_total_cost,2)>':minimum_bill' ";
 		$sql .= "ORDER BY Directory ASC";
-        	return $db->query($sql);
+		$query = $db->prepare($sql);
+		$query->execute(array(':year'=>$year,
+				':month'=>$month,
+				':minimum_bill'=>$minimum_bill)
+			);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
         public static function get_data_boa_bill($db,$month,$year,$minimal_bill = 0.00) {

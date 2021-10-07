@@ -5,6 +5,8 @@ class settings {
 	private const TITLE = "Core Billing";
 	private const ENABLE_LOG = false;
 	private const NEWS_AGE = 120;
+	private const CORESERVER_ENABLED = false;
+
 	public static function get_version() {
 		return VERSION;
 	}
@@ -51,6 +53,14 @@ class settings {
                         return NEWS_AGE;
                 }
                 return self::NEWS_AGE;
+
+	}
+
+	public static function get_coreserver_enabled() {
+		if (defined("CORESERVER_ENABLED") && (is_bool(CORESERVER_ENABLED))) {
+			return CORESERVER_ENABLED;
+		}
+		return self::CORESERVER_ENABLED;
 
 	}
 }

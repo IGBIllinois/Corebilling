@@ -2,6 +2,7 @@
 
 require_once 'includes/main.inc.php';
 
+
 if (isset($_POST['create_cal_report'])) {
     $user = new User ($db);
     $user->load($_REQUEST['user_id']);
@@ -30,13 +31,21 @@ if (isset($_POST['create_cal_report'])) {
         );
         $filename = "calendar-" . $month . "-" . $year . "." . $type;
     }
-
-    switch ($type) {
-        case 'csv':
-            \IGBIllinois\report::create_csv_report($events, $filename);
-            break;
-        case 'xlsx':
-            \IGBIllinois\report::create_excel_2007_report($events, $filename);
-            break;
-    }
 }
+
+elseif (isset($_POST['create_data_report'])) {
+	$month = $_POST['month'];
+        $year = $_POST['year'];
+        $type = $_POST['report_type'];
+        $data = data_functions::get_data_bill($db,$month,$year);
+	$filename = "data-" . $month . "-" . $year . "." . $type;
+}
+
+switch ($type) {
+	case 'csv':
+		\IGBIllinois\report::create_csv_report($events, $filename);
+		break;
+	case 'xlsx':
+		\IGBIllinois\report::create_excel_2007_report($events, $filename);
+		break;
+	}
