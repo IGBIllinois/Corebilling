@@ -14,7 +14,6 @@ CREATE TABLE data_dir (
         data_dir_path VARCHAR(255),
         data_dir_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         data_dir_enabled BOOLEAN DEFAULT TRUE,
-        data_dir_default BOOLEAN DEFAULT FALSE,
         PRIMARY KEY (data_dir_id)
 );
 CREATE TABLE data_usage (

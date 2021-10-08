@@ -104,7 +104,7 @@ if ($sessionIdSelected > 0) {
 }
 
 ?>
-<h4>Facility Billing</h4>
+<h3>Instrument Billing</h3>
 
 <form name="verifyForm" method="post" action="instrument_billing.php" class="form-inline">
 	<div class="well">

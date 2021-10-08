@@ -5,27 +5,30 @@ class data_functions {
         const convert_terabytes = 1099511627776;
         const convert_gigabytes = 1073741824;
 
-	public static function get_directories($db,$default = 1,$start,$count) {
+	public static function get_directories($db,$start,$count) {
 		$sql = "SELECT data_dir.*, projects.project_name, projects.project_id ";
 		$sql .= "FROM data_dir ";
 		$sql .= "LEFT JOIN projects ON projects.project_id=data_dir.data_dir_project_id ";
 		$sql .= "WHERE data_dir_enabled='1' ";
-		$sql .= "AND data_dir_default='" . $default . "' ";
-	
 		$sql .= "ORDER BY data_dir.data_dir_path ASC ";
+		$parameters = array();
 		if ($count != 0) {
-			$sql .= "LIMIT " . $start . "," . $count;
+			$sql .= "LIMIT :start,:count";
+			$parameters[":start"] = $start;
+			$parameters[":count"] = $count;
 		}
-		$result = $db->query($sql);
+		$query = $db->prepare($sql);
+                $query->execute($parameters);
+                $result = $query->fetchAll(PDO::FETCH_ASSOC);
 	
-		for ($i=0;$i<count($result);$i++) {
+		/*for ($i=0;$i<count($result);$i++) {
 			if (is_dir($result[$i]['data_dir_path'])) {
 				$result[$i]['dir_exists'] = true;
 			}
 			else { 
 				$result[$i]['dir_exists'] = false;
 			}
-		}
+		}*/
 		return $result;
 	}
 
@@ -50,11 +53,12 @@ class data_functions {
 
 
 	}
-	public static function get_num_directories($db,$default = 1) {
+	public static function get_num_directories($db) {
 		$sql = "SELECT count(1) as count FROM data_dir ";
 		$sql .= "WHERE data_dir_enabled='1' ";
-		$sql .= "AND data_dir_default='" . $default . "'";
-		$result = $db->query($sql);
+		$query = $db->prepare($sql);
+                $query->execute();
+                $result = $query->fetchAll(PDO::FETCH_ASSOC);
 		return $result[0]['count'];
 	}
 

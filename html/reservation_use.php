@@ -23,7 +23,7 @@ if (isset($_POST['endMonthSelected'])) {
 }
 
 ?>
-<h4>Reservation Usage</h4>
+<h3>Reservation Usage</h3>
 
 <form name="verifyForm" method="post" action="reservation_use.php" class="form-inline">
 	<div class="well">
