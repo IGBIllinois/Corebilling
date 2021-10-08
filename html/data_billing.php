@@ -87,7 +87,7 @@ else {
 <form class='form-inline' action='report.php' method='post'>
         <input type='hidden' name='month' value='<?php echo $month; ?>'> <input
                 type='hidden' name='year' value='<?php echo $year; ?>'> <select
-                name='report_type' class='input-medium'>
+                name='report_type' class='form-control'>
                 <option value='xlsx'>Excel 2007</option>
                 <option value='csv'>CSV</option>
         </select> <input class='btn btn-primary' type='submit'
