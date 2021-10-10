@@ -4,31 +4,24 @@ class data_cost {
 	
 	////////////////Private Variables//////////
 	private $db; //database object
-	private $id;
-	private $type;
+	private $id = 0;
 	private $cost;
 	private $time_created;
-	private $enabled;
+	private $enabled = 0;
 
 	const bytes_to_terabytes = 1099511627776;	
 
 	////////////////Public Functions///////////
 	
-	public function __construct($db,$id = 0) {
+	public function __construct($db) {
 		$this->db = $db;
-		
-		if ($id != 0) {
-			$this->get_data_cost($id);
-		}
+		$this->get_data_cost();
 	}
 	public function __destruct() {
 	}
 	
 	public function get_data_cost_id() {
 		return $this->id;
-	}
-	public function get_type() {
-		return $this->type;
 	}
 	public function get_cost() {
 		return $this->cost;
@@ -43,56 +36,49 @@ class data_cost {
 		return $this->enabled;
 	}
 
-	public function update_cost($cost) {
-		$insert_array = array('data_cost_type'=>$this->get_type(),
-				'data_cost_value'=>$cost);
-		$result = $this->db->build_insert("data_cost",$insert_array);
-		if ($result) {
-			$this->disable();
-			$message = "<div class='alert alert-success'>Cost successfully updated.</div>";
-			return array('RESULT'=>true,'ID'=>$result,'MESSAGE'=>$message);
-			
-		}
-	}
-	public function enable() {
-		$sql = "UPDATE data_cost SET data_cost_enabled='1' ";
-		$sql .= "WHERE data_cost_id='" . $this->get_data_cost_id() . "' LIMIT 1";
-		$result = $this->db->non_select_query($sql);
-		if ($result) {
-			$this->enabled = 1;
-		}
-		return $result;
-	}
-	public function disable() {
-		$sql = "UPDATE data_cost SET data_cost_enabled='0' ";
-		$sql .= "WHERE data_cost_id='" . $this->get_data_cost_id() . "' LIMIT 1";
-		$result = $this->db->non_select_query($sql);
-		if ($result) {
-			$this->enabled = 0;
-		}
-		return $result;
-	
-	}
 
 	public function calculate_cost($bytes) {
 		$terabytes = $this->convert_terabytes($bytes);
 		return $terabytes * $this->get_cost();
 
-	}	
+	}
+
+	public function update_cost($cost) {
+                if (!is_numeric($cost)) {
+                        return false;
+                }
+		elseif ($this->get_cost() == $cost) {
+			return false;
+		}
+                if ($this->disable()) {
+                        $parameters = array(':data_cost_value'=>$cost);
+                        $sql = "INSERT INTO data_cost(data_cost_value) VALUES(:data_cost_value)";
+                        $query = $this->db->prepare($sql);
+                        $query->execute($parameters);
+                        $id = $this->db->lastInsertId();
+                        if ($id) {
+                                return $id;
+
+                        }
+                }
+                return false;
+        }
+	
 	/////////////////Private Functions///////////
 	
-	private function get_data_cost($data_cost_id) {
+	private function get_data_cost() {
 		$sql = "SELECT * FROM data_cost ";
-		$sql .= "WHERE data_cost_id='" . $data_cost_id . "' LIMIT 1";
-		$result = $this->db->query($sql);
+		$sql .= "WHERE data_cost_enabled='1' LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute();
+		$result = $query->fetch(PDO::FETCH_ASSOC);
 		if ($result) {
-			$this->id = $result[0]['data_cost_id'];
-			$this->type = $result[0]['data_cost_type'];
-			$this->cost = $result[0]['data_cost_value'];
-			$this->time_created = $result[0]['data_cost_time'];
-			$this->enabled = $result[0]['data_cost_enabled'];
-			
+			$this->id = $result['data_cost_id'];
+			$this->cost = $result['data_cost_value'];
+			$this->time_created = $result['data_cost_time_created'];
+			$this->enabled = $result['data_cost_enabled'];
 		}
+
 		
 	}
 	
@@ -100,17 +86,24 @@ class data_cost {
 		return $bytes / self::bytes_to_terabytes;
 	}
 
+	private function disable() {
+                $sql = "UPDATE data_cost SET data_cost_enabled='0'";
+                $query = $this->db->prepare($sql);
+                return $query->execute();
+
+        }
+
+	////////////////Public Static Functions////////////////
 	public static function get_data_costs($db) {
                 $sql = "SELECT data_cost.data_cost_id as id, ";
-                $sql .= "data_cost.data_cost_type as type, ";
                 $sql .= "ROUND(data_cost_value,2) as cost, ";
-                $sql .= "data_cost_time as time ";
+                $sql .= "data_cost_time_created as time_created ";
                 $sql .= "FROM data_cost ";
-                $sql .= "WHERE data_cost_enabled='1' ";
-                $sql .= "ORDER BY type ";
+                $sql .= "ORDER BY data_cost_time_created DESC ";
 		$query = $db->prepare($sql);
                 $query->execute();
 		return $query->fetchAll(PDO::FETCH_ASSOC);
         }
+
 
 }
