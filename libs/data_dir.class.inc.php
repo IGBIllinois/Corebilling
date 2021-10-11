@@ -175,27 +175,25 @@ class data_dir {
 	
 	public function add_usage($bytes,$files=0) {
 
-                $project = new project($this->db,$this->get_project_id());
+		$group = new group($this->db);
+		$group->load($this->get_group_id());
 
                 $data_cost = new data_cost($this->db);
-                if ($project->get_bill_project()) {
-                }
-                else {
-                }
-                $insert_array = array('data_usage_data_dir_id'=>$this->get_data_dir_id(),
-                                'data_usage_project_id'=>$project->get_project_id(),
-                                'data_usage_cfop_id'=>$project->get_cfop_id(),
-                                'data_usage_bytes'=>$bytes,
-                                'data_usage_files'=>$files
+		$sql = "INSERT INTO data_usage(data_usage_data_dir_id,data_usage_bytes,data_usage_files) ";
+		$sql .= "VALUES(:data_usage_data_dir_id,:data_usage_bytes,:data_usage_files) ";
+                $parameters = array(':data_usage_data_dir_id'=>$this->get_data_dir_id(),
+                                ':data_usage_group_id'=>$this->get_group_id(),
+                                ':data_usage_bytes'=>$bytes,
+                                ':data_usage_files'=>$files
                                 );
-                $insert_id = $this->db->build_insert('data_usage',$insert_array);
+		$query = $this->db->prepare($sql);
+		$query->execute($parameters);
+		$insert_id = $this->db->lastInsertId();
 		if ($insert_id) {
-			return array('RESULT'=>true,'INSERT_ID'=>$insert_id);
+			return $insert_id
 
 		}
-		else {
-			return array('RESULT'=>false);
-		}
+		return false;
 
 	}	
 
