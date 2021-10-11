@@ -16,6 +16,8 @@ require_once '../conf/app.inc.php';
 require_once '../conf/config.inc.php';
 require_once '../vendor/autoload.php';
 
+date_default_timezone_set(settings::get_timezone());
+
 //Command parameters
 $output_command = "data.php Inserts data usage into database\n";
 $output_command .= "Defaults to previous month\n";
