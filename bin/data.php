@@ -53,10 +53,9 @@ else {
 	$start_time = microtime(true);
 	$log_file->send_log("Data Usage: Start");	
 	$directories = data_functions::get_all_directories($db);
-	print_r($directories);
-	/*foreach ($directories as $directory) {
+	foreach ($directories as $directory) {
 			$data_dir = new data_dir($db,$directory['data_dir_id']);
-			$size = $data_dir->get_dir_size();
+			$size = \IGBIllinois\data_usage::get_dir_size($data_dir->get_directory());
 			if (!isset($options['dry-run'])) {
 				$result = $data_dir->add_usage($size);
 			}
@@ -78,7 +77,7 @@ else {
 	}
 	$end_time = microtime(true);
 	$elapsed_time = round($end_time - $start_time,2);
-	$log_file->send_log("Data Usage: Finished. Elapsed Time: " . $elapsed_time . " seconds");*/
+	$log_file->send_log("Data Usage: Finished. Elapsed Time: " . $elapsed_time . " seconds");
 
 }
 
