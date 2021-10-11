@@ -173,24 +173,23 @@ class data_dir {
 
 	}
 	
-	public function add_usage($bytes,$files=0) {
+	public function add_usage($bytes) {
 
-		$group = new group($this->db);
+		$group = new Group($this->db);
 		$group->load($this->get_group_id());
 
                 $data_cost = new data_cost($this->db);
-		$sql = "INSERT INTO data_usage(data_usage_data_dir_id,data_usage_bytes,data_usage_files) ";
+		$sql = "INSERT INTO data_usage(data_usage_data_dir_id,data_usage_bytes) ";
 		$sql .= "VALUES(:data_usage_data_dir_id,:data_usage_bytes,:data_usage_files) ";
                 $parameters = array(':data_usage_data_dir_id'=>$this->get_data_dir_id(),
                                 ':data_usage_group_id'=>$this->get_group_id(),
-                                ':data_usage_bytes'=>$bytes,
-                                ':data_usage_files'=>$files
+                                ':data_usage_bytes'=>$bytes
                                 );
 		$query = $this->db->prepare($sql);
 		$query->execute($parameters);
 		$insert_id = $this->db->lastInsertId();
 		if ($insert_id) {
-			return $insert_id
+			return $insert_id;
 
 		}
 		return false;

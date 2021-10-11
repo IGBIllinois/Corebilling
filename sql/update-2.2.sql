@@ -20,7 +20,6 @@ CREATE TABLE data_usage (
 	data_usage_id INT NOT NULL AUTO_INCREMENT,
 	data_usage_data_dir_id INT REFERENCES data_dir(data_dir_id),
 	data_usage_bytes BIGINT UNSIGNED,
-	data_usage_files BIGINT UNSIGNED,
 	data_usage_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (data_usage_id)
 );
