@@ -59,6 +59,7 @@ else {
 			$data_dir = new data_dir($db,$directory['data_dir_id']);
 			$data_usage = new \IGBIllinois\data_usage($data_dir->get_directory());
 			$size = $data_usage->get_dir_size();
+			$data_dir->update_dir_exists($data_usage->directory_exists());
 			if (!isset($options['dry-run'])) {
 				$result = $data_dir->add_usage($size);
 			}
