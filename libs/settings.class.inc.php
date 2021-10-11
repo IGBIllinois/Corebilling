@@ -6,6 +6,7 @@ class settings {
 	private const ENABLE_LOG = false;
 	private const NEWS_AGE = 120;
 	private const CORESERVER_ENABLED = false;
+	private const TIMEZONE = "UTC";
 
 	public static function get_version() {
 		return VERSION;
@@ -61,6 +62,14 @@ class settings {
 			return CORESERVER_ENABLED;
 		}
 		return self::CORESERVER_ENABLED;
+
+	}
+
+	public static function get_timezone() {
+		if (defined("TIMEZONE") && (TIMEZONE != '')) {
+			return TIMEZONE;
+		}
+		return self::TIMEZONE;
 
 	}
 }

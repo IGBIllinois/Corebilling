@@ -22,6 +22,8 @@ try {
 }
 
 
+date_default_timezone_set(settings::get_timezone());
+
 //Sets up ldap connection
 $authen = new LdapAuth ( LDAP_HOST, LDAP_PEOPLE_DN, LDAP_GROUP_DN,LDAP_PORT);
 if(LDAPMAN_API_ENABLED){

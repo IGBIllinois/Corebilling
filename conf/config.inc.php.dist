@@ -6,6 +6,8 @@ define ('LDAP_PEOPLE_DN', '');
 define ('LDAP_GROUP_DN', ''); // Leave blank for no group check
 define ('LDAP_PORT','389');
 
+define("TIMEZONE","");
+
 define('LDAPMAN_API_ENABLED',false);
 define('LDAPMAN_API_URL','');
 define('LDAPMAN_API_USERNAME','');
