@@ -255,4 +255,31 @@ class data_dir {
 		return array('RESULT'=>$result,'MESSAGE'=>$message,'id'=>$insert_id);
 	}
 
+	public function update_dir_exists($exists) {
+		if (!is_bool($exists)) { 
+			return false;
+		}
+		if ($this->get_dir_exists() == $exists) {
+			return true;
+		}
+		else {
+			$sql = "UPDATE data_dir SET data_dir_exists=:exists WHERE data_dir_id=:data_dir_id LIMIT 1";
+			$parameters = array(':exists'=>$exists,
+					':data_dir_id'=>$this->get_data_dir_id()
+			);
+			$query = $this->db->prepare($sql);
+			$query->execute();
+			if ($this->db->rowCount() ) {
+				return true;
+			}
+
+		}
+
+
+
+		}
+
+
+	}
+
 }
