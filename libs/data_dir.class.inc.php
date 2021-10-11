@@ -265,7 +265,7 @@ class data_dir {
 			);
 			$query = $this->db->prepare($sql);
 			$query->execute();
-			if ($this->db->rowCount() ) {
+			if ($query->rowCount() ) {
 				return true;
 			}
 
