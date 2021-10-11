@@ -5,23 +5,20 @@ class data_dir {
 
 	private $db;
 	private $id;
-	private $project_id;
+	private $group_id;
 	private $directory;
 	private $time_created;
 	private $enabled;
-	private $default;
+	private $exists;
 
 	const precentile = 0.95;
-	const gpfs_replication = 2;
-	const gpfs_mmpolicy_du = "/usr/local/bin/mmpolicy-du.pl";
 	const kilobytes_to_bytes = "1024";
 
 	public function __construct($db,$data_dir_id = 0) {
 		$this->db = $db;
 
 		if ($data_dir_id != 0) {
-			$this->id = $data_dir_id;
-			$this->get_data_dir();
+			$this->get_data_dir($data_dir_id);
 		}
 
 	}
@@ -63,15 +60,22 @@ class data_dir {
 		return $this->directory;
 	}
 
-	public function get_project_id() {
-		return $this->project_id;
+	public function get_group_id() {
+		return $this->group_id;
 	}
-	
+
+	public function get_group() {
+		return $this->group;
+	}	
 	public function get_enabled() {
 		return $this->enabled;
 	}
 	public function get_time_created() {
 		return $this->time_created;
+	}
+
+	public function get_dir_exists() {
+		return $this->exists;
 	}
 	public function enable() {
                 $sql = "UPDATE data_dir SET data_dir_enabled='1' ";
@@ -105,17 +109,22 @@ class data_dir {
 
 	}
 	
-	private function get_data_dir() {
-		$sql = "SELECT * FROM data_dir ";
-		$sql .= "WHERE data_dir_id='" . $this->id . "' ";
+	private function get_data_dir($data_dir_id) {
+		$sql = "SELECT data_dir.*, groups.group_name, groups.netid as owner FROM data_dir ";
+		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
+		$sql .= "WHERE data_dir_id=:data_dir_id ";
 		$sql .= "LIMIT 1";
-		$result = $this->db->query($sql);
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':data_dir_id'=>$data_dir_id));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
 		if ($result) {
-			$this->directory = $result[0]['data_dir_path'];
-			$this->time_created = $result[0]['data_dir_time'];
-			$this->project_id = $result[0]['data_dir_project_id'];
-			$this->enabled = $result[0]['data_dir_enabled'];
-			$this->default = $result[0]['data_dir_default'];
+			$this->id = $result['data_dir_id'];
+			$this->directory = $result['data_dir_path'];
+			$this->time_created = $result['data_dir_time'];
+			$this->group_id = $result['data_dir_group_id'];
+			$this->group = $result['group_name'];
+			$this->enabled = $result['data_dir_enabled'];
+			$this->exists = $result['data_dir_exists'];
 			return true;
 		}
 		return false;
@@ -131,100 +140,7 @@ class data_dir {
 
 	}
 
-	public function is_default() {
-		return $this->default;
-	}
-	public function directory_exists() {
-		return is_dir($this->get_directory());
 
-	}
-        public function get_dir_size() {
-
-                $result = false;
-		$filesystem_type = $this->get_filesystem_type();
-		switch ($filesystem_type) {
-			case "ceph":
-				$result = $this->get_dir_size_rbytes();
-				break;
-
-			case "gpfs":
-				$result = $this->get_dir_size_gpfs();
-				break;
-			default:
-				$result = $this->get_dir_size_du();
-				break;
-
-
-		}
-                return $result;
-        }
-
-	public function get_filesystem_type() {
-		$result = false;
-		if (file_exists($this->get_directory())) {
-			$exec = "stat --file-system --printf=%T " . $this->get_directory();
-	                $exit_status = 1;
-        	        $output_array = array();
-                	$output = exec($exec,$output_array,$exit_status);
-	                if (!$exit_status) {
-        	                $result = $output;
-                	}
-		}
-		return $result;
-
-	}
-	//get_dir_size_rbytes()
-	//uses the rbytes field in ls or stat command to get directory size
-	//ceph uses this field to store the directory size
-	private function get_dir_size_rbytes() {
-		//$exec = "ls -ld " . $this->get_directory() . " | awk '{print $5}'";
-		$exec = "stat --printf=%s " . $this->get_directory();
-		$exit_status = 1;
-		$output_array = array();
-		$output = exec($exec,$output_array,$exit_status);
-		if (!$exit_status) {
-			$result = $output;
-		}
-		return $result;
-
-
-	}
-
-	//get_dir_size_du()
-	//uses the du command to get directory size.
-        private function get_dir_size_du() {
-		$result = 0;
-		if (file_exists($this->get_directory())) {
-                	$exec = "du --max-depth=0 " . $this->get_directory() . "/ | awk '{print $1}'";
-	                $exit_status = 1;
-        	        $output_array = array();
-                	$output = exec($exec,$output_array,$exit_status);
-	                if (!$exit_status) {
-        	                $result = $output;
-                	}
-		}
-                return $result;
-
-
-        }
-
-	private function get_dir_size_gpfs() {
-
-		$result = 0;
-                if (file_exists($this->get_directory())) {
-                        $exec = "source /etc/profile; ";
-			$exec .= self::gpfs_mmpolicy_du . " " . $this->get_directory() . "/ | awk '{print $1}'";
-                        $exit_status = 1;
-                        $output_array = array();
-                        $output = exec($exec,$output_array,$exit_status);
-                        if (!$exit_status) {
-                                $result = round($output * self::kilobytes_to_bytes / self::gpfs_replication );
-                        }
-                }
-
-		return $result;
-
-	}	
 	private function data_dir_exists($directory) {
 		$sql = "SELECT count(1) as count FROM data_dir ";
 		$sql .= "WHERE data_dir_path LIKE '" . $directory . "%' ";

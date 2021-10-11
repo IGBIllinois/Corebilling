@@ -1,41 +1,75 @@
 <?php
 require_once 'includes/header.inc.php';
 
-if (isset($_GET['start']) && is_numeric($_GET['start'])) {
-	$start = $_GET['start'];
+if(!$login_user->isAdmin()){
+        echo html::error_message("You do not have permission to view this page.","403 Forbidden");
+        require_once 'includes/footer.inc.php';
+        exit;
 }
-else { $start = 0;
+
+
+if (isset($_GET['data_dir_id']) && (is_numeric($_GET['data_dir_id']))) {
+	$data_dir_id = $_GET['data_dir_id'];
 }
+$message = "";
+$data_dir = new data_dir($db,$data_dir_id);
 
-$num_dirs = data_functions::get_num_directories($db);
-$count = 30;
-$pages_url = $_SERVER['PHP_SELF'];
-$pages_html = html::get_pages_html($pages_url,$num_dirs,$start,$count);
-
-$directories = data_functions::get_directories($db,$start,$count);
-$dir_html = html::get_data_dir_rows($directories);
-
+require_once 'includes/header.inc.php';
 
 ?>
-<h3>List of Directories</h3>
-<table class='table table-striped table-condensed table-bordered'>
-	<thead>
-		<tr>
-			<th>Directory</th>
-			<th>Currently Exists</th>
-			<th>Group</th>
-			<th>Owner</th>
-			<th>Time Created</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php echo $dir_html; ?>
-	</tbody>
+
+
+<h3>Data Directory - <?php echo $data_dir->get_directory(); ?></h3>
+
+<div class='row span6'>
+<table class='table table-bordered table-condensed'>
+<tr>
+	<td>Directory</td>
+	<td><?php echo $data_dir->get_directory(); ?></td>
+</tr>
+<tr>
+	<td>Enabled</td>
+	<td><?php
+	if ($data_dir->get_enabled()) {
+		echo "<span class='glyphicon glyphicon-ok'></span>";
+	}
+	else {
+		echo "<span class='glyphicon glyphicon-remove'></span>";
+	}
+	?>
+	</td>
+</tr>
+<tr>
+	<td>Time Added</td>
+	<td><?php echo $data_dir->get_time_created(); ?></td>
+</tr>
+<tr>
+	<td>Currently Exists</td>
+	<td>
+	<?php
+	if ($data_dir->get_dir_exists()) {
+		echo "<span class='glyphicon glyphicon-ok'></span>";
+	}
+	else {
+        	echo "<span class='glyphicon glyphicon-remove'></span>";
+        }
+	?>
+	</td>
+</tr>
+<tr>
+	<td>Group</td>
+	<td><?php $data_dir->get_group(); ?></td>
+</tr>
+
 </table>
-<?php echo $pages_html; ?>
-
-
+</div>
+<div class='row span6'>
 <?php
-if (isset($message)) { echo $message; }
+
+if (isset($message)) { echo $message; } 
+?>
+</div>
+<?php
+
 require_once 'includes/footer.inc.php';
 ?>

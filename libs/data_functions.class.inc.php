@@ -5,51 +5,44 @@ class data_functions {
         const convert_terabytes = 1099511627776;
         const convert_gigabytes = 1073741824;
 
-	public static function get_directories($db,$start,$count) {
-		$sql = "SELECT data_dir.*, projects.project_name, projects.project_id ";
+	public static function get_directories($db,$start = 0,$count = 0) {
+		$sql = "SELECT data_dir.*, groups.group_name, groups.id as group_id, groups.netid as owner ";
 		$sql .= "FROM data_dir ";
-		$sql .= "LEFT JOIN projects ON projects.project_id=data_dir.data_dir_project_id ";
+		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
 		$sql .= "WHERE data_dir_enabled='1' ";
 		$sql .= "ORDER BY data_dir.data_dir_path ASC ";
 		$parameters = array();
-		if ($count != 0) {
-			$sql .= "LIMIT :start,:count";
+		if (!$count) {
+			$sql .= "LIMIT :start, :count";
 			$parameters[":start"] = $start;
 			$parameters[":count"] = $count;
 		}
 		$query = $db->prepare($sql);
                 $query->execute($parameters);
                 $result = $query->fetchAll(PDO::FETCH_ASSOC);
-	
-		/*for ($i=0;$i<count($result);$i++) {
-			if (is_dir($result[$i]['data_dir_path'])) {
-				$result[$i]['dir_exists'] = true;
-			}
-			else { 
-				$result[$i]['dir_exists'] = false;
-			}
-		}*/
 		return $result;
 	}
 
 	public static function get_all_directories($db) {
-		$sql = "SELECT data_dir.*, projects.project_name, projects.project_id ";
+		$sql = "SELECT data_dir.*, groups.group_name, groups.id as group_id, groups.netid as owner ";
                 $sql .= "FROM data_dir ";
-                $sql .= "LEFT JOIN projects ON projects.project_id=data_dir.data_dir_project_id ";
+                $sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
                 $sql .= "WHERE data_dir_enabled='1' ";
-
                 $sql .= "ORDER BY data_dir.data_dir_path ASC ";
-                $result = $db->query($sql);
-
-                for ($i=0;$i<count($result);$i++) {
-                        if (is_dir($result[$i]['data_dir_path'])) {
-                                $result[$i]['dir_exists'] = true;
-                        }
-                        else {
-                                $result[$i]['dir_exists'] = false;
-                        }
-                }
+		$query = $db->prepare($sql);
+		$query->execute();
+                $result = $query->fetchAll(PDO::FETCH_ASSOC);
+		if (count($result)) {
+                	for ($i=0;$i<count($result);$i++) {
+                        	if (is_dir($result[$i]['data_dir_path'])) {
+                                	$result[$i]['dir_exists'] = true;
+	                        }
+        	                else {
+                	                $result[$i]['dir_exists'] = false;
+                        	}
+	                }
                 return $result;
+		}
 
 
 	}

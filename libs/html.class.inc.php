@@ -82,28 +82,4 @@ class html {
 
 	}
 
-	public static function get_data_dir_rows($directories) {
-
-		$dir_html = "";
-		foreach ($directories as $directory) {
-		        if ($directory['dir_exists']) {
-                		$directory_exists = "<i class='icon-ok'></i>";
-	        	}
-	        	else {
-        	        	$directory_exists = "<i class='icon-remove'></i>";
-	        	}
-	        	$dir_html .= "<tr>";
-		        $dir_html .= "<td><a href='data_dir.php?data_dir_id=" . $directory['data_dir_id'] . "'>" . $directory['data_dir_path'] . "</a></td>";
-        		$dir_html .= "<td>" . $directory_exists . "</td>";
-		        $dir_html .= "<td><a href='edit_project.php?project_id=";
-			$dir_html .= $directory['project_id'] ."'>" .  $directory['project_name'] . "</a></td>";
-        		$dir_html .= "<td>" .  $directory['data_dir_time'] . "</td>";
-		        $dir_html .= "</tr>";
-
-		}
-		return $dir_html;
-
-
-
-	}
 }

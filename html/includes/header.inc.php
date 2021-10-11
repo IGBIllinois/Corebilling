@@ -80,7 +80,7 @@
                 	                        <li><a href="edit_devices.php">Devices</a></li>
                         	                <hr>
                                 	        <li><a href="instrument_billing.php">Instrument Billing</a></li>
-						<li><a href='data_dir.php'>Data Directories</a></li>
+						<li><a href='data_dir_list.php'>Data Directories</a></li>
 						<li><a href='data_billing.php'>Data Billing</a></li>
                                         	<li><a href="facility_demographics.php">Facility Demographics</a></li>
 	                                        <li><a href="active_users.php">Active Users</a></li>
