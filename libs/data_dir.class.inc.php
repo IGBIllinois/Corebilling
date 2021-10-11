@@ -264,7 +264,7 @@ class data_dir {
 					':data_dir_id'=>$this->get_data_dir_id()
 			);
 			$query = $this->db->prepare($sql);
-			$query->execute();
+			$query->execute($parameters);
 			if ($query->rowCount() ) {
 				return true;
 			}
