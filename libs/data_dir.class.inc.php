@@ -175,14 +175,10 @@ class data_dir {
 	
 	public function add_usage($bytes) {
 
-		$group = new Group($this->db);
-		$group->load($this->get_group_id());
-
                 $data_cost = new data_cost($this->db);
 		$sql = "INSERT INTO data_usage(data_usage_data_dir_id,data_usage_bytes) ";
-		$sql .= "VALUES(:data_usage_data_dir_id,:data_usage_bytes,:data_usage_files) ";
+		$sql .= "VALUES(:data_usage_data_dir_id,:data_usage_bytes) ";
                 $parameters = array(':data_usage_data_dir_id'=>$this->get_data_dir_id(),
-                                ':data_usage_group_id'=>$this->get_group_id(),
                                 ':data_usage_bytes'=>$bytes
                                 );
 		$query = $this->db->prepare($sql);

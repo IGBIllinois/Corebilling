@@ -16,6 +16,8 @@ require_once '../conf/app.inc.php';
 require_once '../conf/config.inc.php';
 require_once '../vendor/autoload.php';
 
+date_default_timezone_set(settings::get_timezone());
+
 //Command parameters
 $output_command = "data.php Inserts data usage into database\n";
 $output_command .= "Usage: php data.php \n";
@@ -55,14 +57,15 @@ else {
 	$directories = data_functions::get_all_directories($db);
 	foreach ($directories as $directory) {
 			$data_dir = new data_dir($db,$directory['data_dir_id']);
-			$size = \IGBIllinois\data_usage::get_dir_size($data_dir->get_directory());
+			$data_usage = new \IGBIllinois\data_usage($data_dir->get_directory());
+			$size = $data_usage->get_dir_size();
 			if (!isset($options['dry-run'])) {
 				$result = $data_dir->add_usage($size);
 			}
 			else {
-				$result['RESULT'] = true;
+				$result = true;
 			}	
-			if (($result['RESULT']) && (!isset($options['dry-run']))) {
+			if (($result) && (!isset($options['dry-run']))) {
 				$message = "Data Usage: Directory: " . $data_dir->get_directory() . " Size: " . data_functions::bytes_to_gigabytes($size) . "GB sucessfully added";
 				
 			}
