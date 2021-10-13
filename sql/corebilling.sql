@@ -1,6 +1,7 @@
 CREATE TABLE `access_control` (
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,
   `device_id` int(11) NOT NULL,
+  `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`,`device_id`)
 )\p;
 

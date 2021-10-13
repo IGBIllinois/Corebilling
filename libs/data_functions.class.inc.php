@@ -6,9 +6,10 @@ class data_functions {
         const convert_gigabytes = 1073741824;
 
 	public static function get_directories($db,$start = 0,$count = 0) {
-		$sql = "SELECT data_dir.*, groups.group_name, groups.id as group_id, groups.netid as owner ";
+		$sql = "SELECT data_dir.*, groups.group_name, groups.id as group_id, groups.netid as owner, users.id as owner_id ";
 		$sql .= "FROM data_dir ";
 		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
+		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
 		$sql .= "WHERE data_dir_enabled='1' ";
 		$sql .= "ORDER BY data_dir.data_dir_path ASC ";
 		$parameters = array();

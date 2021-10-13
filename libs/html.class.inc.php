@@ -31,7 +31,7 @@ class html {
 
 	}
 
-//get_pages_html()
+	//get_pages_html()
 	//$url - url of page
 	//$num_records - number of items
 	//$start - start index of items
@@ -48,23 +48,23 @@ class html {
         	        $url .= "?start=";
 	        }
 
-        	$pages_html = "<nav><ul class='pagination justify-content-center'>";
+        	$pages_html = "<nav><ul class='pagination'>";
 
 	        if ($current_page > 1) {
         	        $start_record = $start - $count;
-                	$pages_html .= "<li class='page-item'><a href='" . $url . $start_record . "'>&laquo;</a></li> ";
+                	$pages_html .= "<li><a href='" . $url . $start_record . "'>&laquo;</a></li> ";
 	        }
         	else {
-                	$pages_html .= "<li class='page-item disabled'><a href='#'>&laquo;</a></li>";
+                	$pages_html .= "<li class='disabled'><a href='#'>&laquo;</a></li>";
 	        }
 
         	for ($i=0; $i<$num_pages; $i++) {
                 	$start_record = $count * $i;
 	                if ($i == $current_page - 1) {
-        	                $pages_html .= "<li class='page-item disabled'>";
+        	                $pages_html .= "<li class='disabled'>";
                 	}
 	                else {
-        	                $pages_html .= "<li class='page-item'>";
+        	                $pages_html .= "<li>";
                 	}
 	                $page_number = $i + 1;
         	        $pages_html .= "<a class='page-link' href='" . $url . $start_record . "'>" . $page_number . "</a></li>";
@@ -75,7 +75,7 @@ class html {
                 	$pages_html .= "<li><a class='page-link' href='" . $url . $start_record . "'>&raquo;</a></li> ";
 	        }
         	else {
-                	$pages_html .= "<li class='page-item disabled'><a href='#'>&raquo;</a></li>";
+                	$pages_html .= "<li class='disabled'><a href='#'>&raquo;</a></li>";
 	        }
         	$pages_html .= "</ul></nav>";
 	        return $pages_html;

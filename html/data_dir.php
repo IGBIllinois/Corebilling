@@ -20,8 +20,8 @@ require_once 'includes/header.inc.php';
 
 
 <h3>Data Directory - <?php echo $data_dir->get_directory(); ?></h3>
-
-<div class='row span6'>
+<div class='col-xs-6 col-6 col-sm-6 col-lg-6'>
+<div class='row'>
 <table class='table table-bordered table-condensed'>
 <tr>
 	<td>Directory</td>
@@ -58,16 +58,20 @@ require_once 'includes/header.inc.php';
 </tr>
 <tr>
 	<td>Group</td>
-	<td><?php $data_dir->get_group(); ?></td>
+	<td><?php echo $data_dir->get_group(); ?></td>
 </tr>
-
+<tr>
+	<td>Owner</td>
+	<td><?php echo $data_dir->get_owner(); ?></td>
+</tr>
 </table>
 </div>
-<div class='row span6'>
+<div class='row'>
 <?php
 
 if (isset($message)) { echo $message; } 
 ?>
+</div>
 </div>
 <?php
 

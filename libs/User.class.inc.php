@@ -192,7 +192,10 @@ class User
     }
 
     public function giveAccessTo($deviceId) {
-        $query = "insert into access_control (user_id, device_id) values (:userid,:deviceid) LIMIT 1";
+        $query = "insert into access_control (user_id, device_id) values (:userid,:deviceid)";
+	echo "<br>device id: " . $deviceId;
+	echo "<br>user id: " . $this->getId();
+	echo "<br>" . $query;
         $stmt = $this->db->prepare($query);
         if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
             $this->log_file->send_log("Gave user '" . $this->getUsername() . "' access to device $deviceId");
@@ -258,7 +261,7 @@ class User
 								   	GROUP_CONCAT(g.group_name separator ', ') as group_name, 
 								   	uc.cfop, 
 								   	d.department_name, 
-								  	u.date_added, 
+								  	u.time_created as date_added, 
 								   	(select max(`stop`) from `session` where user_id=u.`id`) as last_login, 
 								   	CONCAT(u.last, ', ', u.first) as full_name, 
 								   	s.statusname as status, 
@@ -370,6 +373,11 @@ class User
         return $this->userCfop->getCfop();
     }
 
+	public function getDefaultCFOPID() {
+		$this->userCfop->loadDefaultCfop($this->userId);
+		return $this->userCfop->getCfopId();
+
+	}
     public function setDefaultCFOP($defaultCfopId) {
         $this->userCfop->load($defaultCfopId);
         $this->userCfop->setAsDefaultCFOP();

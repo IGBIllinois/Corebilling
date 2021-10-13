@@ -12,7 +12,7 @@ $userDepartment = new Department($db);
 $rate = new Rate($db);
 $group = new Group($db);
 
-
+$usersFullInfoList = User::getAllUsersFullInfo($db);
 ?>
 
 <h3>List Users</h3>
@@ -28,7 +28,6 @@ $group = new Group($db);
 			</div>
 			<div class="body">
 				<?php
-				$usersFullInfoList = User::getAllUsersFullInfo($db);
 				echo VisualizeData::ListSessionsTable($usersFullInfoList,
 					array('Name', 'E-Mail', 'CFOP', 'Group', 'Department', 'Created', 'Last Login', 'Status', 'Edu. Level', 'Gender', 'Underrep.', ''),
 					array('full_name', 'email', 'cfop', 'group_name', 'department_name', 'date_added', 'last_login', 'status', 'edu_level', 'gender', 'underrepresented', 'edit'), 'usersTable',0);

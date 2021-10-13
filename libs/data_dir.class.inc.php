@@ -6,10 +6,12 @@ class data_dir {
 	private $db;
 	private $id;
 	private $group_id;
+	private $group;
 	private $directory;
 	private $time_created;
 	private $enabled;
 	private $exists;
+	private $owner;
 
 	const precentile = 0.95;
 	const kilobytes_to_bytes = "1024";
@@ -66,6 +68,9 @@ class data_dir {
 
 	public function get_group() {
 		return $this->group;
+	}
+	public function get_owner() {
+		return $this->owner;
 	}	
 	public function get_enabled() {
 		return $this->enabled;
@@ -112,6 +117,7 @@ class data_dir {
 	private function get_data_dir($data_dir_id) {
 		$sql = "SELECT data_dir.*, groups.group_name, groups.netid as owner FROM data_dir ";
 		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
+		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
 		$sql .= "WHERE data_dir_id=:data_dir_id ";
 		$sql .= "LIMIT 1";
 		$query = $this->db->prepare($sql);
@@ -125,6 +131,7 @@ class data_dir {
 			$this->group = $result['group_name'];
 			$this->enabled = $result['data_dir_enabled'];
 			$this->exists = $result['data_dir_exists'];
+			$this->owner = $result['owner'];
 			return true;
 		}
 		return false;
@@ -195,11 +202,16 @@ class data_dir {
 	public function get_usage($month,$year) {
 		$sql = "SELECT * FROM data_usage ";
 		$sql .= "LEFT JOIN data_dir ON data_dir_id=data_usage_data_dir_id ";
-		$sql .= "WHERE MONTH(data_usage_time)='" . $month . "' ";
-		$sql .= "AND YEAR(data_usage_time)='" . $year . "' ";
-		$sql .= "AND data_usage_data_dir_id=" . $this->get_data_dir_id() . " ";
+		$sql .= "WHERE MONTH(data_usage_time)=:month ";
+		$sql .= "AND YEAR(data_usage_time)=:year ";
+		$sql .= "AND data_usage_data_dir_id=:data_dir_id ";
 		$sql .= "ORDER BY data_usage_bytes DESC";
-		$result = $this->db->query($sql);
+		$parameters = array(':month'=>$month,
+			':year'=>$year,
+			':data_dir_id'=>$this->get_data_dir_id());
+		$query = $this->db->prepare($sql);
+		$query->execute($parameters);
+		$result = $query->fetchAll(PDO::FETCH_ASSOC);
 		$days_in_month = date('t',mktime(0,0,0,$month,1,$year));
 		if (count($result) < $days_in_month) {
 			$diff = $days_in_month - count($result);
@@ -217,34 +229,40 @@ class data_dir {
 		$bill_date = $year . "-" . $month . "-01 00:00:00";
 		$sql = "SELECT count(1) as count ";
 		$sql .= "FROM data_bill ";
-		$sql .= "WHERE data_bill.data_bill_date='" . $bill_date ."' ";
-		$sql .= "AND data_bill_data_dir_id='" . $this->get_data_dir_id() . "' ";
+		$sql .= "WHERE data_bill.data_bill_date=:bill_date ";
+		$sql .= "AND data_bill_data_dir_id=:data_dir_id ";
 		$sql .= "LIMIT 1";
-		$check_exists = $this->db->query($sql);
+		$parameters = array(':bill_date'=>$bill_date,
+				':data_dir_id'=>$this->get_data_dir_id());
+		$query = $this->db->prepare($sql);
+		$query->execute($parameters);
+		$check_exists = $query->fetch(PDO::FETCH_ASSOC);
 		$result = true;
 		$insert_id = 0;
-		if ($check_exists[0]['count']) {
+		if ($check_exists['count']) {
 			$result = false;
 			$message = "Data Bill: Directory: " . $this->get_directory() . " Bill already calculated";
 		}
 		else {
-	                $project = new project($this->db,$this->get_project_id());
-			$data_cost_result = data_functions::get_current_data_cost_by_type($this->db,'standard');
-        	        $data_cost = new data_cost($this->db,$data_cost_result['id']);
+			$user = new User($this->db);
+			$user->load($this->get_user_id);
+        	        $data_cost = new data_cost($this->db);
 			$total_cost = $data_cost->calculate_cost($bytes);
 			$billed_cost = 0;
-			if ($project->get_bill_project()) {
-				$billed_cost = $total_cost;
-			}
+			//if ($project->get_bill_project()) {
+			//	$billed_cost = $total_cost;
+			//}
         	        $insert_array = array('data_bill_data_dir_id'=>$this->get_data_dir_id(),
-                	                'data_bill_project_id'=>$project->get_project_id(),
-                        	        'data_bill_cfop_id'=>$project->get_cfop_id(),
+                	                'data_bill_group_id'=>$this->get_group_id(),
+					'data_bill_user_id'=>$this->get_user_id(),
+                        	        'data_bill_cfop_id'=>$user->getDefaultCFOPID(),
                                 	'data_bill_data_cost_id'=>$data_cost_result['id'],
 	                                'data_bill_avg_bytes'=>$bytes,
 					'data_bill_total_cost'=>$total_cost,
 					'data_bill_billed_cost'=>$billed_cost,
 					'data_bill_date'=>$bill_date
 	                                );
+			
         	        $insert_id = $this->db->build_insert('data_bill',$insert_array);
 			$message = "Data Bill: Directory: " . $this->get_directory() . " Successfully added data bill";
 		}
