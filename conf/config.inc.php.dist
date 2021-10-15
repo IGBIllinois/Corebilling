@@ -29,14 +29,6 @@ define ('TITLE', '');
 // Authentication timeout
 define ('LOGIN_TIMEOUT', 8*60*60);
 
-//User Defaults
-define ('DEFAULT_USER_ROLE_ID',3); //No Role
-define ('DEFAULT_USER_RATE_ID',9);
-define ('DEFAULT_USER_STATUS_ID',5); //Disabled does not allow user to log in
-define ('DEFAULT_USER_GROUP_ID',0); //No Group
-define ('DEFAULT_USER_DEPARTMENT_ID',0); //No department
-define ('DEFAULT_USER_EMAIL_DOMAIN','');
-
 define ('CAL_DEFAULT_COLOR','#3a87ad');
 define ('CAL_TRAINING_COLOR','#6c3cae');
 define ('CAL_MISSED_COLOR','#ae3c3c');
