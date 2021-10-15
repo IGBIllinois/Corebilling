@@ -25,7 +25,7 @@ if (count($directories)) {
                 	$dir_html .= "<td><span class='glyphicon glyphicon-remove'></span></td>";
         	}
 
-		$dir_html .= "<td>" . $directory['group_name'] . "</a></td>";
+		$dir_html .= "<td><a href='edit_groups.php?group_id=" . $directory['group_id'] . "'>" . $directory['group_name'] . "</a></td>";
 		$dir_html .= "<td><a href='edit_users.php?user_id=" . $directory['owner_id'] . "'>" . $directory['owner'] . "</a></td>";
 		$dir_html .= "<td>" .  $directory['data_dir_time'] . "</td>";
 		$dir_html .= "</tr>";

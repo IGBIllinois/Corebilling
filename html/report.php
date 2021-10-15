@@ -1,7 +1,7 @@
 <?php
-
+ob_start();
 require_once 'includes/main.inc.php';
-
+ob_clean();
 
 if (isset($_POST['create_cal_report'])) {
     $user = new User ($db);
@@ -49,3 +49,4 @@ switch ($type) {
 		\IGBIllinois\report::create_excel_2007_report($events, $filename);
 		break;
 	}
+?>

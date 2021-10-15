@@ -36,14 +36,23 @@ if (isset($_POST['Modify'])) {
 	$group->update();
 }
 
-
+$groupID = 0;
 if (isset($_POST['Select'])) {
-	$groupID = $_POST['selectGroup'];
+	$groupID = $_POST['group_id'];
 	$group->load($groupID);
 
-	$announce = "<h4>Modify Group:</h4>Modify group details, click modify to apply changes.";
-	$newGroupBtn = ' <input name="Reset" type="submit" class="btn btn-primary" id="reset" value="Reset" >';
 }
+elseif (isset($_GET['group_id']) && is_numeric($_GET['group_id'])) {
+	$groupID = $_GET['group_id'];
+	$group->load($groupID);
+}
+$members = $group->getMembers();
+$members_html = "";
+foreach ($members as $id => $member) {
+	$members_html .= "<tr><td><a href='edit_users.php?user_id=" . $member['id'] . "'>" . $member['user_name'] . "</a></td>";
+	$members_html .= "<td>" . $member['first'] . " " . $member['last'] . "</td></tr>";
+}
+
 ?>
 
 <h3>Edit Groups</h3>
@@ -55,11 +64,14 @@ if (isset($_POST['Select'])) {
 				<div class="form-group">
 					<label class="col-sm-3 control-label" for="editGroup">Group</label>
 					<div class="col-sm-6">
-						<select name="selectGroup" class="form-control">
+						<select name="group_id" class="form-control">
 							<?php
 							$groupList = Group::getAllGroups($db);
 							echo "<option value=\"0\">New Group</optionv>";
 							foreach ($groupList as $groupInfo) {
+								if ($groupInfo["id"] == $groupID) {
+									echo "<option value=" . $groupInfo["id"] . " selected='selected'>" . $groupInfo["group_name"] . "</option>";
+								}
 								echo "<option value=" . $groupInfo["id"] . ">" . $groupInfo["group_name"] . "</option>";
 							}
 							?>
@@ -124,18 +136,14 @@ if (isset($_POST['Select'])) {
 		<div class="col-md-6">
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4>Members</h4>
+					<h4>Members - <?php if (isset($members)) { echo count($members); } ?></h4>
 				</div>
 				<div class="panel-body">
-					<table class="table table-striped table-hover">
-						<th>NetId</th>
-						<th>Full Name</th>
-						<?php
-						$members = $group->getMembers();
-						foreach ($members as $id => $member) {
-							echo "<tr><td>" . $member['user_name'] . "</td><td>" . $member['first'] . " " . $member['last'] . "</td></tr>";
-						}
-						?>
+					<table class="table table-striped table-hover table-bordered table-condensed">
+						<thead><th>NetId</th><th>Full Name</th></thead>
+						<tbody>
+						<?php echo $members_html; ?>
+						</tbody>
 					</table>
 				</div>
 			</div>

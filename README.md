@@ -74,4 +74,10 @@ chown apache.apache log
 ```
 composer install
 ```
+*To Enable creation of data folders, need to allow apache user have sudo rights.  Run visudo and add below.  Change the paths to the install location of Core Billing
+```
+Cmnd_Alias COREAPP = /var/www/corebilling/bin/*.sh
+apache ALL=NOPASSWD: COREAPP
+Defaults:apache !requiretty
+```
 * Done

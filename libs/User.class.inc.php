@@ -483,19 +483,25 @@ class User
         foreach ( $ids as $id ) {
             if ( !in_array($id, $currentIds) ) {
                 // not in group; add to group
-				$group = new Group($this->db);
-				$group->load($id);
+		$group = new Group($this->db);
+		$group->load($id);
                 $addStmt->execute([':user' => $this->getId(), ':group' => $id]);
                 $this->log_file->send_log("Added user " . $this->getUsername() . " to group " . $group->getName());
                 if(LDAPMAN_API_ENABLED){
                 	if($group->getNetid() != null) {
-                	    $gid = LDAPMAN_PI_PREFIX . $group->getNetid();
-						$ldapman->addGroupMember($gid, $this->getUsername());
-						if(CORESERVER_ENABLED) {
-                            $coreserverman->createDirectory($gid, $group->getNetid(), $this->getUsername());
-                        }
+				$gid = LDAPMAN_PI_PREFIX . $group->getNetid();
+				$ldapman->addGroupMember($gid, $this->getUsername());
+				if(CORESERVER_ENABLED) {
+					try {
+						$coreserverman->createDirectory($gid, $group->getNetid(), $this->getUsername());
+					}
+					catch (Exception $e) {
+						$this->log_file->send_log("Error creating directory for user " . $this->getUsername,2);
+						throw Exception($e->getMessage());
 					}
 				}
+			}
+		}
             }
         }
         foreach ( $currentIds as $oldId ) {
