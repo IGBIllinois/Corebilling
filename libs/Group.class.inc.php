@@ -1,14 +1,15 @@
 <?php
-class Group
-{
-    private $db;
-    
-    private $groupId;
-    private $groupName;
-    private $description;
-    private $departmentId;
-    private $netid;
+class Group {
+
+	private $db;
+    	private $groupId;
+	private $groupName;
+	private $description;
+	private $departmentId;
+	private $netid;
+
 	private $log_file = null;
+
 	public function __construct(PDO $db)
 	{
 		$this->db = $db;
@@ -21,38 +22,46 @@ class Group
 		
 	}
 
-    /**Add a group to the database and load it in the current object
-     * @param $groupName
-     * @param $description
-     * @param $departmentId
-     */
-    public function create($groupName, $description, $departmentId)
-	{
-		$queryAddGroup = "INSERT INTO groups (group_name, description, department_id)VALUES(:group_name,:description,:department_id)";
-        $addGroupPrep = $this->db->prepare($queryAddGroup);
-        $addGroupPrep->execute(array(':group_name'=>$groupName,':description'=>$description,':department_id'=>$departmentId));
-        $groupId = $this->db->lastInsertId();
-        $this->groupName = $groupName;
-        $this->description = $description;
-        $this->departmentId = $departmentId;
-        $this->groupId = $groupId;
-        $this->log_file->send_log("Added group '$groupName'");
+	/**Add a group to the database and load it in the current object
+	* @param $groupName
+	* @param $description
+	* @param $departmentId
+	* @param $netid
+	*/
+	public function create($groupName, $description, $departmentId,$netid) {
+		$groupId = 0;
+		$sql= "INSERT INTO groups (group_name, description, department_id,netid)VALUES(:group_name,:description,:department_id,:netid)";
+		$query = $this->db->prepare($sql);
+		$parameters = array(':group_name'=>$groupName,
+				':description'=>$description,
+				':department_id'=>$departmentId,
+				':netid'=>$netid,
+				);
+		$query->execute($parameters);
+		$groupId = $this->db->lastInsertId();
+		$this->groupName = $groupName;
+		$this->description = $description;
+		$this->departmentId = $departmentId;
+		$this->groupId = $groupId;
+		$this->netid = $netid;
+		$this->log_file->send_log("Added group " . $groupName . " with owner " . $netid);
+		return $groupId;
 	}
 
-    /**Load a group into object from database given a group ID
-     * @param $groupId
-     */
-    public function load($groupId)
+	/**Load a group into object from database given a group ID
+	* @param $groupId
+	*/
+	public function load($groupId)
 	{
 		$queryGroupInfo = "SELECT * FROM groups WHERE id=:id";
-        $groupInfo = $this->db->prepare($queryGroupInfo);
-        $groupInfo->execute(array(':id'=>$groupId));
-        $groupInfoArr = $groupInfo->fetch(PDO::FETCH_ASSOC);
-        $this->groupName = $groupInfoArr['group_name'];
-        $this->description = $groupInfoArr['description'];
-        $this->departmentId = $groupInfoArr['department_id'];
-        $this->groupId = $groupId;
-        $this->netid = $groupInfoArr['netid'];
+		$groupInfo = $this->db->prepare($queryGroupInfo);
+		$groupInfo->execute(array(':id'=>$groupId));
+		$groupInfoArr = $groupInfo->fetch(PDO::FETCH_ASSOC);
+		$this->groupName = $groupInfoArr['group_name'];
+		$this->description = $groupInfoArr['description'];
+		$this->departmentId = $groupInfoArr['department_id'];
+		$this->groupId = $groupId;
+		$this->netid = $groupInfoArr['netid'];
 	}
 
     /**
