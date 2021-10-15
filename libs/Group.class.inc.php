@@ -7,7 +7,6 @@ class Group {
 	private $description;
 	private $departmentId;
 	private $netid;
-
 	private $log_file = null;
 
 	public function __construct(PDO $db)
@@ -37,13 +36,20 @@ class Group {
 				':department_id'=>$departmentId,
 				':netid'=>$netid,
 				);
+		$this->db->beginTransaction();
 		$query->execute($parameters);
 		$groupId = $this->db->lastInsertId();
-		$this->groupName = $groupName;
-		$this->description = $description;
-		$this->departmentId = $departmentId;
-		$this->groupId = $groupId;
-		$this->netid = $netid;
+		$this->load($groupId);
+		try {
+			$this->addLdapGroup();	
+			$this->createGroupFolder();
+		}
+		catch (Exception $e) {
+			$this->db->rollBack();
+			throw $e;
+			$result = false;
+		}
+		$this->db->commit();
 		$this->log_file->send_log("Added group " . $groupName . " with owner " . $netid);
 		return $groupId;
 	}
@@ -53,32 +59,52 @@ class Group {
 	*/
 	public function load($groupId)
 	{
-		$queryGroupInfo = "SELECT * FROM groups WHERE id=:id";
-		$groupInfo = $this->db->prepare($queryGroupInfo);
-		$groupInfo->execute(array(':id'=>$groupId));
-		$groupInfoArr = $groupInfo->fetch(PDO::FETCH_ASSOC);
-		$this->groupName = $groupInfoArr['group_name'];
-		$this->description = $groupInfoArr['description'];
-		$this->departmentId = $groupInfoArr['department_id'];
+		$sql = "SELECT * FROM groups WHERE id=:id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':id'=>$groupId));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		$this->groupName = $result['group_name'];
+		$this->description = $result['description'];
+		$this->departmentId = $result['department_id'];
 		$this->groupId = $groupId;
-		$this->netid = $groupInfoArr['netid'];
+		$this->netid = $result['netid'];
+		
 	}
 
-    /**
-     * Update group parameters in database
-     */
-    public function update()
-    {
-        $queryUpdateGroup = "UPDATE `groups` SET
-                                group_name=:group_name,
-                                description=:description,
-                                department_id=:department_id,
-                                netid=:netid
-                                WHERE id=:group_id";
-
-        $updateGroup = $this->db->prepare($queryUpdateGroup);
-        $updateGroup->execute(array(":group_name"=>$this->groupName,":description"=>$this->description,":department_id"=>$this->departmentId,":group_id"=>$this->groupId, ":netid"=>$this->netid));
-    }
+	/**
+	* Update group parameters in database
+	*/
+	public function update($groupName,$netid,$departmentId,$description) {
+		$old_netid = $this->getNetid();
+		try {
+			$sql = "UPDATE `groups` SET group_name=:group_name,description=:description, department_id=:department_id, ";
+			$sql .= "netid=:netid WHERE id=:group_id LIMIT 1";
+			$parameters = array(":group_name"=>$groupName,
+					":description"=>$description,
+					":department_id"=>$departmentId,
+					":group_id"=>$this->groupId, 
+					":netid"=>$netid);
+			$query = $this->db->prepare($sql);
+			$query->execute($parameters);
+			$old_netid = $this->getNetid();
+			if ($this->getName() != $groupName) {
+				$this->log_file->send_log("Group folder name " . $this->groupName . " changed to " . $groupName);
+			}
+			if ($this->getNetid() != $netid) {
+				$this->log_file->send_log("Group folder " . $groupName . " netid changed to " . $netid);
+			}
+			$this->log_file->send_log("Group folder " . $this->groupName . " was update");
+			$this->load($this->groupId);
+			if ($old_netid != $netid) {
+				$this->createGroupFolder();
+			}
+		}
+		catch (Exception $e) {
+			throw $e;
+			return false;	
+		}
+ 		return true;
+	}
 
     /**Get a list of all groups by id and group_name
      * @return array
@@ -130,33 +156,11 @@ class Group {
     //Getters and setters for this class
 
     /**
-     * @param mixed $departmentId
-     */
-    public function setDepartmentId($departmentId)
-    {
-	    if($this->departmentId != $departmentId){
-	        $this->departmentId = $departmentId;
-	        $this->log_file->send_log("Set department id for group '".$this->groupName."' to $departmentId");
-	    }
-    }
-
-    /**
      * @return mixed
      */
     public function getDepartmentId()
     {
         return $this->departmentId;
-    }
-
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
-    {
-	    if($this->description != $description){
-	        $this->description = $description;
-	        $this->log_file->send_log("Set description for group '".$this->groupName."' to '$description'");
-	    }
     }
 
     /**
@@ -167,53 +171,69 @@ class Group {
         return $this->description;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNetid() {
-        return $this->netid;
-    }
-
-    /**
-     * @param mixed $netid
-     */
-    public function setNetid($netid) {
-        /** @var LdapManager $ldapman */
-        global $ldapman;
-        /** @var CoreServerManager $coreserverman */
-        global $coreserverman;
-        if($this->netid != $netid) {
-            $this->netid = $netid;
-            $this->log_file->send_log("Set owner netid for group '".$this->groupName."' to '$netid'");
-            if(LDAPMAN_API_ENABLED){
-                if($netid != null){
-                    $gid = LDAPMAN_PI_PREFIX . $netid;
-                    $ldapman->addGroup($gid, "Core $netid PI group");
-                    $ldapman->addGroupMember($gid, $netid);
-                    $coreserverman->createDirectory($gid, $netid, $netid);
-                    foreach($this->getMembers() as $member) {
-                        $ldapman->addGroupMember($gid, $member['user_name']);
-                        if ( CORESERVER_ENABLED ) {
-                            $coreserverman->createDirectory($gid, $netid, $member['user_name']);
-                        }
-                    }
-                }
-            }
-        }
-    }
+	/**
+	* @return mixed
+	*/
+	public function getNetid() {
+		return $this->netid;
+	}
 
 
+	public function createGroupFolder() {
+		$gid = LDAPMAN_PI_PREFIX . $this->netid;
+		if (settings::get_dataserver_enabled()) {
+			try {
+				$directory = settings::get_dataserver_root_dir() . "/" . $this->netid;
+				data_dir::create($this->db,$this->getId(),$directory);
+				data_dir::createDirectory($gid, $this->netid, $this->netid);
+				foreach($this->getMembers() as $member) {
+					data_dir::createDirectory($gid, $this->netid, $member['user_name']);
+				}
+				$this->log_file->send_log("Created group folder " . $directory . " for group " . $this->groupName . " with netid " . $this->netid);
+			}
+			catch (Exception $e) {
+				$this->log_file->send_log($e->getMessage(),2);
+				throw $e;
+				return false;
+			}
+		}
+		return true;
+	}
 
-    /**
-     * @param mixed $groupId
-     */
-    public function setId($groupId)
-    {
-	    if($this->groupId != $groupId){
-	        $this->groupId = $groupId;
-	        $this->log_file->send_log("Set id for group '".$this->groupName."' to $groupId");
-	    }
-    }
+	public function addLdapGroup() {
+		if(LDAPMAN_API_ENABLED){
+			global $ldapman;
+			try {
+				$gid = LDAPMAN_PI_PREFIX . $this->netid;
+				if (count($ldapman->getGroup($gid))) {
+					throw new Exception("Error ldap group " . $gid . " already exists");
+					return false;
+				}
+				if (!$ldapman->addGroup($gid, "Core $this->netid PI group")) {
+					throw new Exception("Error adding group " . $gid . " to ldap");
+					return false;	
+				}
+				if (!$ldapman->addGroupMember($gid, $this->netid)) {
+					throw new Exception("Error adding user " . $this->netid . " to ldap group " . $gid);
+					return false;
+				}
+				foreach($this->getMembers() as $member) {
+					if (!$ldapman->addGroupMember($gid, $member['user_name'])) {
+						throw new Exception("Error adding user " . $this->netid . " to ldap group " . $gid);
+        	                                return false;
+					}
+				}
+
+			}
+			catch (Exception $e) {
+				$this->log_file->send_log($e->getMessage(),2);
+				throw $e;
+				return false;
+				
+			}
+		}
+		return true;
+	}
 
     /**
      * @return mixed
@@ -223,16 +243,6 @@ class Group {
         return $this->groupId;
     }
 
-    /**
-     * @param mixed $groupName
-     */
-    public function setName($groupName)
-    {
-	    if($this->groupName != $groupName){
-	    	$this->log_file->send_log("Set name for group '".$this->groupName."' to $groupName");
-	        $this->groupName = $groupName;
-	    }
-    }
 
     /**
      * @return mixed

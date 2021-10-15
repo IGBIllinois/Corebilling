@@ -41,3 +41,4 @@ CREATE TABLE data_bill (
         PRIMARY KEY(data_bill_id)
 );
 
+INSERT INTO data_cost(data_cost_value) VALUES(0.00);

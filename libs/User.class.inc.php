@@ -193,12 +193,13 @@ class User
 
     public function giveAccessTo($deviceId) {
         $query = "insert into access_control (user_id, device_id) values (:userid,:deviceid)";
-	echo "<br>device id: " . $deviceId;
-	echo "<br>user id: " . $this->getId();
-	echo "<br>" . $query;
+	$device = new Device($this->db);
+	$device->load($deviceId);
         $stmt = $this->db->prepare($query);
         if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
-            $this->log_file->send_log("Gave user '" . $this->getUsername() . "' access to device $deviceId");
+		$device = new Device($this->db);
+		$device->load($deviceId);
+		$this->log_file->send_log("Gave user '" . $this->getUsername() . "' access to device " . $device->getShortName());
         }
     }
 
@@ -206,7 +207,9 @@ class User
         $query = "delete from access_control where user_id=:userid and device_id=:deviceid limit 1";
         $stmt = $this->db->prepare($query);
         if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
-            $this->log_file->send_log("Removed access to device $deviceId for user '" . $this->getUsername() . "'");
+		$device = new Device($this->db);
+		$device->load($deviceId);		
+		$this->log_file->send_log("Removed access to device " . $device->getShortName() . " for user " . $this->getUsername());
         }
     }
 
@@ -474,8 +477,6 @@ class User
     public function setGroupIds($ids) {
     	/** @var LdapManager $ldapman */
     	global $ldapman;
-    	/** @var CoreServerManager $coreserverman */
-    	global $coreserverman;
         $addStmt = $this->db->prepare('insert into user_groups (user_id, group_id) values (:user, :group)');
         $deleteStmt = $this->db->prepare('delete from user_groups where group_id=:group and user_id=:user limit 1');
 
@@ -491,14 +492,12 @@ class User
                 	if($group->getNetid() != null) {
 				$gid = LDAPMAN_PI_PREFIX . $group->getNetid();
 				$ldapman->addGroupMember($gid, $this->getUsername());
-				if(CORESERVER_ENABLED) {
-					try {
-						$coreserverman->createDirectory($gid, $group->getNetid(), $this->getUsername());
-					}
-					catch (Exception $e) {
-						$this->log_file->send_log("Error creating directory for user " . $this->getUsername,2);
-						throw Exception($e->getMessage());
-					}
+				try {
+					data_dir::createDirectory($gid, $group->getNetid(), $this->getUsername());
+				}
+				catch (Exception $e) {
+					$this->log_file->send_log($e->getMesage(),2);
+					throw $e;
 				}
 			}
 		}

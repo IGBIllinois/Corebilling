@@ -5,7 +5,7 @@ class settings {
 	private const TITLE = "Core Billing";
 	private const ENABLE_LOG = false;
 	private const NEWS_AGE = 120;
-	private const CORESERVER_ENABLED = false;
+	private const DATASERVER_ENABLED = false;
 	private const TIMEZONE = "UTC";
 
 	public static function get_version() {
@@ -57,14 +57,20 @@ class settings {
 
 	}
 
-	public static function get_coreserver_enabled() {
-		if (defined("CORESERVER_ENABLED") && (is_bool(CORESERVER_ENABLED))) {
-			return CORESERVER_ENABLED;
+	public static function get_dataserver_enabled() {
+		if (defined("DATASERVER_ENABLED") && (is_bool(DATASERVER_ENABLED))) {
+			return DATASERVER_ENABLED;
 		}
-		return self::CORESERVER_ENABLED;
+		return self::DATASERVER_ENABLED;
 
 	}
 
+	public static function get_dataserver_root_dir() {
+		if (defined("DATASERVER_ROOT_DIR") && (DATASERVER_ROOT_DIR != "")) {
+			return DATASERVER_ROOT_DIR;
+		}
+		return false;
+	}
 	public static function get_timezone() {
 		if (defined("TIMEZONE") && (TIMEZONE != '')) {
 			return TIMEZONE;

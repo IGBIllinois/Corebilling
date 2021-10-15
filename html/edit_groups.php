@@ -31,39 +31,64 @@ if (isset($_POST['create'])) {
 	elseif ($netid == "") {
 		$message .= html::error_message("No netID specified");
 	}
-	elseif (!User::exists($db,$netid)) {
+	/*elseif (!User::exists($db,$netid)) {
 		$message .= html::error_message("netID " . $netid . " does not exist");
-	}
+	}*/
 	else {
+		try {
 		$result = $group->create($groupName, $description, $departmentId,$netid);
 		if ($result) {
 			$message .= html::success_message("Group " . $groupName . " successfully created.");
 		}
+		}
+		catch (Exception $e) {
+			$message .= html::error_message($e->getMessage());
+		}
 	}
 }
 
-if (isset($_POST['Modify'])) {
+if (isset($_POST['modify'])) {
+	foreach ($_POST as $var) {
+                $var = trim(rtrim($var));
+        }
 	$groupName = $_POST['group_name'];
-	$groupID = $_POST['groupID'];
+	$groupID = $_POST['group_id'];
 	$description = $_POST['description'];
 	$departmentId = $_POST['department'];
+	$netid = $_POST['netid'];
+	$group->load($groupID);
 	if ($groupName == "") {
                 $message .= html::error_message("No group name specified");
         }
 	elseif (!$departmentId) {
                 $message .= html::error_message("Please specify a department");
         }
+	elseif ($netid == "") {
+                $message .= html::error_message("No netID specified");
+        }
+        /*elseif (!User::exists($db,$netid)) {
+                $message .= html::error_message("netID " . $netid . " does not exist");
+        }*/
+	elseif (($group->getName() == $groupName) &&
+		($group->getNetid() == $netid) &&
+		($group->getDepartmentId() == $departmentId) &&
+		($group->getDescription() == $description)) {
+		$message .= html::error_message("No group changes made");
+	}
 	else {
-		$group->load($groupID);
-		$group->setDepartmentId($departmentId);
-		$group->setName($groupName);
-		$group->setDescription($description);
-		$group->update();
-		$message .= html::success_message("Group " . $groupName . " successfully updated.");
+		try {
+			if($group->update($groupName,$netid,$departmentId,$description)) {
+				$message .= html::success_message("Group " . $groupName . " successfully updated.");
+			}
+		}
+		catch (Exception $e) {
+				$message .= html::error_message($e->getMessage());
+				unset($group);
+		}
 	}
 }
 
-if (isset($_POST['Select'])) {
+if (isset($_POST['select'])) {
 	$groupID = $_POST['group_id'];
 	$group->load($groupID);
 	
@@ -116,7 +141,7 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 						</select>
 					</div>
 					<div class="col-sm-3">
-						<input name="Select" type="submit" class="btn btn-primary" id="Select" Value="Select"/>
+						<input name="select" type="submit" class="btn btn-primary" id="Select" Value="Select"/>
 					</div>
 				</div>
 			</div>
@@ -151,9 +176,8 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 				<div class="form-group">
 					<div class="col-sm-9 col-sm-offset-3">
 						<?php
-						echo "<input name=\"groupID\" type=\"hidden\" value=\"" . $group->getId() . "\">";
 						if ($group->getId() != 0) {
-							echo '<input name="Modify" type="submit" class="btn btn-primary" id="Modify" value="Modify">';
+							echo '<input name="modify" type="submit" class="btn btn-primary" id="Modify" value="Modify">';
 						} else {
 							echo '<input name="create" type="submit" class="btn btn-primary" id="Submit" value="Create" >  <input name="Reset" type="submit" class="btn btn-primary" id="reset" value="Reset" >';
 						}

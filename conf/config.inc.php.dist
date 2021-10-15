@@ -15,8 +15,8 @@ define('LDAPMAN_API_PASSWORD','');
 define('LDAPMAN_DEVICE_PREFIX', '');
 define('LDAPMAN_PI_PREFIX', '');
 
-define('CORESERVER_ENABLED', false);
-
+define('DATASERVER_ENABLED', false);
+define('DATASERVER_ROOT_DIR','');
 //MySQL settings
 define ('DB_USER','');
 define ('DB_PASSWORD','');

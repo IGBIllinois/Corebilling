@@ -1,9 +1,8 @@
 <?php
 class Device
 {
+	const STATUS_TYPE_DEVICE=1;
 	private $db;
-
-    const STATUS_TYPE_DEVICE=1;
 	private $deviceId;
 	private $shortName;
 	private $full_name;
@@ -12,10 +11,10 @@ class Device
 	private $status;
 	private $deviceToken;
 	private $unauthorizedUser;
-    private $loggedUser;
-    private $ldap_group;
+	private $loggedUser;
+	private $ldap_group;
 	private $ipaddress;
-    private $log_file = null;
+	private $log_file = null;
 
 	public function __construct(PDO $db)
 	{

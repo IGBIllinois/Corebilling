@@ -28,29 +28,31 @@ class data_dir {
 	public function __destruct() {
 	}
 	
-	public function create($project_id,$directory,$default = 0) {
-		$directory = $this->format_directory($directory);
-		$this->project = new project($this->db,$project_id);
-
+	public function create($db,$group_id,$directory) {
+		$directory = self::format_directory($directory);
 		$error = false;
 
-		if ($this->data_dir_exists($directory)) {
+		if (self::data_dir_exists($db,$directory)) {
 			$error = true;
-			$message .= "<div class='alert'>Directory " . $directory . " is already in the database</div>";
+			throw new Exception("Directory " . $directory . " is already in the database");
+			
 		}
 
 		if ($error) {
 			return array('RESULT'=>false,"MESSAGE"=>$message);
 		}
 		else {
-			$sql = "INSERT INTO data_dir(data_dir_project_id,data_dir_path,data_dir_default) ";
-			$sql .= "VALUES('" . $this->project->get_project_id() . "','" . $directory . "'";
-			$sql .= ",'" . $default . "')";
-			$result = $this->db->insert_query($sql);
-			return array('RESULT'=>true,
-					"data_dir_id"=>$result,
-					"MESSAGE"=>"<div class='alert alert-success'>Directory " . $directory . " successfully added</div>"
-			);
+			$sql = "INSERT INTO data_dir(data_dir_group_id,data_dir_path) ";
+			$sql .= "VALUES(:group_id,:directory)";
+			$parameters = array(':group_id'=>$group_id,
+					':directory'=>$directory);
+			$query = $db->prepare($sql);
+			$query->execute($parameters);
+			$id = $db->lastInsertId();
+			if ($id) {
+				return $id;
+			}
+			return false;	
 		}
 	}
 	
@@ -137,7 +139,7 @@ class data_dir {
 		return false;
 	}
 
-	private function format_directory($directory) {
+	private static function format_directory($directory) {
 		if (strrpos($directory,"/") == strlen($directory) -1) {
 			return substr($directory,0,strlen($directory)-1);
 		}
@@ -148,17 +150,18 @@ class data_dir {
 	}
 
 
-	private function data_dir_exists($directory) {
+	private static function data_dir_exists($db, $directory) {
 		$sql = "SELECT count(1) as count FROM data_dir ";
-		$sql .= "WHERE data_dir_path LIKE '" . $directory . "%' ";
-		$sql .= "AND data_dir_enabled='1'";
-		$result = $this->db->query($sql);
+		$sql .= "WHERE data_dir_path=:directory ";
+		$sql .= "AND data_dir_enabled='1'i LIMIT 1";
+		$query = $db->prepare($sql);
+		$query->execute(array(':directory'=>$directory));	
+		$result = $query->fetch(PDO::FETCH_ASSOC);
 
-		if ($result[0]['count']) {
+		if ($result['count']) {
 			return true;
 		}
-		else { return false;
-		}
+		return false;
 
 	}
 	
@@ -290,5 +293,25 @@ class data_dir {
 		}
 
 	}
+
+	public static function createDirectory($gid, $pi, $user){
+		if(settings::get_dataserver_enabled()) {
+                	$safeGid = escapeshellarg($gid);
+	                $safePi = escapeshellarg($pi);
+        	        $safeUser = escapeshellarg($user);
+			
+                	$exec = "sudo ../bin/addCoreServerDir.sh " . $safeGid . " " . $safePi . " " . $safeUser . " 2>&1";
+	                $exit_status = 1;
+        	        $output_array = array();
+                	$output = exec($exec,$output_array,$exit_status);
+			
+	                if ($exit_status) {
+        	                throw new Exception("Error Creating directory for user " . $user . ", " . end($output_array));
+                	}
+	                return $exit_status;
+		}
+		return false;
+
+        }
 
 }

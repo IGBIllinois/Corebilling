@@ -54,7 +54,7 @@ fi
 # Check if group exists
 getent group $group > /dev/null
 if [ $? -ne 0 ]; then
-  echo "Group $group does not exist."
+  echo "Group $group does not exist on `hostname`."
   exit 1
 fi
 

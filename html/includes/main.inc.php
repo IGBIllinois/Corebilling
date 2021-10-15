@@ -31,9 +31,6 @@ if(LDAPMAN_API_ENABLED){
 } else {
 	$ldapman = new LdapManager(LDAPMAN_API_URL);
 }
-if(settings::get_coreserver_enabled()){
-	$coreserverman = new CoreServerManager();
-}
 
 //Authenticates to website database
 $authenticate = new Authenticate($db, $authen);

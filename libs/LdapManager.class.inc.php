@@ -83,8 +83,7 @@
                 $this->log_file->send_log("Added ldap group '$gid'");
                 return true;
             } else {
-                var_dump($result);
-                $this->log_file->send_log("Failed trying to add ldap group '$gid'");
+                $this->log_file->send_log("Failed trying to add ldap group '$gid'",2);
                 return false;
             }
         }
@@ -111,8 +110,6 @@
             if($result->code == 200){
                 return $result->memberOf;
             } else {
-                var_dump($result);
-                exit();
                 return false;
             }
         }
@@ -130,12 +127,12 @@
 				$this->log_file->send_log("Added user '$uid' to ldap group '$gid'");
 				return true;
 			} else {
-				$this->log_file->send_log("Failed trying to add user '$uid' to ldap group '$gid' with error ".$result->code.": '".$result->msg."'");
+				$this->log_file->send_log("Failed trying to add user '$uid' to ldap group '$gid' with error ".$result->code.": '".$result->msg."'",2);
 				return false;
 			}
 		}
 		
-		function removeGroupMember($gid,$uid){
+	function removeGroupMember($gid,$uid){
 			$data = array(
 				'task'=>'remove_from_group',
 				'username'=>$this->username,
@@ -148,7 +145,7 @@
 				$this->log_file->send_log("Removed user '$uid' from ldap group '$gid'");
 				return true;
 			} else {
-				$this->log_file->send_log("Failed trying to remove user '$uid' from ldap group '$gid' with error ".$result->code.": '".$result->msg."'");
+				$this->log_file->send_log("Failed trying to remove user '$uid' from ldap group '$gid' with error ".$result->code.": '".$result->msg."'",2);
 				return false;
 			}
 		}
