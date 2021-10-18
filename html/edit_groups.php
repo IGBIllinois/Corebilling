@@ -87,7 +87,26 @@ if (isset($_POST['modify'])) {
 		}
 	}
 }
-
+elseif (isset($_POST['delete'])) {
+	$groupID = $_POST['group_id'];
+	$group->load($groupID);
+	$groupName = $group->getName();
+	try { 
+		if ($group->delete()) {
+			$message .= html::error_message("Group " . $groupName . " successfully deleted");
+			$groupID = 0;
+			$group->load($groupID);
+		}
+		
+	}
+	catch (Exception $e) {
+		$message = html::error_message($e->getMessage());
+	}
+		
+}
+elseif (isset($_POST['reset'])) {
+	unset($_POST);
+}
 if (isset($_POST['select'])) {
 	$groupID = $_POST['group_id'];
 	$group->load($groupID);
@@ -178,8 +197,10 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 						<?php
 						if ($group->getId() != 0) {
 							echo '<input name="modify" type="submit" class="btn btn-primary" id="Modify" value="Modify">';
+							echo '&nbsp<input name="delete" type="submit" class="btn btn-danger" id="delete" value="Delete" onClick="return confirm_group_delete()">';
 						} else {
-							echo '<input name="create" type="submit" class="btn btn-primary" id="Submit" value="Create" >  <input name="Reset" type="submit" class="btn btn-primary" id="reset" value="Reset" >';
+							echo '<input name="create" type="submit" class="btn btn-primary" id="Submit" value="Create">';
+							echo '&nbsp<input name="reset" type="submit" class="btn btn-primary" id="reset" value="Reset">';
 						}
 						?>
 					</div>

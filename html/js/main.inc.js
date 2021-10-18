@@ -18,5 +18,9 @@ function matchCol(table,column,field){
 	table.draw();
 }
 
+function confirm_group_delete() {
+        return confirm("Are you sure want to delete this group?");
+}
+
 $.fn.select2.defaults.set( "theme", "bootstrap" );
 $.fn.select2.defaults.set( "width", null );

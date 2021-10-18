@@ -58,7 +58,9 @@ CREATE TABLE `groups` (
   `department_id` int(10) unsigned DEFAULT NULL,
   `netid` varchar(255) DEFAULT NULL,
   `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  `enabled` BOOLEAN DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE(`netid`)
 )\p;
 
 
@@ -155,7 +157,8 @@ CREATE TABLE `users` (
   `secure_key` varchar(45) DEFAULT NULL,
   `certified` int(11) NOT NULL DEFAULT 0,
   `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE(`user_name`)
 )\p;
 
 CREATE TABLE `user_demographics` (

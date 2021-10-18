@@ -12,13 +12,14 @@ class data_dir {
 	private $enabled;
 	private $exists;
 	private $owner;
+	private $log_file = null;
 
 	const precentile = 0.95;
 	const kilobytes_to_bytes = "1024";
 
 	public function __construct($db,$data_dir_id = 0) {
 		$this->db = $db;
-
+		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 		if ($data_dir_id != 0) {
 			$this->get_data_dir($data_dir_id);
 		}
@@ -98,21 +99,30 @@ class data_dir {
 	public function disable() {
 		$error = false;
 		$message = "";
-		if (is_dir($this->get_directory())) {
-                        $message = "Unable to delete directory.  Directory " . $this->get_directory() . " still exists.";
-                        $error = true;
+		$exists = false;
+		try {
+			$exists = self::remote_dir_exists($this->get_directory());
+		}
+		catch (Exception $e) {
+			throw $e;
+		}
+
+		if ($exists) {
+                        throw new Exception("Unable to delete directory.  Directory " . $this->get_directory() . " still exists.");
                 }
-		if (!$error) {
-			$sql = "UPDATE data_dir SET data_dir_enabled='0' ";
-			$sql .= "WHERE data_dir_id='" . $this->get_data_dir_id() . "' LIMIT 1";
-			$result = $this->db->non_select_query($sql);
+		else {
+			$sql = "UPDATE data_dir SET data_dir_enabled='0',data_dir_exists='0' ";
+			$sql .= "WHERE data_dir_id=:data_dir_id LIMIT 1";
+			$query = $this->db->prepare($sql);
+			$result = $query->execute(array(':data_dir_id'=>$this->get_data_dir_id()));
+			
 			if ($result) {
 				$this->enabled = 0;
-				$message = "Successfully remove directory " . $this->get_directory() . ".";
+				$this->log_file->send_log("Successfully disabled data directory " . $this->get_directory());
+				return true;
 			}
 		}
-		return array('RESULT'=>$result,'MESSAGE'=>$message);
-
+		return false;
 
 	}
 	
@@ -314,4 +324,33 @@ class data_dir {
 
         }
 
+	public static function remote_dir_exists($directory) {
+		if(settings::get_dataserver_enabled()) {
+			$safeDirectory = escapeshellarg($directory);
+			$exec = "sudo ../bin/CoreServerDirExists.sh " . $safeDirectory . " 2>&1";
+			$exit_status = 01;
+			$output_array = array();
+			$output = exec($exec,$output_array,$exit_status);
+			if ($exit_status) {
+				throw new Exception("Error checking if directory exists for " . $directory . ", " . end($output_array));
+				return false;
+			}
+			return end($output_array);
+		
+		}
+		return false;
+
+
+	}
+	public static function get_id_by_directory($db, $directory) {
+		$sql = "SELECT data_dir_id FROM data_dir WHERE data_dir_path=:data_dir_path LIMIT 1";
+		$query = $db->prepare($sql);
+		$query->execute(array(':data_dir_path'=>$directory));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $result['data_dir_id'];
+		}
+		return false;
+
+	}
 }

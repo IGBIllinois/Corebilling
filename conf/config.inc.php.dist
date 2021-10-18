@@ -17,6 +17,7 @@ define('LDAPMAN_PI_PREFIX', '');
 
 define('DATASERVER_ENABLED', false);
 define('DATASERVER_ROOT_DIR','');
+
 //MySQL settings
 define ('DB_USER','');
 define ('DB_PASSWORD','');

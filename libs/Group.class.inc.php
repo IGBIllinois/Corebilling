@@ -8,6 +8,7 @@ class Group {
 	private $departmentId;
 	private $netid;
 	private $log_file = null;
+	private $enabled = false;
 
 	public function __construct(PDO $db)
 	{
@@ -68,6 +69,7 @@ class Group {
 		$this->departmentId = $result['department_id'];
 		$this->groupId = $groupId;
 		$this->netid = $result['netid'];
+		$this->enabled = $result['enabled'];
 		
 	}
 
@@ -106,70 +108,76 @@ class Group {
  		return true;
 	}
 
-    /**Get a list of all groups by id and group_name
-     * @return array
-     */
-    public static function getAllGroups($db)
-	{
-		$queryGroupList = "SELECT id, group_name, netid FROM groups ORDER BY group_name";
-        $groupList = $db->query($queryGroupList);
-        $groupListArr = $groupList->fetchAll(PDO::FETCH_ASSOC);
-
-        return $groupListArr;
+	/**Get a list of all groups by id and group_name
+	* @return array
+	*/
+	public static function getAllGroups($db) {
+		$sql = "SELECT id, group_name, netid FROM groups WHERE enabled='1' ORDER BY group_name";
+		$query = $db->query($sql);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-    /**Check if a group exists by groupName
-     * @param $groupName
-     * @return bool
-     */
-    public static function exists($db, $groupName)
-    {
-        $queryGroup = "SELECT COUNT(*) FROM groups WHERE group_name=:group_name";
-        $group = $db->prepare($queryGroup);
-        $group->execute(array(':group_name'=>$groupName));
-        $groupCount = $group->fetchColumn();
+	/**Check if a group exists by groupName
+	* @param $groupName
+	* @return bool
+	*/
+	public static function exists($db, $groupName) {
+		$queryGroup = "SELECT COUNT(*) FROM groups WHERE group_name=:group_name";
+		$group = $db->prepare($queryGroup);
+		$group->execute(array(':group_name'=>$groupName));
+		$groupCount = $group->fetchColumn();
 
-        if($groupCount)
-        {
-            return true;
-        }
-        return false;
-    }
+		if($groupCount) {
+			return true;
+		}
+		return false;
+	}
 
-    /**Get a list of all group members
-     * @return array
-     */
-    public function getMembers()
-    {
-        if($this->getId())
-        {
-            $queryGroupUsers = "SELECT * FROM users u left join user_groups ug on u.id = ug.user_id WHERE ug.group_id=:group_id order by u.user_name";
+	/**Get a list of all group members
+	* @return array
+	*/
+	public function getMembers() {
+		if($this->getId()) {
+			$queryGroupUsers = "SELECT * FROM users u left join user_groups ug on u.id = ug.user_id WHERE ug.group_id=:group_id order by u.user_name";
 			$groupUsers = $this->db->prepare($queryGroupUsers);
 			$groupUsers->execute(array(":group_id"=>$this->getId()));
 			$groupUsersArr = $groupUsers->fetchAll(PDO::FETCH_ASSOC);
-            return $groupUsersArr;
-        }
-        return array();
-    }
+			return $groupUsersArr;
+		}
+		return array();
+	}
 
 
-    //Getters and setters for this class
+	//Getters and setters for this class
 
-    /**
-     * @return mixed
-     */
-    public function getDepartmentId()
-    {
-        return $this->departmentId;
-    }
+	/**
+	* @return mixed
+	*/
+	public function getDepartmentId() {
+		return $this->departmentId;
+	}
 
-    /**
-     * @return mixed
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
+	/**
+	* @return mixed
+	*/
+	public function getDescription() {
+		return $this->description;
+	}
+
+	/**
+	* @return int
+	*/
+	public function getId() {
+		return $this->groupId;
+	}
+
+
+	/**
+	* @return string
+	*/
+	public function getName() {
+		return $this->groupName;
+	}
 
 	/**
 	* @return mixed
@@ -178,9 +186,11 @@ class Group {
 		return $this->netid;
 	}
 
-
+	public function getEnabled() {
+		return $this->enabled;
+	}
 	public function createGroupFolder() {
-		$gid = LDAPMAN_PI_PREFIX . $this->netid;
+		$gid = $this->getLdapGroupName();
 		if (settings::get_dataserver_enabled()) {
 			try {
 				$directory = settings::get_dataserver_root_dir() . "/" . $this->netid;
@@ -200,11 +210,17 @@ class Group {
 		return true;
 	}
 
+	public function getLdapGroupName() {
+		if (LDAPMAN_API_ENABLED && ($this->netid != null)) {
+			return LDAPMAN_PI_PREFIX . $this->netid;
+		}
+		return false;
+	}
 	public function addLdapGroup() {
 		if(LDAPMAN_API_ENABLED){
 			global $ldapman;
 			try {
-				$gid = LDAPMAN_PI_PREFIX . $this->netid;
+				$gid = $this->getLdapGroupName();
 				if (count($ldapman->getGroup($gid))) {
 					throw new Exception("Error ldap group " . $gid . " already exists");
 					return false;
@@ -235,22 +251,44 @@ class Group {
 		return true;
 	}
 
-    /**
-     * @return mixed
-     */
-    public function getId()
-    {
-        return $this->groupId;
-    }
+
+	public function delete() {
+		if ($this->getId()) {
+			$members = $this->getMembers();
+			if (count($members)) {
+				throw new Exception("Can not delete group " . $this->getName() . ".  Group has " . count($members) ." members.  The group has to be empty before it can be deleted.");
+				return false;
+			}
+			if (settings::get_dataserver_enabled()) {
+				$directory = settings::get_dataserver_root_dir() . "/" . $this->netid;	
+				$data_dir_id = data_dir::get_id_by_directory($this->db, $directory);
+				if ($data_dir_id) {
+					$data_dir = new data_dir($this->db,$data_dir_id);
+					try {
+						$data_dir->disable();
+	
+					}
+					catch (Exception $e) {
+						throw $e;	
+						return false;
+					}
+				}
+                        }
+	
+			$sql = "UPDATE groups SET enabled=0 WHERE id=:group_id LIMIT 1";
+			$query = $this->db->prepare($sql);
+			$result = $query->execute(array(':group_id'=>$this->getId()));
+			$this->log_file->send_log("Group " . $this->getName() . " successfully deleted");
+			$this->enabled = false;	
+			return true;
 
 
-    /**
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->groupName;
-    }
+
+
+		}
+
+
+	}
 }
 
 ?>

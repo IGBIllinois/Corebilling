@@ -2,7 +2,9 @@ ALTER TABLE users CHANGE date_added time_created DATETIME NOT NULL DEFAULT CURRE
 ALTER TABLE access_control ADD time_created DATETIME;
 UPDATE access_control SET time_created='0000-00-00 00:00:00';
 ALTER TABLE access_control MODIFY time_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
-
+ALTER TABLE groups ADD UNIQUE(netid);
+ALTER TABLE groups ADD enabled BOOLEAN DEFAULT 1;
+ALTER TABLE users ADD UNIQUE(user_name);
 
 CREATE TABLE data_cost(
 	data_cost_id INT NOT NULL AUTO_INCREMENT,
@@ -18,7 +20,8 @@ CREATE TABLE data_dir (
         data_dir_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         data_dir_enabled BOOLEAN DEFAULT TRUE,
 	data_dir_exists BOOLEAN DEFAULT FALSE,
-        PRIMARY KEY (data_dir_id)
+        PRIMARY KEY (data_dir_id),
+	UNIQUE(data_dir_path)
 );
 CREATE TABLE data_usage (
 	data_usage_id INT NOT NULL AUTO_INCREMENT,
@@ -42,3 +45,4 @@ CREATE TABLE data_bill (
 );
 
 INSERT INTO data_cost(data_cost_value) VALUES(0.00);
+
