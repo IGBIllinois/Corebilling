@@ -16,6 +16,7 @@ CREATE TABLE data_cost(
 CREATE TABLE data_dir (
         data_dir_id INT NOT NULL AUTO_INCREMENT,
 	data_dir_group_id INT REFERENCES groups(id),
+	data_dir_user_id INT REFERENCES users(id),
         data_dir_path VARCHAR(255),
         data_dir_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         data_dir_enabled BOOLEAN DEFAULT TRUE,
@@ -34,8 +35,8 @@ CREATE TABLE data_bill (
         data_bill_id INT NOT NULL AUTO_INCREMENT,
         data_bill_data_dir_id INT REFERENCES data_dir(data_dir_id),
         data_bill_data_cost_id INT REFERENCES user_cfop(id),
-	data_bill_data_user_id INT REFERENCES users(id),
 	data_bill_group_id INT REFERENCES groups(id),
+	data_bill_user_id INT REFERENCES users(id),
         data_bill_cfop_id INT REFERENCES cfops(cfop_id),
         data_bill_date TIMESTAMP,
         data_bill_avg_bytes BIGINT(20) DEFAULT 0,

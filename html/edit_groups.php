@@ -39,12 +39,17 @@ if (isset($_POST['create'])) {
 		$result = $group->create($groupName, $description, $departmentId,$netid);
 		if ($result) {
 			$message .= html::success_message("Group " . $groupName . " successfully created.");
+			$groupID = $result;
+			$group->load($groupID);
 		}
 		}
 		catch (Exception $e) {
 			$message .= html::error_message($e->getMessage());
+			$groupID = 0;
+			$group->load($groupID);
 		}
 	}
+
 }
 
 if (isset($_POST['modify'])) {
@@ -83,7 +88,8 @@ if (isset($_POST['modify'])) {
 		}
 		catch (Exception $e) {
 				$message .= html::error_message($e->getMessage());
-				unset($group);
+				$groupID = 0;
+				$group->load($groupID);
 		}
 	}
 }
@@ -195,7 +201,7 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 				<div class="form-group">
 					<div class="col-sm-9 col-sm-offset-3">
 						<?php
-						if ($group->getId() != 0) {
+						if ($group->getId() != 0 || $group->getId() != null) {
 							echo '<input name="modify" type="submit" class="btn btn-primary" id="Modify" value="Modify">';
 							echo '&nbsp<input name="delete" type="submit" class="btn btn-danger" id="delete" value="Delete" onClick="return confirm_group_delete()">';
 						} else {

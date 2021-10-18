@@ -21,7 +21,7 @@ if (isset($_POST['create_cal_report'])) {
             die($e->getMessage());
         }
 
-        $events = Reservation::getEventsInRangeForSpreadsheet(
+        $data = Reservation::getEventsInRangeForSpreadsheet(
             $db,
             $start_date,
             $end_date,
@@ -43,10 +43,10 @@ elseif (isset($_POST['create_data_report'])) {
 
 switch ($type) {
 	case 'csv':
-		\IGBIllinois\report::create_csv_report($events, $filename);
+		\IGBIllinois\report::create_csv_report($data, $filename);
 		break;
 	case 'xlsx':
-		\IGBIllinois\report::create_excel_2007_report($events, $filename);
+		\IGBIllinois\report::create_excel_2007_report($data, $filename);
 		break;
 	}
 ?>

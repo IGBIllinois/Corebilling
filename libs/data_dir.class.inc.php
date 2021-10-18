@@ -13,6 +13,7 @@ class data_dir {
 	private $exists;
 	private $owner;
 	private $log_file = null;
+	private $user_id;
 
 	const precentile = 0.95;
 	const kilobytes_to_bytes = "1024";
@@ -29,7 +30,7 @@ class data_dir {
 	public function __destruct() {
 	}
 	
-	public function create($db,$group_id,$directory) {
+	public function create($db,$group_id,$directory,$netid) {
 		$directory = self::format_directory($directory);
 		$error = false;
 
@@ -43,10 +44,14 @@ class data_dir {
 			return array('RESULT'=>false,"MESSAGE"=>$message);
 		}
 		else {
-			$sql = "INSERT INTO data_dir(data_dir_group_id,data_dir_path) ";
-			$sql .= "VALUES(:group_id,:directory)";
+			$user_id = User::getIDByUsername($db,$netid);
+			echo "user id: " . $user_id;
+			$sql = "INSERT INTO data_dir(data_dir_group_id,data_dir_path,data_dir_user_id) ";
+			$sql .= "VALUES(:group_id,:directory,:user_id)";
 			$parameters = array(':group_id'=>$group_id,
-					':directory'=>$directory);
+					':directory'=>$directory,
+					':user_id'=>$user_id,
+					);
 			$query = $db->prepare($sql);
 			$query->execute($parameters);
 			$id = $db->lastInsertId();
@@ -84,6 +89,10 @@ class data_dir {
 
 	public function get_dir_exists() {
 		return $this->exists;
+	}
+
+	public function get_user_id() {
+		return $this->user_id;
 	}
 	public function enable() {
                 $sql = "UPDATE data_dir SET data_dir_enabled='1' ";
@@ -144,6 +153,7 @@ class data_dir {
 			$this->enabled = $result['data_dir_enabled'];
 			$this->exists = $result['data_dir_exists'];
 			$this->owner = $result['owner'];
+			$this->user_id = $result['data_dir_user_id'];
 			return true;
 		}
 		return false;
@@ -258,28 +268,34 @@ class data_dir {
 		}
 		else {
 			$user = new User($this->db);
-			$user->load($this->get_user_id);
+			$user->load($this->get_user_id());
+			
         	        $data_cost = new data_cost($this->db);
 			$total_cost = $data_cost->calculate_cost($bytes);
 			$billed_cost = 0;
-			//if ($project->get_bill_project()) {
-			//	$billed_cost = $total_cost;
-			//}
-        	        $insert_array = array('data_bill_data_dir_id'=>$this->get_data_dir_id(),
-                	                'data_bill_group_id'=>$this->get_group_id(),
-					'data_bill_user_id'=>$this->get_user_id(),
-                        	        'data_bill_cfop_id'=>$user->getDefaultCFOPID(),
-                                	'data_bill_data_cost_id'=>$data_cost_result['id'],
-	                                'data_bill_avg_bytes'=>$bytes,
-					'data_bill_total_cost'=>$total_cost,
-					'data_bill_billed_cost'=>$billed_cost,
-					'data_bill_date'=>$bill_date
-	                                );
+			if ($user->getDefaultCFOPID() != '') {
+				$billed_cost = $total_cost;
+			}
+			$insert_sql = "INSERT INTO data_bill(data_bill_data_dir_id,data_bill_data_cost_id,data_bill_group_id,";
+			$insert_sql .= "data_bill_user_id,data_bill_cfop_id,data_bill_avg_bytes,data_bill_total_cost,data_bill_billed_cost,data_bill_date) ";
+			$insert_sql .= "VALUES(:data_dir_id,:data_cost_id,:group_id,:user_id,:cfop_id,:bytes,:total_cost,:billed_cost,:bill_date)";
 			
-        	        $insert_id = $this->db->build_insert('data_bill',$insert_array);
-			$message = "Data Bill: Directory: " . $this->get_directory() . " Successfully added data bill";
+        	        $parameters = array(':data_dir_id'=>$this->get_data_dir_id(),
+					':data_cost_id'=>$data_cost->get_data_cost_id(),
+                	                ':group_id'=>$this->get_group_id(),
+					':user_id'=>$this->get_user_id(),
+                        	        ':cfop_id'=>$user->getDefaultCFOPID(),
+	                                ':bytes'=>$bytes,
+					':total_cost'=>$total_cost,
+					':billed_cost'=>$billed_cost,
+					':bill_date'=>$bill_date
+	                                );
+			$query = $this->db->prepare($insert_sql);
+			$query->execute($parameters);
+        	        $insert_id = $this->db->lastInsertId();
+			return true;
 		}
-		return array('RESULT'=>$result,'MESSAGE'=>$message,'id'=>$insert_id);
+		return false;
 	}
 
 	public function update_dir_exists($exists) {

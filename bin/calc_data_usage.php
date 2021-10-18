@@ -84,8 +84,11 @@ else {
 				$sum += $usage['data_usage_bytes'];
 			}
 			$average = round($sum / $count);
+			
 			$result = $data_dir->add_data_bill($month,$year,$average);
-			$log_file->send_log($result['MESSAGE']);
+			if ($result) {
+				$log_file->send_log("Data Bill: Directory: " . $data_dir->get_directory() . " successfully added to data bill");
+			}
         }
 	
 	

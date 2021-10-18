@@ -77,19 +77,20 @@ class data_functions {
 		$sql = "SELECT data_dir.data_dir_path as 'Directory', ";
 	        $sql .= "ROUND(data_bill.data_bill_avg_bytes / 1099511627776,3) as 'Terabytes', ";
         	$sql .= "ROUND(data_cost.data_cost_value,2) as 'Rate ($/Terabyte)', ";
-	        $sql .= "data_cost.data_cost_type as 'Data Type', ";
         	$sql .= "ROUND(data_bill.data_bill_total_cost,2) as 'Total Cost', ";
 	        $sql .= "ROUND(data_bill.data_bill_billed_cost,2) as 'Billed Cost', ";
         	$sql .= "groups.group_name as 'Group', ";
+		$sql .= "users.user_name as 'User', ";
 	        $sql .= "user_cfop.cfop as 'CFOP' ";
         	$sql .= "FROM data_bill ";
+		$sql .= "LEFT JOIN users ON users.id=data_bill.data_bill_user_id ";
 	        $sql .= "LEFT JOIN user_cfop ON user_cfop.id=data_bill.data_bill_cfop_id ";
         	$sql .= "LEFT JOIN groups ON groups.id=data_bill.data_bill_group_id ";
 	        $sql .= "LEFT JOIN data_dir ON data_dir.data_dir_id=data_bill.data_bill_data_dir_id ";
         	$sql .= "LEFT JOIN data_cost ON data_cost_id=data_bill_data_cost_id ";
-	        $sql .= "WHERE YEAR(data_bill.data_bill_date)=':year' ";
-        	$sql .= "AND MONTH(data_bill.data_bill_date)=':month' ";
-	        $sql .= "AND ROUND(data_bill.data_bill_total_cost,2)>':minimum_bill' ";
+	        $sql .= "WHERE YEAR(data_bill.data_bill_date)=:year ";
+        	$sql .= "AND MONTH(data_bill.data_bill_date)=:month ";
+	        $sql .= "AND ROUND(data_bill.data_bill_total_cost,2)>:minimum_bill ";
 		$sql .= "ORDER BY Directory ASC";
 		$query = $db->prepare($sql);
 		$query->execute(array(':year'=>$year,
@@ -98,41 +99,6 @@ class data_functions {
 			);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
-
-        public static function get_data_boa_bill($db,$month,$year,$minimal_bill = 0.00) {
-                $sql = "SELECT '' as 'DATE', ";
-		$sql .= "projects.project_name as 'NAME', ";
-		$sql .= "cfops.cfop_value as 'CFOP', ";
-		$sql .= "cfops.cfop_activity as 'ACTIVITY CODE', ";	
-                $sql .= "ROUND(data_bill.data_bill_billed_cost,2) as 'COST', ";
-		$sql .= "CONCAT('Biocluster Data - ',data_dir.data_dir_path) as 'DESCRIPTION' ";
-                $sql .= "FROM data_bill ";
-                $sql .= "LEFT JOIN cfops ON cfops.cfop_id=data_bill.data_bill_cfop_id ";
-                $sql .= "LEFT JOIN projects ON projects.project_id=data_bill.data_bill_project_id ";
-                $sql .= "LEFT JOIN data_dir ON data_dir.data_dir_id=data_bill.data_bill_data_dir_id ";
-                $sql .= "LEFT JOIN data_cost ON data_cost_id=data_bill_data_cost_id ";
-                $sql .= "WHERE YEAR(data_bill.data_bill_date)='" . $year . "' ";
-                $sql .= "AND MONTH(data_bill.data_bill_date)='" . $month . "' ";
-                $sql .= "AND ROUND(data_bill.data_bill_billed_cost,2)>'" . $minimal_bill . "' ";
-                $sql .= "ORDER BY `CFOP` ASC, `ACTIVITY CODE` ASC";
-		$data_result = $db->query($sql);
-
-
-		$total_bill = 0;
-		foreach ($data_result as $num => $values) {
-                        $total_bill += $values['COST'];
-                }
-
-                $first_row = array(array('DATE'=>$month . "/" . $year,
-                        'NAME'=>'IGB Biocluster Data',
-                        'CFOP'=>settings::get_boa_cfop(),
-                        'ACTIVITY CODE'=>'',
-                        'COST'=>"-" . $total_bill,
-			'DESCRIPTION'=>'',
-			));
-
-		return array_merge($first_row,$data_result);			
-        }
 
 	public static function get_existing_dirs() {
 		$root_dirs = settings::get_root_data_dirs();
@@ -182,6 +148,42 @@ class data_functions {
         }
         public static function bytes_to_gigabytes($bytes = 0) {
                 return round($bytes / self::convert_gigabytes,3);
+        }
+
+	public static function get_total_cost($db,$start_date,$end_date,$format = 0) {
+                $sql = "SELECT SUM(data_bill_total_cost) as total_cost ";
+                $sql .= "FROM data_bill ";
+                $sql .= "WHERE data_bill_date BETWEEN :start_date AND :end_date ";
+                $query = $db->prepare($sql);
+                $query->execute(array(':start_date'=>$start_date,
+                                ':end_date'=>$end_date));
+                $result = $query->fetch(PDO::FETCH_ASSOC);
+                $cost = 0;
+                if (count($result)) {
+                        $cost = $result['total_cost'];
+                        if ($format) {
+                                $cost = number_format($result['total_cost'],2);
+                        }
+                }
+                return $cost;
+        }
+
+        public static function get_billed_cost($db,$start_date,$end_date,$format = 0) {
+                $sql = "SELECT SUM(data_bill_billed_cost) as billed_cost ";
+                $sql .= "FROM data_bill ";
+                $sql .= "WHERE data_bill_date BETWEEN :start_date AND :end_date ";
+                $query = $db->prepare($sql);
+                $query->execute(array(':start_date'=>$start_date,':end_date'=>$end_date));
+                $result = $query->fetch(PDO::FETCH_ASSOC);
+                $cost = 0;
+                if (count($result)) {
+                        $cost = $result['billed_cost'];
+                        if ($format) {
+                                $cost = number_format($result['billed_cost'],2);
+                        }
+                }
+                return $cost;
+
         }
 
 }

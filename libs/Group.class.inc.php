@@ -194,7 +194,7 @@ class Group {
 		if (settings::get_dataserver_enabled()) {
 			try {
 				$directory = settings::get_dataserver_root_dir() . "/" . $this->netid;
-				data_dir::create($this->db,$this->getId(),$directory);
+				data_dir::create($this->db,$this->getId(),$directory,$this->netid);
 				data_dir::createDirectory($gid, $this->netid, $this->netid);
 				foreach($this->getMembers() as $member) {
 					data_dir::createDirectory($gid, $this->netid, $member['user_name']);
@@ -221,7 +221,7 @@ class Group {
 			global $ldapman;
 			try {
 				$gid = $this->getLdapGroupName();
-				if (count($ldapman->getGroup($gid))) {
+				if ($ldapman->getGroup($gid) != null) {
 					throw new Exception("Error ldap group " . $gid . " already exists");
 					return false;
 				}
@@ -253,7 +253,7 @@ class Group {
 
 
 	public function delete() {
-		if ($this->getId()) {
+		if ($this->getId() && $this->getEnabled()) {
 			$members = $this->getMembers();
 			if (count($members)) {
 				throw new Exception("Can not delete group " . $this->getName() . ".  Group has " . count($members) ." members.  The group has to be empty before it can be deleted.");
@@ -286,7 +286,7 @@ class Group {
 
 
 		}
-
+		return false;
 
 	}
 }

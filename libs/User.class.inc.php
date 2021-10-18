@@ -583,6 +583,18 @@ class User
             }
         }
     }
+
+	public static function getIDByUsername($db,$username) {
+		$sql = "SELECT id FROM users where user_name=:username LIMIT 1";
+		$query = $db->prepare($sql);
+		$query->execute(array(':username'=>$username));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $result['id'];
+
+		}
+		return false;
+	}
 }
 
 ?>
