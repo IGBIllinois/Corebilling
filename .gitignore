@@ -1,6 +1,5 @@
 /log/*.log
 /vendor
 /html/vendor
-composer.lock
 /conf/config.inc.php
 /components
