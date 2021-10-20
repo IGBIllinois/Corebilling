@@ -1,6 +1,6 @@
 IGB Core Facilities Instrument Tracking
 ====================
-[![Build Status](https://www.travis-ci.com/IGBIllinois/CoreBilling.svg?branch=master)](https://www.travis-ci.com/IGBIllinois/CoreBilling)
+[![Build Status]((https://github.com/IGBIllinois/Corebilling/actions/workflows/php.yml/badge.svg)
 
 * Web interface to schedule, track, and bill instrument usage by tracking user logins and session times.
 ## Features 
