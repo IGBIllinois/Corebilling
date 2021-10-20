@@ -5,7 +5,6 @@ class Group {
     	private $groupId;
 	private $groupName;
 	private $description;
-	private $departmentId;
 	private $netid;
 	private $log_file = null;
 	private $enabled = false;
@@ -25,16 +24,14 @@ class Group {
 	/**Add a group to the database and load it in the current object
 	* @param $groupName
 	* @param $description
-	* @param $departmentId
 	* @param $netid
 	*/
-	public function create($groupName, $description, $departmentId,$netid) {
+	public function create($groupName, $description, $netid) {
 		$groupId = 0;
-		$sql= "INSERT INTO groups (group_name, description, department_id,netid)VALUES(:group_name,:description,:department_id,:netid)";
+		$sql= "INSERT INTO groups (group_name, description, netid)VALUES(:group_name,:description,:netid)";
 		$query = $this->db->prepare($sql);
 		$parameters = array(':group_name'=>$groupName,
 				':description'=>$description,
-				':department_id'=>$departmentId,
 				':netid'=>$netid,
 				);
 		$this->db->beginTransaction();
@@ -66,7 +63,6 @@ class Group {
 		$result = $query->fetch(PDO::FETCH_ASSOC);
 		$this->groupName = $result['group_name'];
 		$this->description = $result['description'];
-		$this->departmentId = $result['department_id'];
 		$this->groupId = $groupId;
 		$this->netid = $result['netid'];
 		$this->enabled = $result['enabled'];
@@ -76,14 +72,12 @@ class Group {
 	/**
 	* Update group parameters in database
 	*/
-	public function update($groupName,$netid,$departmentId,$description) {
+	public function update($groupName,$netid,$description) {
 		$old_netid = $this->getNetid();
 		try {
-			$sql = "UPDATE `groups` SET group_name=:group_name,description=:description, department_id=:department_id, ";
-			$sql .= "netid=:netid WHERE id=:group_id LIMIT 1";
+			$sql = "UPDATE `groups` SET group_name=:group_name,description=:description,netid=:netid WHERE id=:group_id LIMIT 1";
 			$parameters = array(":group_name"=>$groupName,
 					":description"=>$description,
-					":department_id"=>$departmentId,
 					":group_id"=>$this->groupId, 
 					":netid"=>$netid);
 			$query = $this->db->prepare($sql);
@@ -149,13 +143,6 @@ class Group {
 
 
 	//Getters and setters for this class
-
-	/**
-	* @return mixed
-	*/
-	public function getDepartmentId() {
-		return $this->departmentId;
-	}
 
 	/**
 	* @return mixed

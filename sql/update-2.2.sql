@@ -5,6 +5,7 @@ ALTER TABLE access_control MODIFY time_created DATETIME NOT NULL DEFAULT CURRENT
 ALTER TABLE groups ADD UNIQUE(netid);
 ALTER TABLE groups ADD enabled BOOLEAN DEFAULT 1;
 ALTER TABLE users ADD UNIQUE(user_name);
+ALTER TABLE groups DROP COLUMN department_id;
 
 CREATE TABLE data_cost(
 	data_cost_id INT NOT NULL AUTO_INCREMENT,

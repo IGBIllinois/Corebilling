@@ -45,7 +45,6 @@ class data_dir {
 		}
 		else {
 			$user_id = User::getIDByUsername($db,$netid);
-			echo "user id: " . $user_id;
 			$sql = "INSERT INTO data_dir(data_dir_group_id,data_dir_path,data_dir_user_id) ";
 			$sql .= "VALUES(:group_id,:directory,:user_id)";
 			$parameters = array(':group_id'=>$group_id,

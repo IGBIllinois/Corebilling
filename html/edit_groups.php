@@ -17,13 +17,9 @@ if (isset($_POST['create'])) {
 	
 	$groupName = $_POST['group_name'];
 	$description = $_POST['description'];
-	$departmentId = $_POST['department'];
 	$netid = $_POST['netid'];
 	if ($groupName == "") {
 		$message .= html::error_message("No group name specified");
-	}
-	elseif (!$departmentId) {
-		$message .= html::error_message("Please specify a department");
 	}
 	elseif (Group::exists($db,$groupName)) {
 		$message .= html::error_message("Group name already exists.");
@@ -31,12 +27,12 @@ if (isset($_POST['create'])) {
 	elseif ($netid == "") {
 		$message .= html::error_message("No netID specified");
 	}
-	/*elseif (!User::exists($db,$netid)) {
+	elseif (!User::exists($db,$netid)) {
 		$message .= html::error_message("netID " . $netid . " does not exist");
-	}*/
+	}
 	else {
 		try {
-		$result = $group->create($groupName, $description, $departmentId,$netid);
+		$result = $group->create($groupName, $description, $netid);
 		if ($result) {
 			$message .= html::success_message("Group " . $groupName . " successfully created.");
 			$groupID = $result;
@@ -59,30 +55,25 @@ if (isset($_POST['modify'])) {
 	$groupName = $_POST['group_name'];
 	$groupID = $_POST['group_id'];
 	$description = $_POST['description'];
-	$departmentId = $_POST['department'];
 	$netid = $_POST['netid'];
 	$group->load($groupID);
 	if ($groupName == "") {
                 $message .= html::error_message("No group name specified");
         }
-	elseif (!$departmentId) {
-                $message .= html::error_message("Please specify a department");
-        }
 	elseif ($netid == "") {
                 $message .= html::error_message("No netID specified");
         }
-        /*elseif (!User::exists($db,$netid)) {
+        elseif (!User::exists($db,$netid)) {
                 $message .= html::error_message("netID " . $netid . " does not exist");
-        }*/
+        }
 	elseif (($group->getName() == $groupName) &&
 		($group->getNetid() == $netid) &&
-		($group->getDepartmentId() == $departmentId) &&
 		($group->getDescription() == $description)) {
 		$message .= html::error_message("No group changes made");
 	}
 	else {
 		try {
-			if($group->update($groupName,$netid,$departmentId,$description)) {
+			if($group->update($groupName,$netid,$description)) {
 				$message .= html::success_message("Group " . $groupName . " successfully updated.");
 			}
 		}
@@ -130,15 +121,6 @@ foreach ($members as $id => $member) {
 	$members_html .= "<td>" . $member['first'] . " " . $member['last'] . "</td></tr>";
 }
 
-$departments = Department::getAllDepartments($db);
-$department_html = "";
-foreach ($departments as $department) {
-	$department_html .= "<option value=" . $department['id'];
-	if ($department['id'] == $group->getDepartmentId()) {
-		$department_html .= " selected='selected'";
-	}
-	$department_html .= ">" . $department['department_name'] . "</option>";
-}
 
 $groups_html = "";
 foreach (Group::getAllGroups($db) as $groupInfo) {
@@ -181,15 +163,6 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 					<label class="col-sm-3 control-label">PI netid</label>
 					<div class="col-sm-9">
 						<input name="netid" type="text" value="<?php echo $group->getNetid(); ?>" class="form-control"<?php if($group->getNetid() != null){echo " readonly";}?>>
-					</div>
-				</div>
-				<div class="form-group">
-					<label class="col-sm-3 control-label">Department</label>
-					<div class="col-sm-9">
-						<select name="department" class="form-control">
-							<option value=0>Not Set</option>
-							<?php echo $department_html; ?>
-						</select>
 					</div>
 				</div>
 				<div class="form-group">
