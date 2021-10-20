@@ -8,6 +8,7 @@ class Group {
 	private $netid;
 	private $log_file = null;
 	private $enabled = false;
+	private $time_created;
 
 	public function __construct(PDO $db)
 	{
@@ -66,7 +67,8 @@ class Group {
 		$this->groupId = $groupId;
 		$this->netid = $result['netid'];
 		$this->enabled = $result['enabled'];
-		
+		$this->time_created = $result['time_created'];
+	
 	}
 
 	/**
@@ -175,6 +177,9 @@ class Group {
 
 	public function getEnabled() {
 		return $this->enabled;
+	}
+	public function getTimeCreated() {
+		return $this->time_created;
 	}
 	public function createGroupFolder() {
 		$gid = $this->getLdapGroupName();
