@@ -1,7 +1,7 @@
 {
-	"name": "IGBIllinois/Corebilling",
+	"name": "igbillinois/corebilling",
 	"description": "Instrument Tracking Software",
-	"license": "GPLv3",
+	"license": "GPL-3.0-only",
 	"repositories" : [
 	{
 		"type": "vcs",
