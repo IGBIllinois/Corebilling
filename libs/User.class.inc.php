@@ -595,6 +595,19 @@ class User
 		}
 		return false;
 	}
+
+	public function get_data_dir_id() {
+		$sql = "SELECT data_dir_id FROM data_dir WHERE data_dir_enabled=1 AND data_dir_user_id=:user_id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':user_id'=>$this->getId()));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			return $result['data_dir_id'];
+
+		}
+		return false;
+
+	}
 }
 
 ?>

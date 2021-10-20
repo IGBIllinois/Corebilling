@@ -6,6 +6,7 @@ class data_dir {
 	private $db;
 	private $id;
 	private $group_id;
+	private $user_id;
 	private $group;
 	private $directory;
 	private $time_created;
@@ -13,7 +14,6 @@ class data_dir {
 	private $exists;
 	private $owner;
 	private $log_file = null;
-	private $user_id;
 
 	const precentile = 0.95;
 	const kilobytes_to_bytes = "1024";
@@ -76,9 +76,12 @@ class data_dir {
 	public function get_group() {
 		return $this->group;
 	}
+	public function get_user_id() {
+		return $this->user_id;
+	}
 	public function get_owner() {
 		return $this->owner;
-	}	
+	}
 	public function get_enabled() {
 		return $this->enabled;
 	}
@@ -90,9 +93,6 @@ class data_dir {
 		return $this->exists;
 	}
 
-	public function get_user_id() {
-		return $this->user_id;
-	}
 	public function enable() {
                 $sql = "UPDATE data_dir SET data_dir_enabled='1' ";
                 $sql .= "WHERE data_dir_id='" . $this->get_data_dir_id() . "' LIMIT 1";
@@ -137,7 +137,6 @@ class data_dir {
 	private function get_data_dir($data_dir_id) {
 		$sql = "SELECT data_dir.*, groups.group_name, groups.netid as owner FROM data_dir ";
 		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
-		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
 		$sql .= "WHERE data_dir_id=:data_dir_id ";
 		$sql .= "LIMIT 1";
 		$query = $this->db->prepare($sql);
@@ -208,8 +207,7 @@ class data_dir {
 		$sql = "INSERT INTO data_usage(data_usage_data_dir_id,data_usage_bytes) ";
 		$sql .= "VALUES(:data_usage_data_dir_id,:data_usage_bytes) ";
                 $parameters = array(':data_usage_data_dir_id'=>$this->get_data_dir_id(),
-                                ':data_usage_bytes'=>$bytes
-                                );
+                                ':data_usage_bytes'=>$bytes);
 		$query = $this->db->prepare($sql);
 		$query->execute($parameters);
 		$insert_id = $this->db->lastInsertId();
@@ -297,6 +295,27 @@ class data_dir {
 		return false;
 	}
 
+	public function get_data_bill($month,$year) {
+		$sql = "SELECT data_bill.*,data_cost.data_cost_value as cost, user_cfop.cfop as cfop FROM data_bill ";
+		$sql .= "LEFT JOIN data_cost ON data_cost.data_cost_id=data_bill.data_bill_data_cost_id ";
+		$sql .= "LEFT JOIN user_cfop ON user_cfop.id=data_bill_cfop_id ";
+		$sql .= "WHERE data_bill_data_dir_id=:data_dir_id ";
+		$sql .= "AND MONTH(data_bill_date)=:month AND YEAR(data_bill_date)=:year LIMIT 1";
+		$parameters = array(':data_dir_id'=>$this->get_data_dir_id(),
+				':month'=>$month,
+				':year'=>$year);
+		$query = $this->db->prepare($sql);
+		$query->execute($parameters);
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+
+			return $result;
+
+		}
+		return false;
+
+
+	}
 	public function update_dir_exists($exists) {
 		if (!is_bool($exists)) { 
 			return false;
