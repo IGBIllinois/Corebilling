@@ -1,10 +1,10 @@
-name: PHP Composer
+name: Build Status
 
 on:
   push:
-    branches: [ master devel ]
+    branches: [ master ]
   pull_request:
-    branches: [ master devel ]
+    branches: [ master ]
 
 jobs:
   build:
