@@ -70,15 +70,6 @@ if (isset($_POST['CreateNewDevice'])) {
 ?>
 <h3>Devices Configuration</h3>
 <form action="edit_devices.php" method=POST>
-	<div class="form-group">
-		<?php
-		if ($device->getId() > 0) {
-			echo "<input name=\"ModifyDevice\" type=\"submit\" class=\"btn btn-primary\" id=\"Modify\" value=\"Modify\">";
-		} else {
-			echo "  <input name=\"CreateNewDevice\" type=\"submit\" class=\"btn btn-primary\" id=\"Submit\" value=\"Create\" >";
-		}
-		?>
-	</div>
 	<div class="row">
 		<div class="col-md-6">
 			<div class="well form-horizontal">
@@ -92,7 +83,7 @@ if (isset($_POST['CreateNewDevice'])) {
 							foreach ($devicesList as $id => $deviceInfo) {
 								echo "<option value=" . $deviceInfo["id"];
 								if ($device->getId() == $deviceInfo["id"]) {
-									echo " selected";
+									echo " selected='selected'";
 								}
 								echo ">" . $deviceInfo["full_device_name"] . "</option>";
 							}
@@ -154,13 +145,24 @@ if (isset($_POST['CreateNewDevice'])) {
 				<div class="form-group">
 					<label class="col-sm-3 control-label" for="ldap_group">LDAP Group:</label>
 					<div class="col-sm-9">
-						<input type="text" name="ldap_group" id="ldap_group" class="form-control" value="<?php echo $device->getLDAPGroup(); ?>">
+						<input type="text" name="ldap_group" id="ldap_group" readonly class="form-control" value="<?php echo $device->getLDAPGroup(); ?>">
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label" for="editDevice">Notes</label>
 					<div class="col-sm-9">
 						<textarea name="description" class="form-control"><?php echo $device->getDescription();?></textarea>
+					</div>
+				</div>
+				<div class='form-group'>
+					<div class='col-sm-9 col-sm-offset-3'>
+					<?php if ($device->getId() > 0) {
+						echo "<input name=\"ModifyDevice\" type=\"submit\" class=\"btn btn-primary\" id=\"Modify\" value=\"Modify\">";
+					} 
+					else {
+						echo "<input name=\"CreateNewDevice\" type=\"submit\" class=\"btn btn-primary\" id=\"Submit\" value=\"Create\" >";
+					}
+					?>
 					</div>
 				</div>
 			</div>

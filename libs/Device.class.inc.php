@@ -230,8 +230,12 @@ class Device
 	public function getIPAddress() {
 		return $this->ipaddress;
 	}
-	public function getLDAPGroup(){
-		return $this->ldap_group;
+	public function getLDAPGroup() {
+		if (LDAPMAN_API_ENABLED) {
+                        return LDAPMAN_DEVICE_PREFIX . $this->shortName;
+                }
+                return false;
+	
 	}
 	public function setLDAPGroup($ldap_group){
 		if($this->ldap_group != $ldap_group){

@@ -171,18 +171,18 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 						<textarea name="description" class="form-control"><?php echo $group->getDescription(); ?></textarea>
 					</div>
 				</div>
-				<?php if ($groupID != 0) { 
+				<?php if ($group->getId() != 0) { 
 					echo "<div class='form-group'><label class='col-sm-3 control-label'>Time Created</label>";
 					echo "<div class='col-sm-9'><input class='form-control' type='text' readonly value='". $group->getTimeCreated() . "'></div></div>";
 					if (LDAPMAN_API_ENABLED) {
-						echo "<div class='form-group'><label class='col-sm-3 control-label'>Ldap Group</label>";
+						echo "<div class='form-group'><label class='col-sm-3 control-label'>LDAP Group</label>";
 						echo "<div class='col-sm-9'><input class='form-control' type='text' readonly value='" . $group->getLdapGroupName() . "'></div></div>";
 					}
 				} ?>
 				<div class="form-group">
 					<div class="col-sm-9 col-sm-offset-3">
 						<?php
-						if ($group->getId() != 0 || $group->getId() != null) {
+						if ($group->getId() != 0 && $group->getId() != null) {
 							echo '<input name="modify" type="submit" class="btn btn-primary" id="Modify" value="Modify">';
 							echo '&nbsp<input name="delete" type="submit" class="btn btn-danger" id="delete" value="Delete" onClick="return confirm_group_delete()">';
 						} else {
