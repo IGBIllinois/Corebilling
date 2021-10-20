@@ -7,29 +7,59 @@ $userToBill = new User($db);
 $bills = new Bills($db);
 $userCfop = new UserCfop($db);
 
-if($login_user->isAdmin()){
+$selectableUsersList = array();
+if($login_user->isAdmin()) {
 	$selectableUsersList = User::getAllUsers($db);
-} elseif($login_user->isSupervisor()){
+} 
+elseif($login_user->isSupervisor()) {
 	$group = new Group($db);
 	$group->load($authenticate->getAuthenticatedUser()->getGroupId());
 	$selectableUsersList = $group->getMembers();
-} else {
-	$selectableUsersList = array();
-}
+} 
 
 if (isset($_POST['monthSelected'])) {
 	list($month, $year) = explode(" ", $_POST['monthSelected']);
-} else {
+} 
+else {
 	$month = Date("n");
 	$year = Date("Y");
 }
 
 if (isset($_POST['selectedUser'])) {
 	$userToBill->load($_POST['selectedUser']);
-} else {
+} 
+else {
 	$userToBill->load($authenticate->getAuthenticatedUser()->getId());
 }
 
+$data_dir_id = $userToBill->get_data_dir_id();
+$data_html = "";
+if ($data_dir_id) {
+	$data_dir = new data_dir($db,$data_dir_id);
+	$data_bill = $data_dir->get_data_bill($month,$year);
+	if ($data_bill) {
+		$data_html = "<div class='panel panel-default'>";
+	        $data_html .= "<div class='panel-heading'>";
+        	$data_html .= "<h4>Data Usage Billing</h4></div>";
+	        $data_html .= "<div class='panel-body'>";
+        	$data_html .= "<table class='table table-striped table-hover'>";
+		$data_html .= "<thead><tr>";
+		$data_html .= "<th>Directory</th><th>Group</th><th>Terabytes</th>";
+		$data_html .= "<th>Cost Per Terabyte</th><th>Billed Amount</th><th>CFOP</th>";
+		$data_html .= "</thead>";
+		$data_html .= "<tr>";
+		$data_html .= "<td>" . $data_dir->get_directory() . "</td>";
+		$data_html .= "<td>" . $data_dir->get_group() . "</td>";
+		$data_html .= "<td>" . data_functions::bytes_to_terabytes($data_bill['data_bill_avg_bytes']) . "</td>";
+		$data_html .= "<td>" . number_format($data_bill['cost'],2) . "</td>";
+		$data_html .= "<td>$" . number_format($data_bill['data_bill_billed_cost'],2) . "</td>";
+		$data_html .= "<td>" . UserCfop::formatCfop($data_bill['cfop']) . "</td>";	
+		$data_html .= "</tr>";
+		$data_html .= "</table>";
+		$data_html .= "</div></div>";
+	}	
+
+}
 ?>
 
 <h3>User Billing</h3>
@@ -51,7 +81,7 @@ if (isset($_POST['selectedUser'])) {
 				foreach ($selectableUsersList as $id => $availUser) {
 					echo "<option value=" . $availUser['id'];
 					if ($userToBill->getId() == $availUser['id']) {
-						echo " SELECTED ";
+						echo " selected='selected'";
 					}
 					echo ">" . $availUser['user_name'] . "</option>";
 				}
@@ -66,7 +96,7 @@ if (isset($_POST['selectedUser'])) {
 			foreach ($availableBillingMonths as $id => $charge) {
 				echo "<option value=\"" . $charge['month'] . " " . $charge['year'] . "\"";
 				if ($charge['month'] == $month && $charge['year'] == $year) {
-					echo " SELECTED";
+					echo " selected='selected'";
 				}
 				echo ">" . $charge['mon_yr'] . "</option>";
 			}
@@ -95,6 +125,10 @@ if (isset($_POST['selectedUser'])) {
 			<tr>
 				<th>E-Mail:</th>
 				<td><?php echo $userToBill->getEmail();?></td>
+			</tr>
+			<tr>
+				<th>CFOP:</th>
+				<td><?php echo $userToBill->getDefaultCFOP();?></td>
 			</tr>
 		</table>
 	</div>
@@ -148,5 +182,6 @@ foreach ($rateTypesList as $rateTypeId => $rateTypeName) { ?>
 </script>
 <?php
 }
-require_once 'includes/footer.inc.php';
-?>
+echo $data_html;
+
+require_once 'includes/footer.inc.php'; ?>

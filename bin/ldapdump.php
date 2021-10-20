@@ -1,9 +1,22 @@
 #!/usr/bin/env/php
 <?php
-// setting up the web root and server root for
-include('../html/includes/config.php');
-include('../html/includes/auto_load_classes.php');
-include('../html/includes/mysql_connect.php');
+chdir(dirname(__FILE__));
+
+$include_paths = array('../libs');
+set_include_path(get_include_path() . ":" . implode(':',$include_paths));
+
+function my_autoloader($class_name) {
+        if(file_exists("../libs/" . $class_name . ".class.inc.php")) {
+                require_once $class_name . '.class.inc.php';
+        }
+}
+spl_autoload_register('my_autoloader');
+
+require_once '../conf/app.inc.php';
+require_once '../conf/config.inc.php';
+require_once '../vendor/autoload.php';
+
+date_default_timezone_set(settings::get_timezone());
 
 //Sets up ldap connection
 if(LDAPMAN_API_ENABLED){

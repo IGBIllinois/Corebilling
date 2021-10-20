@@ -1,6 +1,6 @@
 IGB Core Facilities Instrument Tracking
 ====================
-[![Build Status](https://www.travis-ci.com/IGBIllinois/CoreBilling.svg?branch=master)](https://www.travis-ci.com/IGBIllinois/CoreBilling)
+![Build Status]((https://github.com/IGBIllinois/Corebilling/actions/workflows/main.yml/badge.svg)
 
 * Web interface to schedule, track, and bill instrument usage by tracking user logins and session times.
 ## Features 
@@ -73,5 +73,11 @@ chown apache.apache log
 * Install composer packages
 ```
 composer install
+```
+* To Enable creation of data folders, need to allow apache user have sudo rights.  Run visudo and add below.  Change the paths to the install location of Core Billing
+```
+Cmnd_Alias COREAPP = /var/www/corebilling/bin/*.sh
+apache ALL=NOPASSWD: COREAPP
+Defaults:apache !requiretty
 ```
 * Done

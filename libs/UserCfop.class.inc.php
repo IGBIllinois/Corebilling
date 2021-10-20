@@ -152,6 +152,9 @@ class UserCfop {
         return $this->cfop;
     }
 
+	public function getCfopId() {
+		return $this->userCfopId;
+	}
     /**
      * @param mixed $description
      */

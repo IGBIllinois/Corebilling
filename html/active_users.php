@@ -18,7 +18,7 @@ if (isset($_POST['endMonthSelected'])) {
 }
 
 ?>
-<h4>Active Users</h4>
+<h3>Active Users</h3>
 
 <form name="verifyForm" method="post" action="active_users.php" class="form-inline">
 	<div class="well">

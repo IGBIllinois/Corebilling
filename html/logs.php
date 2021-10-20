@@ -21,7 +21,7 @@ if ($log_name == 'device.log') {
 }
 
 ?>
-<h2>Logs</h2>
+<h3>Logs</h3>
 <form class='form-inline' method='post' name='log' action='<?php echo $_SERVER['PHP_SELF']; ?>'>
 <div class='form-group'>
 	<select class='form-control' name='log_name' id='log_name'>

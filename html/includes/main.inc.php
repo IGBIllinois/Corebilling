@@ -22,15 +22,14 @@ try {
 }
 
 
+date_default_timezone_set(settings::get_timezone());
+
 //Sets up ldap connection
 $authen = new LdapAuth ( LDAP_HOST, LDAP_PEOPLE_DN, LDAP_GROUP_DN,LDAP_PORT);
 if(LDAPMAN_API_ENABLED){
 	$ldapman = new LdapManager(LDAPMAN_API_URL, LDAPMAN_API_USERNAME, LDAPMAN_API_PASSWORD);
 } else {
 	$ldapman = new LdapManager(LDAPMAN_API_URL);
-}
-if(CORESERVER_ENABLED){
-	$coreserverman = new CoreServerManager();
 }
 
 //Authenticates to website database

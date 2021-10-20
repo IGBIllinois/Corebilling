@@ -1,9 +1,8 @@
 <?php
 class Device
 {
+	const STATUS_TYPE_DEVICE=1;
 	private $db;
-
-    const STATUS_TYPE_DEVICE=1;
 	private $deviceId;
 	private $shortName;
 	private $full_name;
@@ -12,10 +11,10 @@ class Device
 	private $status;
 	private $deviceToken;
 	private $unauthorizedUser;
-    private $loggedUser;
-    private $ldap_group;
+	private $loggedUser;
+	private $ldap_group;
 	private $ipaddress;
-    private $log_file = null;
+	private $log_file = null;
 
 	public function __construct(PDO $db)
 	{
@@ -231,8 +230,12 @@ class Device
 	public function getIPAddress() {
 		return $this->ipaddress;
 	}
-	public function getLDAPGroup(){
-		return $this->ldap_group;
+	public function getLDAPGroup() {
+		if (LDAPMAN_API_ENABLED) {
+                        return LDAPMAN_DEVICE_PREFIX . $this->shortName;
+                }
+                return false;
+	
 	}
 	public function setLDAPGroup($ldap_group){
 		if($this->ldap_group != $ldap_group){

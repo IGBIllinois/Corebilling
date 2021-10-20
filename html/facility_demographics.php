@@ -31,7 +31,7 @@ else
 }
 
 ?>
-	<h4>Facility Demographics</h4>
+	<h3>Facility Demographics</h3>
 
 	<form name="verifyForm" method="post" class="form-inline">
 		<div class="well">

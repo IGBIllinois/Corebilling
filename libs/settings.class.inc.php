@@ -4,6 +4,10 @@ class settings {
 
 	private const TITLE = "Core Billing";
 	private const ENABLE_LOG = false;
+	private const NEWS_AGE = 120;
+	private const DATASERVER_ENABLED = false;
+	private const TIMEZONE = "UTC";
+
 	public static function get_version() {
 		return VERSION;
 	}
@@ -43,6 +47,36 @@ class settings {
 			return PASSWORD_RESET_URL;
 		}
 		return false;
+	}
+
+	public static function get_news_age() {
+		if (defined("NEWS_AGE") && (is_int(NEWS_AGE))) {
+                        return NEWS_AGE;
+                }
+                return self::NEWS_AGE;
+
+	}
+
+	public static function get_dataserver_enabled() {
+		if (defined("DATASERVER_ENABLED") && (is_bool(DATASERVER_ENABLED))) {
+			return DATASERVER_ENABLED;
+		}
+		return self::DATASERVER_ENABLED;
+
+	}
+
+	public static function get_dataserver_root_dir() {
+		if (defined("DATASERVER_ROOT_DIR") && (DATASERVER_ROOT_DIR != "")) {
+			return DATASERVER_ROOT_DIR;
+		}
+		return false;
+	}
+	public static function get_timezone() {
+		if (defined("TIMEZONE") && (TIMEZONE != '')) {
+			return TIMEZONE;
+		}
+		return self::TIMEZONE;
+
 	}
 }
 ?>
