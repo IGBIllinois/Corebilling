@@ -26,10 +26,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-php-
 
-    - name: Install Composer
-      uses: php-actions/composer@v6
-      with:
-        version: 1
     - name: Install Depedencies
       run: composer install --prefer-dist --no-progress
 
