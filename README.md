@@ -80,4 +80,9 @@ Cmnd_Alias COREAPP = /var/www/corebilling/bin/*.sh
 apache ALL=NOPASSWD: COREAPP
 Defaults:apache !requiretty
 ```
+
+* To enable calculation of data usage, copy the example /conf/cron.dist to /etc/cron.d/corebilling and edit the paths in the file
+```
+cp /var/www/corebilling/etc/cron.dist /etc/cron.d/corebilling
+```
 * Done
