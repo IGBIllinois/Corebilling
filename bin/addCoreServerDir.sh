@@ -3,7 +3,7 @@ gid=$1
 pi=$2
 user=$3
 
-OUTPUT=`ssh root@core-server.igb.illinois.edu "mkcoredir -g $gid -p $pi -u $user"`
+OUTPUT=`ssh root@core-server.igb.illinois.edu "/usr/local/coreapp/bin/mkcoredir -g $gid -p $pi -u $user"`
 
 if [ $? -eq 1 ]
 then
