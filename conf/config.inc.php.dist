@@ -22,7 +22,7 @@ define('DATASERVER_ROOT_DIR','');
 define ('DB_USER','');
 define ('DB_PASSWORD','');
 define ('DB_HOST','localhost');
-define ('DB_NAME','coreapp_flowcyt');
+define ('DB_NAME','corebilling');
 
 //Page Settings
 define ('TITLE', '');
