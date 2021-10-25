@@ -3,3 +3,4 @@
 /html/vendor
 /conf/config.inc.php
 /components
+composer.lock

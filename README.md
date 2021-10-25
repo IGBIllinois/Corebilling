@@ -42,7 +42,7 @@ CREATE DATABASE corebilling CHARACTER SET utf8;
 ```
 * Create mysql user with insert,update,select,delete privileges on the database
 ```
-CREATE USER 'posting_log'@'localhost' IDENTIFIED BY 'STRONG_PASSWORD';
+CREATE USER 'corebilling'@'localhost' IDENTIFIED BY 'STRONG_PASSWORD';
 GRANT SELECT,INSERT,DELETE,UPDATE ON corebilling.* to 'corebilling'@'localhost';
 ```
 * Import database structure
@@ -69,6 +69,10 @@ cp html/includes/config.default.php html/includes/config.php
 * If enabling log file, set permissions on the log folder for the apache user to read/write.
 ```
 chown apache.apache log
+```
+* Enable log rotation by copying conf/log_rotate.conf.dist to /etc/logrotate.d/corebilling.  Adjust the log folder in the file
+```
+cp conf/log_rotate.conf.dist /etc/logrotate.d/corebilling
 ```
 * Install composer packages
 ```
