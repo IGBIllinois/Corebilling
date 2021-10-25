@@ -120,7 +120,7 @@ if (isset($_POST['CreateNewDevice'])) {
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-3 control-label" for="editDevice">Status</label>
+					<label class="col-sm-3 control-label" for="editDevice">Status:</label>
 					<div class="col-sm-9">
 						<select name="status" class="form-control">
 							<?php
@@ -149,7 +149,7 @@ if (isset($_POST['CreateNewDevice'])) {
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-3 control-label" for="editDevice">Notes</label>
+					<label class="col-sm-3 control-label" for="editDevice">Notes:</label>
 					<div class="col-sm-9">
 						<textarea name="description" class="form-control"><?php echo $device->getDescription();?></textarea>
 					</div>
