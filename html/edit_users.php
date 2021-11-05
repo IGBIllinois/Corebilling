@@ -151,6 +151,7 @@ if (isset($_POST['create_user'])) {
 if (isset($_REQUEST['user_id'])) {
     $selectedUser->load($_REQUEST['user_id']);
 }
+
 ?>
 
 <h3><?php
@@ -262,10 +263,11 @@ if ($selectedUser->getId() > 0 && $ldapinfo == null) {
                                             <?php
                                             $listGroups = Group::getAllGroups($db);
                                             $userGroups = $selectedUser->getGroupIds();
+						
                                             foreach ($listGroups as $id => $groupToSelect) {
                                                 echo "<option value=" . $groupToSelect['id'];
                                                 if (in_array($groupToSelect['id'], $userGroups)) {
-                                                    echo " SELECTED";
+                                                    echo " selected='selected'";
                                                 }
                                                 echo ">" . $groupToSelect['group_name'] . "</option>";
                                             }

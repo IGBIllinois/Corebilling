@@ -11,7 +11,7 @@ class LdapAuth
 	private  $groupDN="";
 	private $port="";
 	private $error="No Error Detected";
-    private $ldap;
+    	private $ldap;
 	
 	public function __construct($host,$peopleDN,$groupDN,$port)
 	{

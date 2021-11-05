@@ -64,7 +64,7 @@ if (isset($_POST['modify'])) {
                 $message .= html::error_message("No netID specified");
         }
         elseif (!User::exists($db,$netid)) {
-                $message .= html::error_message("netID " . $netid . " does not exist");
+                $message .= html::error_message("User " . $netid . " does not exist.  Please add user first before updating group.");
         }
 	elseif (($group->getName() == $groupName) &&
 		($group->getNetid() == $netid) &&
@@ -90,7 +90,7 @@ elseif (isset($_POST['delete'])) {
 	$groupName = $group->getName();
 	try { 
 		if ($group->delete()) {
-			$message .= html::error_message("Group " . $groupName . " successfully deleted");
+			$message .= html::success_message("Group " . $groupName . " successfully deleted");
 			$groupID = 0;
 			$group->load($groupID);
 		}

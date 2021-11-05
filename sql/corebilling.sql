@@ -36,7 +36,9 @@ CREATE TABLE `device` (
   `device_token` varchar(32) DEFAULT NULL,
   `ldap_group` varchar(64) DEFAULT NULL,
   `ipaddress` VARCHAR(15) DEFAULT "",
+  `json` JSON DEFAULT '{}',
   `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT CHECK(JSON_VALID(json)),
   PRIMARY KEY (`id`)
 )\p;
 
@@ -147,7 +149,6 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL DEFAULT '',
   `first` varchar(45) NOT NULL DEFAULT '',
   `last` varchar(45) NOT NULL DEFAULT '',
-  `grank` int(10) unsigned NOT NULL DEFAULT 0,
   `rate` varchar(45) NOT NULL DEFAULT '',
   `hidden` tinyint(1) DEFAULT 0,
   `rate_id` int(11) DEFAULT NULL,

@@ -3,44 +3,37 @@ class Device
 {
 	const STATUS_TYPE_DEVICE=1;
 	private $db;
-	private $deviceId;
-	private $shortName;
-	private $full_name;
-	private $location;
-	private $description; 
-	private $status;
+	private $deviceId = 0;
+	private $shortName = "";
+	private $full_name = "";
+	private $location = "";
+	private $description = ""; 
+	private $status = 1;
 	private $deviceToken;
 	private $unauthorizedUser;
 	private $loggedUser;
 	private $ldap_group;
 	private $ipaddress;
 	private $log_file = null;
-
-	public function __construct(PDO $db)
-	{
+	private $json = "{}";
+	
+	public function __construct(PDO $db) {
 		$this->db = $db;
-		$this->shortName = "";
-		$this->full_name = "";
-		$this->location= "";
-		$this->description= "";
-		$this->deviceId = 0;
-		$this->status = 1;
 		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 	}
 	
-	public function __destruct()
-	{
+	public function __destruct() {
+
 	}
 
-    /**Create a new Device object and insert it into the database
-     * @param $dn
-     * @param $name
-     * @param $location
-     * @param $description
-     * @param $status
-     */
-    public function create($dn, $name,$location, $description, $status)
-	{
+	/**Create a new Device object and insert it into the database
+	* @param $dn
+	* @param $name
+	* @param $location
+	* @param $description
+	* @param $status
+	*/
+	public function create($dn, $name,$location, $description, $status) {
 		$this->shortName = $dn;
 		$this->full_name = $name;
 		$this->location = $location;
@@ -48,57 +41,77 @@ class Device
 		$this->status = $status;
 		$this->deviceToken = md5(uniqid(mt_rand(), true));
 		// TODO this sql query is not running
-		$queryAddDevice = "INSERT INTO device (device_name,location,description,full_device_name,status_id,device_token) VALUES(:device_name,:location,:description,:full_device_name,:status_id,:device_token)";
-        	$addDevicePrep = $this->db->prepare($queryAddDevice);
-	        $addDevicePrep->execute(array(":device_name"=>$dn,":location"=>$location,":description"=>$description,":full_device_name"=>$name,":status_id"=>$status,":device_token"=>$this->deviceToken));
+		$sql_add = "INSERT INTO device (device_name,location,description,full_device_name,status_id,device_token) ";
+		$sql_add .= "VALUES(:device_name,:location,:description,:full_device_name,:status_id,:device_token)";
+        	$query_add = $this->db->prepare($sql_add);
+		$parameters = array(":device_name"=>$dn,
+				":location"=>$location,
+				":description"=>$description,
+				":full_device_name"=>$name,
+				":status_id"=>$status,
+				":device_token"=>$this->deviceToken);
+		$query_add->execute($parameters);
 		$this->log_file->send_log("Created Device - " . $dn . " in location " . $location);
 		$this->deviceId = $this->db->lastInsertId();
 
         	//Add device rates rows to device rates table with default value of 0 for all values
 	        $ratesArr = Rate::getAllRates($this->db);
         	foreach ($ratesArr as $id => $rateInfo) {
-	            $queryAddRates = "INSERT INTO device_rate (rate,device_id,rate_id, min_use_time, rate_type_id)VALUES(0,:device_id,:rate_id,0,0)";
-        	    $addRatesPrep = $this->db->prepare($queryAddRates);
-	            $addRatesPrep->execute(array(":device_id"=>$this->deviceId,":rate_id"=>$rateInfo["id"]));
+			$sql_rates = "INSERT INTO device_rate (rate,device_id,rate_id, min_use_time, rate_type_id) ";
+			$sql_rates .= "VALUES(0,:device_id,:rate_id,0,0)";
+			$query_rates = $this->db->prepare($sql_rates);
+			$query_rates->execute(array(":device_id"=>$this->deviceId,":rate_id"=>$rateInfo["id"]));
         	}
         
 		return true;
 
 	}
-    /** Load device from database into object given an authKey or id
-     * @param $id
-     * @param int $authKey
-     */
-    public function load($id,$authKey=0)
-	{
-		$queryDeviceInfo = "SELECT * FROM device WHERE id=:id OR (device_token=:device_token AND device_token!=\"0\")";
-        $deviceInfoPrep = $this->db->prepare($queryDeviceInfo);
-		$deviceInfoPrep->execute(array(':id'=>$id,':device_token'=>$authKey));
-        $deviceInfoArr = $deviceInfoPrep->fetch(PDO::FETCH_ASSOC);
-        if($deviceInfoArr) {
-            $this->shortName = $deviceInfoArr["device_name"];
-            $this->full_name = $deviceInfoArr["full_device_name"];
-            $this->location = $deviceInfoArr["location"];
-            $this->description = $deviceInfoArr["description"];
-            $this->status = $deviceInfoArr["status_id"];
-            $this->deviceToken = $deviceInfoArr["device_token"];
-            $this->loggedUser = $deviceInfoArr["loggeduser"];
-            $this->unauthorizedUser = $deviceInfoArr["unauthorized"];
-            $this->deviceId = $deviceInfoArr['id'];
-            $this->ldap_group = $deviceInfoArr['ldap_group'];
-	    $this->ipaddress = $deviceInfoArr['ipaddress'];
-        }
+
+	/** Load device from database into object given an authKey or id
+	* @param $id
+	* @param int $authKey
+	*/
+	public function load($id,$authKey=0) {
+		$sql = "SELECT * FROM device WHERE id=:id OR (device_token=:device_token AND device_token!=\"0\") LIMIT 1";
+        	$query = $this->db->prepare($sql);
+		$query->execute(array(':id'=>$id,':device_token'=>$authKey));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if($result) {
+			$this->shortName = $result["device_name"];
+			$this->full_name = $result["full_device_name"];
+			$this->location = $result["location"];
+			$this->description = $result["description"];
+			$this->status = $result["status_id"];
+			$this->deviceToken = $result["device_token"];
+			$this->loggedUser = $result["loggeduser"];
+			$this->unauthorizedUser = $result["unauthorized"];
+			$this->deviceId = $result['id'];
+			$this->ldap_group = $result['ldap_group'];
+			$this->ipaddress = $result['ipaddress'];
+			$this->json = $result['json'];
+			return true;
+        	}
+		return false;
 	}
 
 
-    /**
-     * Update device object in database with getters and setters
-     */
-    public function update()
-	{
-		$queryUpdateDevice = "UPDATE device SET device_name=:device_name, location=:location,description=:description,full_device_name=:full_device_name, status_id=:status_id, ldap_group=:ldap_group WHERE id=:id";
-        $updateDevicePrep = $this->db->prepare($queryUpdateDevice);
-        $updateDevicePrep->execute(array(":device_name"=>$this->shortName,":location"=>$this->location,":description"=>$this->description,":full_device_name"=>$this->full_name,":status_id"=>$this->status,":id"=>$this->deviceId,":ldap_group"=>$this->ldap_group));
+	/**
+	* Update device object in database with getters and setters
+	*/
+	public function update() {
+		$sql = "UPDATE device SET device_name=:device_name, ";
+		$sql .= "location=:location,description=:description, ";
+		$sql .= "full_device_name=:full_device_name, status_id=:status_id, ";
+		$sql .= "ldap_group=:ldap_group WHERE id=:id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$parameters = array(":device_name"=>$this->shortName,
+			":location"=>$this->location,
+			":description"=>$this->description,
+			":full_device_name"=>$this->full_name,
+			":status_id"=>$this->status,
+			":id"=>$this->deviceId,
+			":ldap_group"=>$this->ldap_group);
+		return $query->execute($parameters);
 	}
 
 	public function updateLastTick($username="")
@@ -108,128 +121,118 @@ class Device
 		} else {
 			$loggeduser = -1;
 		}
-		$queryUpdateLastTick = "UPDATE device SET lasttick=NOW(), loggeduser=:loggeduser, unauthorized=:username WHERE id=:id";
-		$updateLastTick = $this->db->prepare($queryUpdateLastTick);
-        $updateLastTick->execute(array(':username'=>$username,':id'=>$this->deviceId,':loggeduser'=>$loggeduser));
+		$sql = "UPDATE device SET lasttick=NOW(), loggeduser=:loggeduser, unauthorized=:username WHERE id=:id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$parameters = array(':username'=>$username,':id'=>$this->deviceId,':loggeduser'=>$loggeduser);
+		return $query->execute($parameters);
 	}
 
-    /**Check if device with deviceName alrady exists
-     * @param $deviceName
-     * @return int
-     */
-    public function exists($deviceName)
-	{
-		$queryDeviceCount = "SELECT COUNT(*) AS num_devices FROM device WHERE device_name=:device_name";
-		$deviceCount = $this->db->prepare($queryDeviceCount);
-        $deviceCount->execute(array(':device_name'=>$deviceName));
-        $deviceCountArr = $deviceCount->fetch(PDO::FETCH_ASSOC);
-		if($deviceCountArr["num_devices"] > 0)
-		{
-			return 1;
-		}
-		else 
-		{
-			return 0;
-		}
+	/**Check if device with deviceName alrady exists
+	* @param $deviceName
+	* @return int
+	*/
+	public function exists($deviceName) {
+		$sql = "SELECT COUNT(1) AS exists FROM device WHERE device_name=:device_name LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':device_name'=>$deviceName));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		return $result['exists'];
 	}
 
 	/**List all devices
 	 * @param PDO $db
 	 * @return array
 	 */
-    public static function getAllDevices($db)
-    {
-        $queryAllDevices = "SELECT id, device_name, full_device_name, status_id FROM device ORDER BY full_device_name";
-        $allDevices = $db->query($queryAllDevices);
-        $allDevicesArr = $allDevices->fetchAll(PDO::FETCH_ASSOC);
-
-        return $allDevicesArr;
-    }
+	public static function getAllDevices($db) {
+		$sql = "SELECT id, device_name, full_device_name, status_id FROM device ORDER BY full_device_name";
+		$query = $db->query($sql);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
 
 	/**
 	 * @param PDO $db
 	 * @param int $id
 	 * @return mixed
 	 */
-    public static function getDevicesInSameRoom($db, $id){
-    	$query = "select id from device where location = (select location from device where id=? limit 1) and id != ?";
-    	$devices = $db->prepare($query);
-    	$devices->execute(array($id, $id));
-		return $devices->fetchAll(PDO::FETCH_ASSOC);
+	public static function getDevicesInSameRoom($db, $id){
+		$sql = "select id from device where location = (select location from device where id=:id limit 1) and id != :id";
+		$query = $db->prepare($sql);
+		$query->execute(array(':id'=>$id));
+		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-    public static function getAllDevicesStatus($db)
-    {
-        $queryDevicesUse = "SELECT d.full_device_name, d.ipaddress, d.location, u.user_name, d.loggeduser,u.first, u.last, TIMESTAMPDIFF(SECOND, lasttick, NOW()) AS lastseen , unauthorized FROM users u RIGHT JOIN device d ON u.id=d.loggeduser WHERE d.status_id=1 OR d.status_id=2 order by d.full_device_name";
-        $devicesUse = $db->prepare($queryDevicesUse);
-        $devicesUse->execute();
-        $devicesUseArr = $devicesUse->fetchAll(PDO::FETCH_ASSOC);
-        return $devicesUseArr;
-    }
-    /**Get rates list for device
-     * @return array
-     */
-    public function getRates()
-    {
-        $queryDeviceRates = "SELECT dr.rate, dr.id, dr.rate_id, dr.min_use_time, r.rate_name, dr.rate_type_id FROM device_rate dr, rates r WHERE r.id=dr.rate_id AND dr.device_id=:device_id";
-        $deviceRatesPrep = $this->db->prepare($queryDeviceRates);
-        $deviceRatesPrep->execute(array(":device_id"=>$this->deviceId));
-        $deviceRatesArr = $deviceRatesPrep->fetchAll(PDO::FETCH_ASSOC);
+	public static function getAllDevicesStatus($db) {
+		$sql = "SELECT d.full_device_name, d.ipaddress, d.location, u.user_name, ";
+		$sql .= "d.loggeduser,u.first, u.last, TIMESTAMPDIFF(SECOND, lasttick, NOW()) AS lastseen, ";
+		$sql .= "unauthorized FROM users u ";
+		$sql .= "RIGHT JOIN device d ON u.id=d.loggeduser ";
+		$sql .= "WHERE d.status_id=1 OR d.status_id=2 order by d.full_device_name";
+		$query = $db->prepare($sql);
+		$query->execute();
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
 
-        return $deviceRatesArr;
-    }
+	/**Get rates list for device
+	* @return array
+	*/
+	public function getRates() {
+		$sql = "SELECT dr.rate, dr.id, dr.rate_id, dr.min_use_time, r.rate_name, dr.rate_type_id ";
+		$sql .= "FROM device_rate dr, rates r ";
+		$sql .= "WHERE r.id=dr.rate_id AND dr.device_id=:device_id";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(":device_id"=>$this->deviceId));
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
 
-    /**Update this device's rate
-     * @param $rateId
-     * @param $rate
-     * @param $minTime
-     * @param $rateTypeId
-     */
-    public function updateRate($rateId, $rate, $minTime, $rateTypeId)
-    {
-        $queryUpdateDeviceRate = "UPDATE device_rate SET rate=:rate, min_use_time=:mintime, rate_type_id=:rate_type_id WHERE rate_id=:rate_id AND device_id=:device_id";
-        $updateDeviceRatePrep = $this->db->prepare($queryUpdateDeviceRate);
-        $updateDeviceRatePrep->execute(array(":rate"=>$rate,":mintime"=>$minTime,":rate_id"=>$rateId,":device_id"=>$this->deviceId,":rate_type_id"=>$rateTypeId));
-    }
+	/**Update this device's rate
+	* @param $rateId
+	* @param $rate
+	* @param $minTime
+	* @param $rateTypeId
+	*/
+	public function updateRate($rateId, $rate, $minTime, $rateTypeId) {
+		$sql = "UPDATE device_rate SET rate=:rate, min_use_time=:mintime, rate_type_id=:rate_type_id ";
+		$sql .= "WHERE rate_id=:rate_id AND device_id=:device_id";
+		$query = $this->db->prepare($sql);
+		$parameters = array(":rate"=>$rate,":mintime"=>$minTime,":rate_id"=>$rateId,":device_id"=>$this->deviceId,":rate_type_id"=>$rateTypeId);
+		return $query->execute($parameters);
+	}
 
-    public static function deviceStatusList($db)
-    {
-        $queryDeviceStatusList = "SELECT * FROM status WHERE type=:type";
-        $deviceStatusList = $db->prepare($queryDeviceStatusList);
-        $deviceStatusList->execute(array('type'=>Device::STATUS_TYPE_DEVICE));
-        $deviceStatusListArr = $deviceStatusList->fetchAll(PDO::FETCH_ASSOC);
+	public static function deviceStatusList($db) {
+		$sql = "SELECT * FROM status WHERE type=:type";
+		$query = $db->prepare($sql);
+		$query->execute(array('type'=>Device::STATUS_TYPE_DEVICE));
+        	return $query->fetchAll(PDO::FETCH_ASSOC);
 
-        return $deviceStatusListArr;
-    }
+	}
 
-    //Getters and setters for device
-    public function setDeviceId($id){
-	    if($this->deviceId != $id){
-		    $this->deviceId = $id;
+	//Getters and setters for device
+	public function setDeviceId($id){
+		if($this->deviceId != $id){
+			$this->deviceId = $id;
 			$this->log_file->send_log("Set id of device '".$this->shortName."' to $id");
 		}
-    }
-    public function getId()
-	{
+	}
+
+	public function getId() {
 		return $this->deviceId;
 	}
 
-	public function setShortName($dn)
-	{
+	public function setShortName($dn) {
 		if($this->shortName != $dn){
 			$this->log_file->send_log("Set short name of device '".$this->shortName."' to '$dn'");
 			$this->shortName = $dn;
 		}
 	}
 
-	public function getShortName()
-	{
+	public function getShortName() {
 		return $this->shortName;
 	}
 
 	public function getIPAddress() {
 		return $this->ipaddress;
 	}
+
 	public function getLDAPGroup() {
 		if (LDAPMAN_API_ENABLED) {
                         return LDAPMAN_DEVICE_PREFIX . $this->shortName;
@@ -237,6 +240,7 @@ class Device
                 return false;
 	
 	}
+
 	public function setLDAPGroup($ldap_group){
 		if($this->ldap_group != $ldap_group){
 			$this->ldap_group = $ldap_group;
