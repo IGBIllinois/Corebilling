@@ -103,16 +103,20 @@ if (isset($_POST['Select'])) {
 					<h4>Members</h4>
 				</div>
 				<div class="panel-body">
-					<table class="table table-striped table-hover">
+					<table class="table table-striped table-hover table-bordered table-condensed">
 						<tr>
 							<th>NetId</th>
 							<th>Full Name</th>
 						</tr>
 						<?php
 						$members = $department->getMembers();
-						foreach($members as $id=>$member)
-						{
-							echo "<tr><td>".$member['user_name']."</td><td>".$member['first']." ".$member['last']."</td></tr>";
+						if (count($members)) { 
+							foreach($members as $id=>$member) {
+								echo "<tr><td>".$member['user_name']."</td><td>".$member['first']." ".$member['last']."</td></tr>";
+							}
+						}
+						else {
+							echo "<tr><td colspan='2'>No Members</td></tr>";
 						}
 						?>
 					</table>

@@ -40,7 +40,7 @@ echo $extensions_string;
 <tr><td>LDAPMAN_API_ENABLED</td><td><?php echo LDAPMAN_API_ENABLED; ?></td></tr>
 <tr><td>LDAPMAN_API_URL</td><td><?php echo LDAPMAN_API_URL; ?></td></tr>
 <tr><td>LDAPMAN_DEVICE_PREFIX</td><td><?php echo LDAPMAN_DEVICE_PREFIX; ?></td></tr>
-<tr><td>LDAPMAN_PI_PREFIX'</td><td><?php echo LDAPMAN_PI_PREFIX; ?></td></tr>
+<tr><td>LDAPMAN_PI_PREFIX</td><td><?php echo LDAPMAN_PI_PREFIX; ?></td></tr>
 <tr><td>DATASERVER_ENABLED</td><td><?php echo settings::get_dataserver_enabled(); ?></td></tr>
 <tr><td>DATASERVER_ROOT_DIR</td><td><?php echo settings::get_dataserver_root_dir(); ?></td></tr>
 <tr><td>DB_HOST</td><td><?php echo DB_HOST; ?></td></tr>
@@ -48,23 +48,27 @@ echo $extensions_string;
 <tr><td>TITLE</td><td><?php echo settings::get_title(); ?></td></tr>
 <tr><td>LOGIN_TIMEOUT (seconds)</td><td><?php echo LOGIN_TIMEOUT; ?></td></tr>
 <tr><td>CAL_DEFAULT_COLOR</td>
-	<td><?php echo CAL_DEFAULT_COLOR; ?>&nbsp
+	<td>
 	<svg width="20" height="20"><rect width="20" height="20" style="fill:<?php echo CAL_DEFAULT_COLOR; ?>;stroke-width:3;stroke:rgb(0,0,0)" /></svg>
+	&nbsp;<?php echo strtoupper(CAL_DEFAULT_COLOR); ?>
 	</td>
 </tr>
 <tr><td>CAL_TRAINING_COLOR</td>
-	<td><?php echo CAL_TRAINING_COLOR; ?>&nbsp
+	<td>
 	<svg width="20" height="20"><rect width="20" height="20" style="fill:<?php echo CAL_TRAINING_COLOR; ?>;stroke-width:3;stroke:rgb(0,0,0)" /></svg>
+	&nbsp;<?php echo strtoupper(CAL_TRAINING_COLOR); ?>
 	</td>
 </tr>
 <tr><td>CAL_MISSED_COLOR</td>
-	<td><?php echo CAL_MISSED_COLOR; ?>&nbsp
+	<td>
 	<svg width="20" height="20"><rect width="20" height="20" style="fill:<?php echo CAL_MISSED_COLOR; ?>;stroke-width:3;stroke:rgb(0,0,0)" /></svg>
+	&nbsp;<?php echo strtoupper(CAL_MISSED_COLOR); ?>
         </td>
 </tr>
 <tr><td>CAL_ROOM_COLOR</td>
-	<td><?php echo CAL_ROOM_COLOR; ?>&nbsp
+	<td>
 	<svg width="20" height="20"><rect width="20" height="20" style="fill:<?php echo CAL_ROOM_COLOR; ?>;stroke-width:3;stroke:rgb(0,0,0)" /></svg>
+	&nbsp;<?php echo strtoupper(CAL_ROOM_COLOR); ?>
         </td>
 </tr>
 <tr><td>RESERVE_ROOM</td><td><?php echo RESERVE_ROOM; ?></td></tr>

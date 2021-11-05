@@ -96,9 +96,9 @@ class Department {
     {
         if($this->getDepartmentId())
         {
-	        $queryDepartmentUsers = "SELECT * FROM users WHERE department_id=:department_id";
+	        $queryDepartmentUsers = "SELECT * FROM users WHERE department_id=:department_id AND users.status_id=:status_id ORDER BY user_name";
 			$departmentUsers = $this->db->prepare($queryDepartmentUsers);
-			$departmentUsers->execute(array(":department_id"=>$this->getDepartmentId()));
+			$departmentUsers->execute(array(":department_id"=>$this->getDepartmentId(),":status_id"=>User::ACTIVE));
 			$departmentUsersArr = $departmentUsers->fetchAll(PDO::FETCH_ASSOC);
             
             return $departmentUsersArr;

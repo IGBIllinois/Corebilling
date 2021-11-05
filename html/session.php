@@ -1,7 +1,12 @@
 <?php
-
+ob_start();
 //Check if the proper $_POST inputs are set
-if (isset($_POST['username']) && $_POST['username']!="" && isset($_POST['key'])) {
+
+if (isset($_POST['json'])) {
+	require_once('includes/main.inc.php');
+	$json = json_decode($_POST['json']);
+}
+elseif (isset($_POST['username']) && $_POST['username']!="" && isset($_POST['key'])) {
 	require_once('includes/main.inc.php');
 	$deviceInfo = new Device($db);
 	$deviceInfo->load(0, $_POST['key']);
@@ -28,5 +33,6 @@ if (isset($_POST['username']) && $_POST['username']!="" && isset($_POST['key']))
 
 	}
 }
+ob_clean();
 
 ?>	
