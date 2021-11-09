@@ -10,15 +10,13 @@ class Group {
 	private $enabled = false;
 	private $time_created;
 
-	public function __construct(PDO $db)
-	{
+	public function __construct(PDO $db) {
 		$this->db = $db;
 		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 
 	}
 	
-	public function __destruct()
-	{
+	public function __destruct() {
 		
 	}
 
