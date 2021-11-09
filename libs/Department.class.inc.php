@@ -21,47 +21,48 @@ class Department {
 	* @param $description
 	*/
 	public function create($departmentName, $description) {
-	        $queryAddDepartment= "INSERT INTO departments (department_name, description, department_code)VALUES(:department,:description, '')";
-        	$addDepartmentPrep = $this->db->prepare($queryAddDepartment);
-	        $addDepartmentPrep->execute(array(':department'=>$departmentName,':description'=>$description));
+	        $sql = "INSERT INTO departments (department_name, description, department_code)VALUES(:department,:description, '')";
+        	$query = $this->db->prepare($sql);
+		$query->execute(array(':department'=>$departmentName,':description'=>$description));
         	$departmentId = $this->db->lastInsertId();
 	        $this->departmentName = $departmentName;
         	$this->description = $description;
 	        $this->departmentId = $departmentId;
-		$this->log_file->send_log("Added department '$departmentName'");
+		$this->log_file->send_log("Added department " . $departmentName);
 	}
 
 	/**
 	* Update department row in database with changes made to this object
 	*/
 	public function update() {
-			$queryUpdateDepartment = "UPDATE departments SET
-                                department_name=\"".$this->departmentName."\",
-                                description=\"".$this->description."\"
-                                WHERE id=".$this->departmentId;
-			$this->db->exec($queryUpdateDepartment);
+		$sql = "UPDATE departments SET department_name=:departmentName,description=:description ";
+		$sql .= "WHERE id=:id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$result = $query->execute(array(':departmentName'=>$this->departmentName,':description'=>$this->description,':id'=>$this->departmentId));
+		return $result;
 	}
 
 	/** Load department by id from database into this object
 	* @param $id
 	*/
 	public function load($id) {
-		$queryDepartmentById = "SELECT department_name,id,department_code FROM departments WHERE id=:id";
-		$departmentInfo = $this->db->prepare($queryDepartmentById);
-		$departmentInfo->execute(array(':id'=>$id));
-		$departmentInfoArr = $departmentInfo->fetch(PDO::FETCH_ASSOC);
-		$this->departmentName = $departmentInfoArr["department_name"];
-		$this->departmentCode = $departmentInfoArr["department_code"];
-		$this->departmentId = $departmentInfoArr["id"];
+		$sql= "SELECT department_name,id,department_code FROM departments WHERE id=:id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':id'=>$id));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		$this->departmentName = $result["department_name"];
+		$this->departmentCode = $result["department_code"];
+		$this->departmentId = $result["id"];
 	}
 
 	/** Get a list of available departments
 	* @return array
 	*/
 	public static function getAllDepartments($db) {
-		$queryDepartmentList= "SELECT department_name,id FROM departments ORDER BY department_name";
-		$departmentInfo = $db->query($queryDepartmentList);
-		return $departmentInfo->fetchAll(PDO::FETCH_ASSOC);
+		$sql = "SELECT department_name,id FROM departments ORDER BY department_name";
+		$query = $db->prepare($sql);
+		$query->execute(array());
+		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/** Check if a department name already exists in the database
