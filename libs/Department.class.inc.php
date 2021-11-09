@@ -70,14 +70,11 @@ class Department {
 	* @return bool
 	*/
 	public static function exists($db,$departmentName) {
-		$queryDepartment= "SELECT COUNT(*) FROM departments WHERE department_name=:department_name";
-		$department= $db->prepare($queryDepartment);
-		$department->execute(array(':department_name'=>$departmentName));
-		$departmentCount = $department->fetchColumn();
-		if($departmentCount) {
-			return true;
-		}
-		return false;
+		$sql = "SELECT COUNT(1) as department_exists FROM departments WHERE department_name=:department_name";
+		$query = $db->prepare($sql);
+		$query->execute(array(':department_name'=>$departmentName));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		return $result['department_exists'];
 	}
 
 	/**Get all members of this department
@@ -85,11 +82,10 @@ class Department {
 	*/
 	public function getMembers() {
 		if($this->getDepartmentId()) {
-			$queryDepartmentUsers = "SELECT * FROM users WHERE department_id=:department_id AND users.status_id=:status_id ORDER BY user_name";
-			$departmentUsers = $this->db->prepare($queryDepartmentUsers);
-			$departmentUsers->execute(array(":department_id"=>$this->getDepartmentId(),":status_id"=>User::ACTIVE));
-			$departmentUsersArr = $departmentUsers->fetchAll(PDO::FETCH_ASSOC);
-			return $departmentUsersArr;
+			$sql = "SELECT * FROM users WHERE department_id=:department_id AND users.status_id=:status_id ORDER BY user_name";
+			$query = $this->db->prepare($sql);
+			$query->execute(array(":department_id"=>$this->getDepartmentId(),":status_id"=>User::ACTIVE));
+			return $query->fetchAll(PDO::FETCH_ASSOC);
 		}
 		return array();
 	}
@@ -109,16 +105,6 @@ class Department {
 	*/
 	public function getDescription() {
 		return $this->description;
-	}
-
-	/**
-	* @param mixed $departmentId
-	*/
-	public function setDepartmentId($departmentId)  {
-		if($this->departmentId != $departmentId){
-			$this->departmentId = $departmentId;
-			$this->log_file->send_log("Set id of department '".$this->departmentName."' to $departmentId");
-		}
 	}
 
 	/**
