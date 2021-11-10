@@ -20,7 +20,8 @@ CREATE TABLE `departments` (
   `department_name` longtext DEFAULT NULL,
   `description` varchar(45) NOT NULL,
   `department_code` varchar(45) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE(`department_name`)
 )\p;
 
 CREATE TABLE `device` (
