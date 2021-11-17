@@ -9,7 +9,7 @@ CREATE TABLE `articles` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `text` text NOT NULL,
-  `title` text NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
   `enabled` BOOLEAN DEFAULT 1,
   PRIMARY KEY (`id`)
@@ -17,8 +17,8 @@ CREATE TABLE `articles` (
 
 CREATE TABLE `departments` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `department_name` longtext DEFAULT NULL,
-  `description` varchar(45) NOT NULL,
+  `department_name` VARCHAR(255) DEFAULT NULL,
+  `description` VARCHAR(255) NOT NULL,
   `department_code` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE(`department_name`)

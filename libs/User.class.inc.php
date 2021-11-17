@@ -496,7 +496,7 @@ class User
 					data_dir::createDirectory($gid, $group->getNetid(), $this->getUsername());
 				}
 				catch (Exception $e) {
-					$this->log_file->send_log($e->getMesage(),2);
+					$this->log_file->send_log($e->getMesage(),\IGBIllinois\log::ERROR);
 					throw $e;
 				}
 			}

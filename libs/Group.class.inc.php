@@ -192,7 +192,7 @@ class Group {
 				$this->log_file->send_log("Created group folder " . $directory . " for group " . $this->groupName . " with netid " . $this->netid);
 			}
 			catch (Exception $e) {
-				$this->log_file->send_log($e->getMessage(),2);
+				$this->log_file->send_log($e->getMessage(),\IGBIllinois\log::ERROR);
 				throw $e;
 				return false;
 			}
@@ -232,7 +232,7 @@ class Group {
 
 			}
 			catch (Exception $e) {
-				$this->log_file->send_log($e->getMessage(),2);
+				$this->log_file->send_log($e->getMessage(),\IGBIllinois\log::ERROR);
 				throw $e;
 				return false;
 				

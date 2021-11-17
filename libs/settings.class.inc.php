@@ -78,5 +78,12 @@ class settings {
 		return self::TIMEZONE;
 
 	}
+	public static function get_user_exceptions() {
+		if (defined("USER_EXCEPTIONS_ARRAY") && is_array(USER_EXCEPTIONS_ARRAY)) {
+			return array_map('strtolower',USER_EXCEPTIONS_ARRAY);
+		}
+		return array();
+	
+	}
 }
 ?>

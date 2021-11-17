@@ -82,4 +82,13 @@ class html {
 
 	}
 
+	public static function get_times() {
+		$minute_increments = 15;
+		for($t = 0; $t <= 1410; $t += $minute_increments) {
+			$arr[] = strtolower(date('g:iA',mktime(0,$t,0)));
+		}
+		return $arr;
+
+	}
+
 }

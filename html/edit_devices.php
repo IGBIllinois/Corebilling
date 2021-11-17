@@ -67,6 +67,36 @@ if (isset($_POST['CreateNewDevice'])) {
 
 }
 
+
+$harddrives_html = "";
+$harddrives = $device->getHardDrives();
+if (count($harddrives)) {
+	foreach ($harddrives as $drive) {
+		$total_size = round(data_functions::bytes_to_gigabytes($drive['size']));
+		$free_size = round(data_functions::bytes_to_gigabytes($drive['free']));
+		$used_size = round($total_size - $free_size);
+		$percent_full = round($used_size / $total_size * 100);
+		$harddrives_html .= "<tr>";
+		if (strpos($device->getOperatingSystem(),"Windows") === 0) {
+			$harddrives_html .= "<td>" . $drive['volume'] . ":\</td>";
+		}
+		else {
+			$harddrives_html .= "<td>" . $drive['volume'] . "</td>";
+		}
+		$harddrives_html .= "<td>" . $used_size . " / " . $total_size . " GB</td>";
+		$harddrives_html .= "<td><div class='progress'>";
+		if ($percent_full > Device::HARDDRIVE_WARNING) {
+			$harddrives_html .= "<div class='progress-bar progress-bar-danger' ";
+		}
+		else {
+			$harddrives_html .= "<div class='progress-bar progress-bar-success' ";
+		}
+		$harddrives_html .= "aria-valuenow='" . $percent_full . "' aria-valuemin='0' ";
+		$harddrives_html .= "aria-valuemax='100' style='width: " . $percent_full . "%;'>" . $percent_full . "%</div></div>";
+		$harddrives_html .= "</td></tr>";	
+	}
+
+}
 ?>
 <h3>Devices Configuration</h3>
 <form action="edit_devices.php" method=POST>
@@ -128,7 +158,7 @@ if (isset($_POST['CreateNewDevice'])) {
 							foreach ($statusList as $id => $statusOption) {
 								echo "<option value=" . $statusOption["id"];
 								if ($device->getStatus() == $statusOption["id"]) {
-									echo " SELECTED";
+									echo " selected='selected'";
 								}
 								echo ">" . $statusOption["statusname"] . "</option>";
 							}
@@ -193,7 +223,7 @@ if (isset($_POST['CreateNewDevice'])) {
 			</div>
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4>Device Rates <?php echo $device->getFullName(); ?><h4>
+					<h4>Device Rates - <?php echo $device->getFullName(); ?><h4>
 				</div>
 				<div class="panel-body">
 					<table class="table table-hover">
@@ -227,14 +257,14 @@ if (isset($_POST['CreateNewDevice'])) {
 								{
 									echo "<option value=" . $rateTypeInfo['id'];
 									if ($rateTypeInfo['id'] == $deviceRateInfo['rate_type_id']) {
-										echo " SELECTED";
+										echo " selected='selected'";
 										$rateTypeNotSelected = false;
 	
 									}
 									echo ">" . $rateTypeInfo['rate_type_name'] . "</option>";
 								}
 								if ($rateTypeNotSelected) {
-									echo "<option value=0 SELECTED>Not Set</option>";
+									echo "<option value=0 selected='selected'>Not Set</option>";
 								}
 	
 								echo "</select>";
@@ -248,6 +278,41 @@ if (isset($_POST['CreateNewDevice'])) {
 		</div>
 	</div>
 </form>
+<div class='row'>
+	<div class='col-md-6'>
+		<div class="panel panel-default">
+			<div class="panel-heading"><h3>Device Information</h3></div>
+			<div class="panel-body">
+				<table class='table table-striped table-bordered table-condensed'>
+					<tr><td>IP Address</td><td><?php echo $device->getIPAddress(); ?></td></tr>
+					<tr><td>Hostname</td><td><?php echo $device->getHostname(); ?></td></tr>
+					<tr><td>Operating System</td><td><?php echo $device->getOperatingSystem(); ?></td></tr>
+					<tr><td>Windows Computer Name</td><td><?php echo $device->getWindowsComputerName(); ?></td></tr>
+					<tr><td>Client Version</td><td><?php echo $device->getClientVersion(); ?></td></tr></td></tr>
+					<tr><td>Faster User Switching Enabled</td>
+					<?php if ($device->getFastUserSwitchingEnabled()) {
+						echo "<td class='danger'>Enabled</td>";
+					}
+					elseif (!$device->getFastUserSwitchingEnabled() && !is_null($device->getFastUserSwitchingEnabled())) {
+						echo "<td>Disabled</td>";
+
+					}
+					else {
+						echo "<td>Unknowned</td>";
+					}
+					?>
+					</tr>
+				</table>
+				<table class='table table-condensed'>
+					<thead><th>Drive</th><th>Used/Total Size</th><th>Percent Full</th></thead>
+					<tbody>
+						<?php echo $harddrives_html; ?>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
 <?php
 	if (isset($message)) {
 		echo $message;

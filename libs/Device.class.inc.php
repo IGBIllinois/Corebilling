@@ -2,6 +2,7 @@
 class Device
 {
 	const STATUS_TYPE_DEVICE=1;
+	const HARDDRIVE_WARNING = 80;
 	private $db;
 	private $deviceId = 0;
 	private $shortName = "";
@@ -15,7 +16,7 @@ class Device
 	private $ldap_group;
 	private $ipaddress;
 	private $log_file = null;
-	private $json = "{}";
+	private $json = null;
 	
 	public function __construct(PDO $db) {
 		$this->db = $db;
@@ -88,7 +89,7 @@ class Device
 			$this->deviceId = $result['id'];
 			$this->ldap_group = $result['ldap_group'];
 			$this->ipaddress = $result['ipaddress'];
-			$this->json = $result['json'];
+			$this->json = json_decode($result['json'],true);
 			return true;
         	}
 		return false;
@@ -114,16 +115,18 @@ class Device
 		return $query->execute($parameters);
 	}
 
-	public function updateLastTick($username="")
+	public function updateLastTick($username="",$ipaddress,$json)
 	{
 		if($username==""){
 			$loggeduser = 0;
 		} else {
 			$loggeduser = -1;
 		}
-		$sql = "UPDATE device SET lasttick=NOW(), loggeduser=:loggeduser, unauthorized=:username WHERE id=:id LIMIT 1";
+		$sql = "UPDATE device SET lasttick=NOW(), loggeduser=:loggeduser, unauthorized=:username, ipaddress=:ipaddress,json=:json WHERE id=:id LIMIT 1";
 		$query = $this->db->prepare($sql);
-		$parameters = array(':username'=>$username,':id'=>$this->deviceId,':loggeduser'=>$loggeduser);
+		$parameters = array(':username'=>$username,
+				':id'=>$this->deviceId,
+				':loggeduser'=>$loggeduser);
 		return $query->execute($parameters);
 	}
 
@@ -233,6 +236,13 @@ class Device
 		return $this->ipaddress;
 	}
 
+	public function getHostname() {
+		if (filter_var($this->getIPAddress(), FILTER_VALIDATE_IP)) {
+			return gethostbyaddr($this->getIPAddress());
+		}
+		return false;
+
+	}
 	public function getLDAPGroup() {
 		if (LDAPMAN_API_ENABLED) {
                         return LDAPMAN_DEVICE_PREFIX . $this->shortName;
@@ -305,5 +315,35 @@ class Device
 		return $this->deviceToken;
 	}
 
+	public function getClientVersion() {
+		if (isset($this->json['version'])) {
+			return $this->json['version'];
+		}
+		return false;
+	}
+	public function getOperatingSystem() {
+		if (isset($this->json['os'])) {
+			return $this->json['os'];
+		}
+		return false;
+	}
+	public function getFastUserSwitchingEnabled() {
+		if (isset($this->json['user_switching'])) {
+			return $this->json['user_switching'];
+		}
+		return null;
+	}
+	public function getHardDrives() {
+		if (isset($this->json['hard_drives'])) {
+			return $this->json['hard_drives'];
+		}
+		return array();
+	}
+	public function getWindowsComputerName() {
+		if (isset($this->json['computer_name'])) {
+			return $this->json['computer_name'];
+		}
+		return false;
+	}
 }
 ?>
