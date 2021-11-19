@@ -30,77 +30,70 @@ $message = "";
 
 //If Modified user form
 if (isset($_POST['update_user'])) {
-    //Update user info
-    $selectedUser->setFirstName($_POST['first']);
-    $selectedUser->setLastName($_POST['last']);
-    $selectedUser->setEmail($_POST['email']);
-    $selectedUser->setDepartmentId($_POST['department']);
-    if ($login_user->isAdmin()) {
+	//Update user info
+	$selectedUser->setFirstName($_POST['first']);
+	$selectedUser->setLastName($_POST['last']);
+	$selectedUser->setEmail($_POST['email']);
+	$selectedUser->setDepartmentId($_POST['department']);
         $selectedUser->setUsername($_POST['user_name']);
         $selectedUser->setRateId($_POST['rate']);
-        $selectedUser->setStatusId($_POST['status']);
+        $selectedUser->setStatus($_POST['status']);
         $selectedUser->setRoleId($_POST['user_role_id']);
         $selectedUser->setGroupIds($_POST['group'] ?? []);
         $selectedUser->setCertified(isset($_POST['safetyquiz']));
-    }
+	$demo = $selectedUser->getDemographics();
+	$demo->setEdulevel($_POST['edulevel']);
+	$demo->setGender($_POST['gender']);
+	$demo->setUnderrep($_POST['underrep']);
+	$demo->update();
 
-    $demo = $selectedUser->getDemographics();
-    $demo->setEdulevel($_POST['edulevel']);
-    $demo->setGender($_POST['gender']);
-    $demo->setUnderrep($_POST['underrep']);
-    $demo->update();
+	$_POST['cfop_to_add'] = UserCfop::formatCfop($_POST['cfop_to_add']);
+	if ($_POST['cfop_to_add'] != "---" && $_POST['cfop_to_add'] != $userCfop->loadDefaultCfop($selectedUser->getId())) {
+        	// Look in old cfops to see if we're reusing an old one
+		$cfopList = $selectedUser->getAllCFOPs();
+		$foundcfop = false;
+		for ($i = 0; $i < count($cfopList); $i++) {
+			if (UserCfop::formatCfop($cfopList[$i]['cfop']) == $_POST['cfop_to_add']) {
+				$foundcfop = true;
+				$selectedUser->setDefaultCFOP($cfopList[$i]['id']);
+				break;
+			}
+		}
+		// Otherwise, add new cfop
+		if (!$foundcfop) {
+			$selectedUser->addCFOP($_POST['cfop_to_add']);
+		}
+	}
 
-    $_POST['cfop_to_add'] = UserCfop::formatCfop($_POST['cfop_to_add']);
-    if ($_POST['cfop_to_add'] != "---" && $_POST['cfop_to_add'] != $userCfop->loadDefaultCfop($selectedUser->getId())) {
-        // Look in old cfops to see if we're reusing an old one
-        $cfopList = $selectedUser->getAllCFOPs();
-        $foundcfop = false;
-        for ($i = 0; $i < count($cfopList); $i++) {
-            if (UserCfop::formatCfop($cfopList[$i]['cfop']) == $_POST['cfop_to_add']) {
-                $foundcfop = true;
-                $selectedUser->setDefaultCFOP($cfopList[$i]['id']);
-                break;
-            }
-        }
-        // Otherwise, add new cfop
-        if (!$foundcfop) {
-            $selectedUser->addCFOP($_POST['cfop_to_add']);
-        }
-    }
+	$deviceList = Device::getAllDevices($db);
+	foreach ($deviceList as $deviceInfo) {
+        	if (isset($_POST['access']) && array_key_exists($deviceInfo['id'], $_POST['access'])) {
+			if (!$selectedUser->hasAccessTo($deviceInfo['id'])) {
+				if (LDAPMAN_API_ENABLED) {
+					$ldapman->addGroupMember(LDAPMAN_DEVICE_PREFIX . $deviceInfo['device_name'],
+						$selectedUser->getUsername());
+				}
+				$selectedUser->giveAccessTo($deviceInfo['id']);
+			}
+		} 
+		else {
+			if ($selectedUser->hasAccessTo($deviceInfo['id'])) {
+				if (LDAPMAN_API_ENABLED) {
+					$ldapman->removeGroupMember(LDAPMAN_DEVICE_PREFIX . $deviceInfo['device_name'],
+						$selectedUser->getUsername());
+				}
+				$selectedUser->removeAccessTo($deviceInfo['id']);
+			}
+		}
+    	}
 
-// 	if(isset($_POST['access'])){
-    $deviceList = Device::getAllDevices($db);
-    foreach ($deviceList as $deviceInfo) {
-        if (isset($_POST['access']) && array_key_exists($deviceInfo['id'], $_POST['access'])) {
-            if (!$selectedUser->hasAccessTo($deviceInfo['id'])) {
-                if (LDAPMAN_API_ENABLED) {
-                    $ldapman->addGroupMember(
-                        LDAPMAN_DEVICE_PREFIX . $deviceInfo['device_name'],
-                        $selectedUser->getUsername()
-                    );
-                }
-                $selectedUser->giveAccessTo($deviceInfo['id']);
-            }
-        } else {
-            if ($selectedUser->hasAccessTo($deviceInfo['id'])) {
-                if (LDAPMAN_API_ENABLED) {
-                    $ldapman->removeGroupMember(
-                        LDAPMAN_DEVICE_PREFIX . $deviceInfo['device_name'],
-                        $selectedUser->getUsername()
-                    );
-                }
-                $selectedUser->removeAccessTo($deviceInfo['id']);
-            }
-        }
-    }
-// 	}
-
-    if ($selectedUser->update()) {
-        $message .= html::success_message("User updated successfully");
-    } else {
-        $error = $db->errorInfo();
-        $message .= html::error_message("User update failed: " . $error[2]);
-    }
+	if ($selectedUser->update()) {
+        	$message .= html::success_message("User updated successfully");
+	} 
+	else {
+		$error = $db->errorInfo();
+		$message .= html::error_message("User update failed: " . $error[2]);
+	}
 }
 
 // Submitted new cfop
@@ -297,14 +290,14 @@ if ($selectedUser->getId() > 0 && $ldapinfo == null) {
                                     <div class="col-sm-10">
                                         <select name="status" class="form-control">
                                             <?php
-                                            $statusList = User::getUserStatusList($db);
+                                            $statusList = User::getUserStatusList();
 
                                             foreach ($statusList as $usersStatus) {
                                                 echo "<option value=" . $usersStatus['id'];
-                                                if ($usersStatus['id'] == $selectedUser->getStatusId()) {
-                                                    echo " SELECTED";
+                                                if ($usersStatus['id'] == $selectedUser->getStatus()) {
+                                                    echo " selected='selected'";
                                                 }
-                                                echo ">" . $usersStatus['statusname'] . "</option>";
+                                                echo ">" . $usersStatus['name'] . "</option>";
                                             }
                                             ?>
                                         </select>

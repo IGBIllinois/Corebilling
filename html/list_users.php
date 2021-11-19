@@ -39,7 +39,7 @@ $usersFullInfoList = User::getAllUsersFullInfo($db);
 						$('<label>Show disabled users <input type="checkbox" id="filteractive" /> &nbsp;</label>').prependTo('#usersTable_filter');
 						$('#filteractive').on('change',function(e){
 							if(this.checked){
-								usersTable.column(7).search('').draw();
+								usersTable.column(7).search('Disabled').draw();
 							} else {
 								usersTable.column(7).search('Active').draw();
 							}

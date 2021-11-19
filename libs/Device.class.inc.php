@@ -1,7 +1,10 @@
 <?php
 class Device
 {
-	const STATUS_TYPE_DEVICE=1;
+	const STATUS_ONLINE = 1;
+	const STATUS_REPAIR = 2;
+	const STATUS_DONOTTRACK = 3;
+	const STATUS_OFFLINE = 4;
 	const HARDDRIVE_WARNING = 80;
 	private $db;
 	private $deviceId = 0;
@@ -122,7 +125,9 @@ class Device
 		} else {
 			$loggeduser = -1;
 		}
-		$sql = "UPDATE device SET lasttick=NOW(), loggeduser=:loggeduser, unauthorized=:username, ipaddress=:ipaddress,json=:json WHERE id=:id LIMIT 1";
+		$sql = "UPDATE device SET lasttick=NOW(), loggeduser=:loggeduser, ";
+		$sql .= "unauthorized=:username, ipaddress=:ipaddress,json=:json ";
+		$sql .= "WHERE id=:id LIMIT 1";
 		$query = $this->db->prepare($sql);
 		$parameters = array(':username'=>$username,
 				':id'=>$this->deviceId,
@@ -169,9 +174,10 @@ class Device
 		$sql .= "d.loggeduser,u.first, u.last, TIMESTAMPDIFF(SECOND, lasttick, NOW()) AS lastseen, ";
 		$sql .= "unauthorized FROM users u ";
 		$sql .= "RIGHT JOIN device d ON u.id=d.loggeduser ";
-		$sql .= "WHERE d.status_id=1 OR d.status_id=2 order by d.full_device_name";
+		$sql .= "WHERE d.status_id=:status_online OR d.status_id=:status_repair ORDER BY d.full_device_name";
 		$query = $db->prepare($sql);
-		$query->execute();
+		$parameters = array(':status_online'=>self::STATUS_ONLINE,':status_repair'=>self::STATUS_REPAIR);
+		$query->execute($parameters);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
@@ -202,9 +208,9 @@ class Device
 	}
 
 	public static function deviceStatusList($db) {
-		$sql = "SELECT * FROM status WHERE type=:type";
+		$sql = "SELECT * FROM device_status";
 		$query = $db->prepare($sql);
-		$query->execute(array('type'=>Device::STATUS_TYPE_DEVICE));
+		$query->execute();
         	return $query->fetchAll(PDO::FETCH_ASSOC);
 
 	}

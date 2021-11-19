@@ -4,43 +4,29 @@ class User
 {
 	private $db;
 
-	const ACTIVE = 5, HIDDEN = 6, DISABLED = 7;
-	const STATUS_TYPE_USER = 2;
+	const ACTIVE = 1;
+	const DISABLED = 0;
 
-	private $userId;
-	private $username;
-	private $first;
-	private $last;
-	private $email;
-	private $departmentId;
-	private $groupIds;
-	private $rateid;
-	private $statusid;
-	private $userRoleId;
-	private $dateAdded;
-	private $secureKey;
+	private $userId = 0;
+	private $username = "";
+	private $first = "";
+	private $last = "";
+	private $email = "";
+	private $departmentId = 0;
+	private $groupIds = array();
+	private $rateid = 9;
+	private $status = self::DISABLED;
+	private $userRoleId = 3;
+	private $secureKey = "";
 	private $userCfop;
-	private $certified;
-	private $time_created;
+	private $certified = 0;
+	private $time_created = "";
 	private $demographics = null;
 	private $log_file = null;
 
     public function __construct(PDO $db) {
         $this->db = $db;
-        $this->userId = 0;
-        $this->username = "";
-        $this->first = "";
-        $this->last = "";
-        $this->email = "";
-        $this->departmentId = 0;
-        $this->groupIds = [];
-        $this->rateid = 9;
-        $this->statusid = 7;
-        $this->dateAdded = "";
-        $this->secureKey = "";
         $this->userCfop = new UserCfop($this->db);
-        $this->certified = 0;
-        $this->userRoleId = 3;
 	$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
     }
 
@@ -66,7 +52,7 @@ class User
         $email,
         $departmentId,
         $rateId,
-        $statusId,
+        $status,
         $userRoleId,
         $certified
     ) {
@@ -76,13 +62,12 @@ class User
         $this->email = $email;
         $this->departmentId = $departmentId;
         $this->rateid = $rateId;
-        $this->statusid = $statusId;
+        $this->status = $status;
         $this->userRoleId = $userRoleId;
-        $this->dateAdded = date('Y-m-d H:i:s');
         $this->certified = $certified;
         if ( User::exists($this->db, $this->username) == 0 ) {
-		$queryAddUser = "insert into users (user_name, first,last,email,department_id,rate_id,status_id,secure_key,user_role_id,certified)
-								   values(:user_name,:first,:last,:email,:department_id,:rate_id,:status_id,MD5(RAND()),:user_role_id,:certified)";
+		$queryAddUser = "insert into users (user_name, first,last,email,department_id,rate_id,status,secure_key,user_role_id,certified)
+								   values(:user_name,:first,:last,:email,:department_id,:rate_id,:status,MD5(RAND()),:user_role_id,:certified)";
 		try {
             $addUserPrepare = $this->db->prepare($queryAddUser);
             $result = $addUserPrepare->execute(
@@ -93,7 +78,7 @@ class User
                     ':email' => $this->email,
                     ':department_id' => $this->departmentId,
                     ':rate_id' => $rateId,
-                    ':status_id' => $statusId,
+                    ':status' => $status,
                     ':user_role_id' => $this->userRoleId,
                     ':certified' => $this->certified ? 1 : 0,
                 ));
@@ -106,26 +91,26 @@ class User
         }
     }
 
-    /**Load user into this object
-     * @param $id
-     */
-    public function load($id) {
-        $queryUserInfo = "select * from users where id=:user_id LIMIT 1";
-        $userInfo = $this->db->prepare($queryUserInfo);
-        $userInfo->execute(array(":user_id" => $id));
-        $userInfoArr = $userInfo->fetch(PDO::FETCH_ASSOC);
-        $this->userId = $userInfoArr["id"];
-        $this->username = $userInfoArr["user_name"];
-        $this->first = $userInfoArr["first"];
-        $this->last = $userInfoArr["last"];
-        $this->email = $userInfoArr["email"];
-        $this->departmentId = $userInfoArr["department_id"];
-        $this->rateid = $userInfoArr["rate_id"];
-        $this->statusid = $userInfoArr["status_id"];
-        $this->userRoleId = $userInfoArr["user_role_id"];
-        $this->dateAdded = $userInfoArr["time_created"];
-        $this->secureKey = $userInfoArr['secure_key'];
-        $this->certified = $userInfoArr['certified'];
+	/**Load user into this object
+	* @param $id
+	*/
+	public function load($id) {
+		$sql = "SELECT * FROM users WHERE id=:user_id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(":user_id" => $id));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		$this->userId = $result["id"];
+		$this->username = $result["user_name"];
+		$this->first = $result["first"];
+		$this->last = $result["last"];
+		$this->email = $result["email"];
+		$this->departmentId = $result["department_id"];
+		$this->rateid = $result["rate_id"];
+		$this->status = $result["status"];
+		$this->userRoleId = $result["user_role_id"];
+		$this->time_created = $result["time_created"];
+		$this->secureKey = $result['secure_key'];
+		$this->certified = $result['certified'];
     }
 
     /**
@@ -140,7 +125,7 @@ class User
 							email=:email,
 							department_id=:department_id,
 							rate_id=:rate_id,
-							status_id=:status_id,
+							status=:status,
 							user_role_id=:user_role_id,
 							certified=:certified
 							where id=:user_id";
@@ -153,7 +138,7 @@ class User
                 ':email' => $this->email,
                 ':department_id' => $this->departmentId,
                 ':rate_id' => $this->rateid,
-                ':status_id' => $this->statusid,
+                ':status' => $this->status,
                 ':user_role_id' => $this->userRoleId,
                 ':certified' => $this->certified ? 1 : 0,
                 ':user_id' => $this->userId,
@@ -233,114 +218,96 @@ class User
      * @return array
      */
     public static function getAllUsers($db) {
-        $queryAllUsers = "select id, user_name from users order by user_name";
+        $queryAllUsers = "SELECT id, user_name FROM users ORDER BY user_name";
         $allUsers = $db->prepare($queryAllUsers);
         $allUsers->execute();
         $allUsersArr = $allUsers->fetchAll(PDO::FETCH_ASSOC);
         return $allUsersArr;
     }
 
-    /**List all active users by id and username on the application
-     * @param PDO $db
-     * @return array
-     */
-    public static function getAllActiveUsers($db) {
-        $queryAllUsers = "select id, user_name from users where status_id=5 order by user_name";
-        $allUsers = $db->prepare($queryAllUsers);
-        $allUsers->execute();
-        $allUsersArr = $allUsers->fetchAll(PDO::FETCH_ASSOC);
-        return $allUsersArr;
+	/**List all active users by id and username on the application
+	* @param PDO $db
+	* @return array
+	*/
+	public static function getAllActiveUsers($db) {
+		$sql = "SELECT id, user_name FROM users where status=:status ORDER BY user_name";
+		$query = $db->prepare($sql);
+		$query->execute(array(":status"=>self::ACTIVE));
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	* @param PDO $db
+	* @return mixed
+	*/
+	public static function getAllUsersFullInfo($db) {
+		$sql = "SELECT u.first, u.last, u.email, u.department_id, ";
+		$sql .= "GROUP_CONCAT(g.group_name separator ', ') as group_name, ";
+		$sql .= "uc.cfop, d.department_name, u.time_created as date_added, ";
+		$sql .= "(select max(`stop`) from `session` where user_id=u.`id`) as last_login, ";
+		$sql .= "CONCAT(u.last, ', ', u.first) as full_name, ";
+		$sql .= "IF (u.status=:status,'Active','Disabled') as status, u.id, ud.edu_level, ud.gender, ";
+		$sql .= "ud.underrepresented ";
+		$sql .= "FROM users u ";
+		$sql .= "LEFT JOIN user_cfop uc on (uc.user_id = u.id and uc.default_cfop=1) ";
+		$sql .= "LEFT JOIN user_groups ug on (u.id=ug.user_id) ";
+		$sql .= "LEFT JOIN `groups` g on (g.id=ug.group_id) ";
+		$sql .= "LEFT JOIN departments d on (d.id=u.department_id) ";
+		$sql .= "LEFT JOIN user_demographics ud on u.id = ud.user_id ";
+		$sql .= "GROUP BY u.id";
+		$query = $db->prepare($sql);
+		$query->execute(array(':status'=>self::ACTIVE));
+		$result = $query->fetchAll(PDO::FETCH_ASSOC);
+
+		for ( $i = 0; $i < count($result); $i++ ) {
+			$result[$i]['cfop'] = UserCfop::formatCfop($result[$i]['cfop']);
+			$result[$i]['edit'] = '<a href="edit_users.php?user_id=' . $result[$i]['id'] . '">Edit</a>';
+		}
+		return $result;
+	}
+
+	/**
+	* @param PDO $db
+	* @param     $startyear
+	* @param     $startmonth
+	* @param     $endyear
+	* @param     $endmonth
+	* @return mixed
+	*/
+	public static function getActiveUsers($db, $startyear, $startmonth, $endyear, $endmonth) {
+		$sql = "select u.first, u.last, u.id, u.user_name, u.email, ";
+		$sql .= "u.department_id, GROUP_CONCAT(distinct g.group_name separator ', ') as group_name, ";
+		$sql .= "d.department_name, CONCAT(u.last, ', ', u.first) as full_name ";
+		$sql .= "FROM users u ";
+		$sql .= "LEFT JOIN user_groups ug on (u.id=ug.user_id) ";
+		$sql .= "LEFT JOIN `groups` g on (g.id=ug.group_id) ";
+		$sql .= "LEFT JOIN departments d on d.id=u.department_id ";
+		$sql .= "LEFT JOIN `session` s on s.user_id=u.id ";
+		$sql .= "WHERE ((MONTH(start)>=:startmonth AND YEAR(start)=:startyear) OR YEAR(start)>:startyear) ";
+		$sql .= "AND ((MONTH(start)<=:endmonth AND YEAR(start)=:endyear) OR YEAR(start)<:endyear) ";
+		$sql .= "GROUP BY u.id ORDER BY u.user_name";
+
+		$query = $db->prepare($sql);
+		$parameters = array(':startyear' => $startyear,
+				':startmonth' => $startmonth,
+				':endyear' => $endyear,
+				':endmonth' => $endmonth
+			);
+		$query->execute($parameters);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+
     }
 
-    /**
-     * @param PDO $db
-     * @return mixed
-     */
-    public static function getAllUsersFullInfo($db) {
-        $queryAllUserInfo = "select u.first, 
-       								u.last, 
-								   	u.email, 
-								   	u.department_id,
-								   	GROUP_CONCAT(g.group_name separator ', ') as group_name, 
-								   	uc.cfop, 
-								   	d.department_name, 
-								  	u.time_created as date_added, 
-								   	(select max(`stop`) from `session` where user_id=u.`id`) as last_login, 
-								   	CONCAT(u.last, ', ', u.first) as full_name, 
-								   	s.statusname as status, 
-								   	u.id, ud.edu_level, 
-								   	ud.gender,
-								   	ud.underrepresented 
-								from users u 
-								  left join user_cfop uc on (uc.user_id = u.id and uc.default_cfop=1) 
-								  left join user_groups ug on (u.id=ug.user_id)
-								  left join `groups` g on (g.id=ug.group_id) 
-								  left join departments d on (d.id=u.department_id) 
-								  left join status s on s.id=u.status_id 
-								  left join user_demographics ud on u.id = ud.user_id
-								  group by u.id";
-        $allUserInfo = $db->prepare($queryAllUserInfo);
-        $allUserInfo->execute();
-        $allUserInfoArr = $allUserInfo->fetchAll(PDO::FETCH_ASSOC);
-
-        for ( $i = 0; $i < count($allUserInfoArr); $i++ ) {
-            $allUserInfoArr[$i]['cfop'] = UserCfop::formatCfop($allUserInfoArr[$i]['cfop']);
-            $allUserInfoArr[$i]['edit'] = '<a href="edit_users.php?user_id=' . $allUserInfoArr[$i]['id'] . '">Edit</a>';
-        }
-
-        return $allUserInfoArr;
-    }
-
-    /**
-     * @param PDO $db
-     * @param     $startyear
-     * @param     $startmonth
-     * @param     $endyear
-     * @param     $endmonth
-     * @return mixed
-     */
-    public static function getActiveUsers($db, $startyear, $startmonth, $endyear, $endmonth) {
-        $queryAllUserInfo = "select u.first, 
-								   u.last, 
-								   u.id, 
-								   u.user_name, 
-								   u.email, 
-								   u.department_id, 
-								   GROUP_CONCAT(distinct g.group_name separator ', ') as group_name, 
-								   d.department_name, 
-								   CONCAT(u.last, ', ', u.first) as full_name
-								from users u 
-								  left join user_groups ug on (u.id=ug.user_id)
-								  left join `groups` g on (g.id=ug.group_id) 
-								  left join departments d on d.id=u.department_id 
-								  left join `session` s on s.user_id=u.id
-								where u.`status_id`=5 
-								  and ((MONTH(start)>=:startmonth and YEAR(start)=:startyear) or YEAR(start)>:startyear) 
-								  and ((MONTH(start)<=:endmonth and YEAR(start)=:endyear) or YEAR(start)<:endyear)
-								group by u.id";
-        $allUserInfo = $db->prepare($queryAllUserInfo);
-        $allUserInfo->execute(
-            array(
-                ':startyear' => $startyear,
-                ':startmonth' => $startmonth,
-                ':endyear' => $endyear,
-                ':endmonth' => $endmonth,
-            ));
-        $allUserInfoArr = $allUserInfo->fetchAll(PDO::FETCH_ASSOC);
-
-        return $allUserInfoArr;
-    }
-
-    /**Get all user roles
-     * @param PDO $db
-     * @return mixed
-     */
-    public static function getUserRoles($db) {
-        $queryUserRoles = "select * from user_roles";
-        $userRoles = $db->prepare($queryUserRoles);
-        $userRoles->execute();
-        return $userRoles->fetchAll(PDO::FETCH_ASSOC);
-    }
+	/**Get all user roles
+	* @param PDO $db
+	* @return mixed
+	*/
+	public static function getUserRoles($db) {
+		$sql = "SELECT * from user_roles";
+		$query = $db->prepare($sql);
+		$query->execute();
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
 
 	public static function getUserRoleById($db,$id) {
 		$sql = "SELECT * FROM user_roles WHERE id=:id LIMIT 1";
@@ -349,17 +316,16 @@ class User
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 
 	}
-    /**
-     * @param PDO $db
-     * @return mixed
-     */
-    public static function getUserStatusList($db) {
-        $queryUserStatusList = "select * from status where type=:type";
-        $userStatusList = $db->prepare($queryUserStatusList);
-        $userStatusList->execute(array(':type' => User::STATUS_TYPE_USER));
-        $userStatusListArr = $userStatusList->fetchAll(PDO::FETCH_ASSOC);
 
-        return $userStatusListArr;
+	/**
+	* @param PDO $db
+	* @return mixed
+	*/
+	public static function getUserStatusList() {
+		$status = array();
+		array_push($status,array('id'=>self::DISABLED,'name'=>'Disabled'));
+		array_push($status,array('id'=>self::ACTIVE,'name'=>'Active'));
+		return $status;
 
     }
 
@@ -530,13 +496,13 @@ class User
         }
     }
 
-    public function getStatusId() {
-        return $this->statusid;
+    public function getStatus() {
+        return $this->status;
     }
 
-    public function setStatusId($statusid) {
-        if ( $this->statusid != $statusid ) {
-            $this->statusid = $statusid;
+    public function setStatus($status) {
+        if ( $this->status != $status ) {
+            $this->status = $status;
             $this->log_file->send_log("Set status of user '" . $this->username . "' to '$statusid'");
         }
     }
@@ -554,7 +520,7 @@ class User
     }
 
     public function getDateAdded() {
-        return $this->dateAdded;
+        return $this->time_created;
     }
 
     public function getLastLogin() {

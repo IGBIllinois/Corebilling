@@ -113,10 +113,9 @@ CREATE TABLE `session` (
   KEY `user_id` (`user_id`,`stop`)
 )\p;
 
-CREATE TABLE `status` (
+CREATE TABLE `device_status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `statusname` varchar(45) NOT NULL,
-  `type` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 )\p;
 
@@ -154,7 +153,7 @@ CREATE TABLE `users` (
   `hidden` tinyint(1) DEFAULT 0,
   `rate_id` int(11) DEFAULT NULL,
   `department_id` int(11) DEFAULT NULL,
-  `status_id` int(11) DEFAULT NULL,
+  `status` BOOLEAN DEFAULT NULL,
   `user_role_id` int(11) DEFAULT NULL,
   `secure_key` varchar(45) DEFAULT NULL,
   `certified` int(11) NOT NULL DEFAULT 0,
@@ -218,13 +217,10 @@ SELECT `users`.`user_name` AS `user_name`,`device`.`full_device_name` AS `full_d
 
 INSERT INTO rate_types(rate_type_name) VALUES('Continuous')\p;
 INSERT INTO rate_types(rate_type_name) VALUES('Monthly')\p;
-INSERT INTO status(statusname,type) VALUES('Online',1)\p;
-INSERT INTO status(statusname,type) VALUES('Repair',1)\p;
-INSERT INTO status(statusname,type) VALUES('Do Not Track',1)\p;
-INSERT INTO status(statusname,type) VALUES('Offline',1)\p;
-INSERT INTO status(statusname,type) VALUES('Active',2)\p;
-INSERT INTO status(statusname,type) VALUES('Hidden',2)\p;
-INSERT INTO status(statusname,type) VALUES('Disabled',2)\p;
+INSERT INTO device_status(statusname) VALUES('Online')\p;
+INSERT INTO device_status(statusname) VALUES('Repair')\p;
+INSERT INTO device_status(statusname) VALUES('Do Not Track')\p;
+INSERT INTO device_status(statusname) VALUES('Offline')\p;
 
 INSERT INTO user_roles(role_name) VALUES('Admin')\p;
 INSERT INTO user_roles(role_name) VALUES('Supervisor')\p;

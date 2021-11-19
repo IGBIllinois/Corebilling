@@ -37,11 +37,11 @@ echo $extensions_string;
 <tr><td>LDAP_GROUP_DN</td><td><?php echo LDAP_GROUP_DN; ?></td></tr>
 <tr><td>LDAP_PORT</td><td><?php echo LDAP_PORT; ?></td></tr>
 <tr><td>TIMEZONE</td><td><?php echo settings::get_timezone(); ?></td></tr>
-<tr><td>LDAPMAN_API_ENABLED</td><td><?php echo LDAPMAN_API_ENABLED; ?></td></tr>
+<tr><td>LDAPMAN_API_ENABLED</td><td><?php if (LDAPMAN_API_ENABLED) { echo "true"; } else { echo "false"; } ?></td></tr>
 <tr><td>LDAPMAN_API_URL</td><td><?php echo LDAPMAN_API_URL; ?></td></tr>
 <tr><td>LDAPMAN_DEVICE_PREFIX</td><td><?php echo LDAPMAN_DEVICE_PREFIX; ?></td></tr>
 <tr><td>LDAPMAN_PI_PREFIX</td><td><?php echo LDAPMAN_PI_PREFIX; ?></td></tr>
-<tr><td>DATASERVER_ENABLED</td><td><?php echo settings::get_dataserver_enabled(); ?></td></tr>
+<tr><td>DATASERVER_ENABLED</td><td><?php if (settings::get_dataserver_enabled()) { echo "true"; } else { echo "false"; } ?></td></tr>
 <tr><td>DATASERVER_ROOT_DIR</td><td><?php echo settings::get_dataserver_root_dir(); ?></td></tr>
 <tr><td>DB_HOST</td><td><?php echo DB_HOST; ?></td></tr>
 <tr><td>DB_NAME</td><td><?php echo DB_NAME; ?></td></tr>
@@ -71,9 +71,9 @@ echo $extensions_string;
 	&nbsp;<?php echo strtoupper(CAL_ROOM_COLOR); ?>
         </td>
 </tr>
-<tr><td>RESERVE_ROOM</td><td><?php echo RESERVE_ROOM; ?></td></tr>
+<tr><td>RESERVE_ROOM</td><td><?php if (RESERVE_ROOM) { echo "true"; } else { echo "false"; } ?></td></tr>
 <tr><td>USER_EXCEPTIONS_ARRAY</td><td><?php echo implode(',',USER_EXCEPTIONS_ARRAY); ?></td></tr>
-<tr><td>ENABLE_LOG</td><td><?php settings::get_log_enabled(); ?></td></tr>
+<tr><td>ENABLE_LOG</td><td><?php if (settings::get_log_enabled()) { echo "true"; } else { echo "false"; } ?></td></tr>
 <tr><td>PASSWORD_RESET_URL</td><td><?php settings::get_password_reset_url(); ?></td></tr>
 <tr><td>NEWS_AGE (days)</td><td><?php echo settings::get_news_age(); ?></td></tr>
 </table>
