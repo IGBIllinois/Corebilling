@@ -7,8 +7,6 @@ if (!$login_user->isAdmin()) {
     exit;
 }
 
-$ldapSearchResults = array();
-
 $selectedUser = new User($db);
 $userCfop = new UserCfop($db);
 $userDepartment = new Department($db);
@@ -18,6 +16,7 @@ $group = new Group($db);
 $ldapinfo = null;
 if (isset($_REQUEST['user_id'])) {
     $selectedUser->load($_REQUEST['user_id']);
+	
     $ldapinfo = $ldapman->getUser($selectedUser->getUsername());
 }
 

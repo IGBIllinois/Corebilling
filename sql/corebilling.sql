@@ -155,7 +155,6 @@ CREATE TABLE `users` (
   `department_id` int(11) DEFAULT NULL,
   `status` BOOLEAN DEFAULT NULL,
   `user_role_id` int(11) DEFAULT NULL,
-  `secure_key` varchar(45) DEFAULT NULL,
   `certified` int(11) NOT NULL DEFAULT 0,
   `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),

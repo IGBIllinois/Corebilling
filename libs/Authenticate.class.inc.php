@@ -7,187 +7,148 @@
  */
 class Authenticate {
 	private $db;
-	private $ldapAuth;
+	private $session;
+	private $ldap;
 	private $authenticatedUser;
-	private $logonError;
+	private $ipaddress;
+	private $login;
 	private $verified;
 	private $user_id = null;
 	private $key = null;
-	public $lastActivity = null;
-	public $sessMethod = null;
+	private $timeout = null;
+	private $user_info;
 
-    public function __construct(PDO $db, LdapAuth $ldapAuth)
-    {
-        $this->db = $db;
-        $this->ldapAuth = $ldapAuth;
-        $this->verified = false;
-        $this->authenticatedUser = new User($this->db);
-    }
+	public function __construct(PDO $db, \IGBIllinois\ldap $ldap) {
+		$this->db = $db;
+		$this->ldap = $ldap;
+		$this->verified = false;
+		$this->authenticatedUser = new User($this->db);
+	}
 
-    public function __destruct()
-    {
+	public function __destruct() {
+	
+	}
 
-    }
+	/** Log user in using their username and password
+	* @param $userName
+	* @param $password
+	* @return bool
+	*/
+	public function Login($username, $password) {
+		$userId = User::exists($this->db,$username);
+		if ($userId) {
+			$this->user_id = $userId;
+			$this->authenticatedUser->load($userId);
+			$this->get_user($username);
+		}
+		else {
+			throw new Exception('Invalid Username or Password'); 
+			return false;
+		}
+		
+		if (!$this->ldap->bind($this->get_user_rdn(),$password)) {
+			throw new Exception('Invalid Username or Password');
+			return false;
+		}
+		$this->SetSession();
+		return true;
 
-    /** Log user in using their username and password
-     * @param $userName
-     * @param $password
-     * @return bool
-     */
-    public function Login($userName, $password)
-    {
-        $this->logonError = "";
+	}
 
-        //Check if user has access by checking LDAP
-        if ($this->ldapAuth->Authenticate ( $userName, $password) ) {
-            $userId = User::exists($this->db,$userName);
-            if ($userId)
-            {
-                //If user is in the system then load this user
-                $this->authenticatedUser->load($userId);
-            } else {
-	            // If user is not in the system, deny them.
-	            $this->verified=false;
-	            $this->logonError = "Unauthorized user.";
-	            return false;
-            }
+	/**
+	* Logout user by removing their session information and marking them as unverified
+	*/
+	public function Logout() {
+		$this->UnsetSession();
+		$this->verified = false;
+	}
 
-            //Generate a secure key for user
-            $this->authenticatedUser->updateSecureKey();
-            $this->SetSession($this->authenticatedUser->getSecureKey(), $this->authenticatedUser->getId() );
-            $this->verified = true;
-
-            return true;
-
-        } else {
-            $this->logonError =$this->ldapAuth->getError();
-            //$this->logonError = $this->logonError. "Incorrect user name or password.";
-        }
-
-        $this->verified=false;
-        return false;
-    }
-
-    /**
-     * Logout user by removing their session information and marking them as unverified
-     */
-    public function Logout()
-    {
-        $this->UnsetSEssion();
-        $this->verified = false;
-    }
-
-    /** Verify the user via their session so we don't have to check LDAP every time
-     *  if the session has expired then force logout the user by removing their session information
-     * @return bool
-     */
-    public function VerifySession()
-    {
-	    $this->load();
-        if($this->user_id != null) {
-            if(time() - $this->lastActivity < LOGIN_TIMEOUT) {
-                $this->authenticatedUser = new User ( $this->db );
-                $this->authenticatedUser->load($this->user_id);
-
-                if($this->authenticatedUser->getSecureKey() == $this->key)
-                {
-                    $this->authenticatedUser->updateSecureKey();
-                    $this->SetSession($this->authenticatedUser->getSecureKey(), $this->authenticatedUser->getId());
-                }
-                $this->verified = true;
+	/** Verify the user via their session so we don't have to check LDAP every time
+	*  if the session has expired then force logout the user by removing their session information
+	* @return bool
+	*/
+	public function VerifySession($session) {
+		$this->session = $session;	
+		$this->load();
+		if(!$this->user_id) {
+			$this->verified = false;
+			return false;
+		}
+		elseif(time() > $this->timeout + settings::get_session_timeout()) {
+			$this->verified = false;
+			return false;
+		}
+		elseif ($this->ipaddress != $_SERVER['REMOTE_ADDR']) {
+			$this->verified = false;
+			return false;
+		}
+		elseif (!$this->login) {
+			return false;
+		}
+		$this->authenticatedUser->load($this->user_id);
+		$this->SetSession();
+		$this->verified = true;
                 return true;
-            }
-        }
-        $this->UnsetSession();
-        $this->verified=false;
-        return false;
-    }
+	}
 
-    /**Sets the session informtion
-     * @param $secureKey
-     * @param $userId
-     */
-    public function SetSession($secureKey,$userId)
-    {
-        $_SESSION ['coreapp_user_id'] = $userId;
-        $_SESSION ['coreapp_key'] = $secureKey;
-        $_SESSION ['coreapp_created'] = time();
-	setcookie('coreapp_user_id', $userId, time()+LOGIN_TIMEOUT);
-	setcookie('coreapp_key', $secureKey, time()+LOGIN_TIMEOUT);
-	setcookie('coreapp_created', time(), time()+LOGIN_TIMEOUT);
-    }
+	/**Sets the session informtion
+	* @param $userId
+	*/
+	private function SetSession() {
+		$session = new \IGBIllinois\session(settings::get_session_name());
+		$session_vars = array('user_id'=> $this->user_id,
+				'timeout'=>time(),
+				'ipaddress'=>$_SERVER['REMOTE_ADDR'],
+				'login'=>true,
+				'lastpage'=>substr($_SERVER['PHP_SELF'],strrpos($_SERVER['PHP_SELF'],"/") + 1)
+			);
+		$session->set_session($session_vars);
+	}
     
-    public function load(){
-	    if(isset($_SESSION['coreapp_user_id'])){
-		    $this->user_id = $_SESSION['coreapp_user_id'];
-		    $this->key = $_SESSION['coreapp_key'];
-		    $this->lastActivity = $_SESSION['coreapp_created'];
-		    
-		    $this->sessMethod = 'session';
-	    } else if(isset($_COOKIE['coreapp_user_id'])) {
-		    $this->user_id = $_COOKIE['coreapp_user_id'];
-		    $this->key = $_COOKIE['coreapp_key'];
-		    $this->lastActivity = $_COOKIE['coreapp_created'];
-		    
-		    $this->sessMethod = 'cookie';
-	    }
-    }
+	private function load() {
+		if ($this->session->get_var('user_id')) {
+			$this->user_id = $this->session->get_var('user_id');
+			$this->timeout = $this->session->get_var('timeout');
+			$this->ipaddress = $this->session->get_var('ipaddress');
+			$this->login = $this->session->get_var('login');
+		}
+	}
+	/**
+	* Removes session information when the user logs out or expired login
+	*/
+	private function UnsetSession() {
+		$session = new \IGBIllinois\session(settings::get_session_name());
+		$session->destroy_session();
+		unset($_POST);
 
-    /**
-     * Removes session information when the user logs out or expired login
-     */
-    public function UnsetSession()
-    {
-        unset ( $_SESSION ['coreapp_user_id'] );
-        unset ( $_SESSION ['coreapp_key'] );
-        unset ( $_SESSION ['coreapp_created'] );
-        
-        setcookie('coreapp_user_id', "", time()-3600);
-        setcookie('coreapp_key', "", time()-3600);
-        setcookie('coreapp_created', "", time()-3600);
-    }
+	}
 
-    /**
-     * Returns an encrypted & utf8-encoded
-     */
-    private function encrypt($pure_string, $encryption_key) {
-        $iv_size = mcrypt_get_iv_size(MCRYPT_BLOWFISH, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        $encrypted_string = mcrypt_encrypt(MCRYPT_BLOWFISH, $encryption_key, utf8_encode($pure_string), MCRYPT_MODE_ECB, $iv);
-        return $encrypted_string;
-    }
+	/**
+	* @return mixed
+	*/
+	public function getAuthenticatedUser() {
+		return $this->authenticatedUser;
+	}
 
-    /**
-     * Returns decrypted original string
-     */
-    private function decrypt($encrypted_string, $encryption_key) {
-        $iv_size = mcrypt_get_iv_size(MCRYPT_BLOWFISH, MCRYPT_MODE_ECB);
-        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-        $decrypted_string = mcrypt_decrypt(MCRYPT_BLOWFISH, $encryption_key, $encrypted_string, MCRYPT_MODE_ECB, $iv);
-        return $decrypted_string;
-    }
+	/**
+	* @return boolean
+	*/
+	public function isVerified() {
+		return $this->verified;
+	}
 
-    /**
-     * @return mixed
-     */
-    public function getAuthenticatedUser()
-    {
-        return $this->authenticatedUser;
-    }
+	private function get_user_rdn() { 
+		if (isset($this->user_info['dn'])) {
+			return $this->user_info['dn'];
+		}
+		else {
+			return false;
+		}
+	}
+	private function get_user($username) {
+		$filter = "(uid=" . $username . ")";
+		$user_info = $this->ldap->search($filter);
+		$this->user_info = $user_info[0];
+	}
 
-    /**
-     * @return mixed
-     */
-    public function getLogonError()
-    {
-        return $this->logonError;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isVerified()
-    {
-        return $this->verified;
-    }
 }

@@ -8,6 +8,7 @@ UPDATE users SET status_id=0 WHERE status_id=6;
 UPDATE users SET status_id=0 WHERE status_id=7;
 ALTER TABLE users MODIFY status_id BOOLEAN;
 ALTER TABLE users CHANGE status_id status BOOLEAN;
+ALTER TABLE users DROP COLUMN secure_key;
 DELETE FROM status WHERE type=2;
 ALTER TABLE status DROP COLUMN `type`;
 RENAME TABLE status TO device_status;

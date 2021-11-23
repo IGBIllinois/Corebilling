@@ -1,12 +1,16 @@
 <?php
-	error_reporting(E_ALL);
-	ini_set('display_errors', '1');
 	
-	require_once('includes/main.inc.php');
+require_once('includes/main.inc.php');
+require_once 'includes/authenticate.inc.php';
+
+if (!$login_user->isAdmin()) {
+    exit;
+}
+
+header('content-type: application/json');
 	
-	require_once 'includes/authenticate.inc.php';
-	header('content-type: application/json');
-	
-	if(isset($_REQUEST['uid'])){
-		echo json_encode($ldapman->getUser($_REQUEST['uid']));
-	}
+if(isset($_REQUEST['uid'])) {
+	echo json_encode($ldapman->getUser($_REQUEST['uid']));
+}
+
+?>

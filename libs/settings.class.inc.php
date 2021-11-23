@@ -7,6 +7,14 @@ class settings {
 	private const NEWS_AGE = 120;
 	private const DATASERVER_ENABLED = false;
 	private const TIMEZONE = "UTC";
+	private const LDAP_HOST = "localhost";
+	private const LDAP_PORT = 389;
+	private const LDAP_BASE_DN = "";
+	private const LDAP_SSL = false;
+	private const LDAP_TLS = false;
+	private const LDAP_BIND_USER = "";
+	private const LDAP_BIND_PASS = "";
+	private const SESSION_TIMEOUT = 300;
 
 	public static function get_version() {
 		return VERSION;
@@ -84,6 +92,63 @@ class settings {
 		}
 		return array();
 	
+	}
+
+	public static function get_ldap_host() {
+		if (defined("LDAP_HOST")) {
+			return LDAP_HOST;
+		}
+		return self::LDAP_HOST;
+	}
+
+	public static function get_ldap_port() {
+		if (defined("LDAP_PORT")) {
+			return LDAP_PORT;
+		}
+		return self::LDAP_PORT;
+	}
+	public static function get_ldap_base_dn() {
+		if (defined("LDAP_BASE_DN")) {
+			return LDAP_BASE_DN;
+		}
+		return self::LDAP_BASE_DN;
+	}
+	public static function get_ldap_ssl() {
+		if (defined("LDAP_SSL")) {
+			return LDAP_SSL;
+		}
+		return self::LDAP_SSL;
+	}
+
+	public static function get_ldap_tls() {
+		if (defined("LDAP_TLS")) {
+			return LDAP_TLS;
+		}
+		return self::LDAP_TLS;
+	}
+	public static function get_ldap_bind_user() {
+		if (defined("LDAP_BIND_USER")) {
+			return LDAP_BIND_USER;
+		}
+		return self::LDAP_BIND_USER;
+	}
+	public static function get_ldap_bind_password() {
+		if (defined("LDAP_BIND_PASS")) {
+			return LDAP_BIND_PASS;
+		}
+		return self::LDAP_BIND_PASS;
+	}
+	public static function get_session_name() {
+		if (defined("SESSION_NAME")) {
+			return SESSION_NAME;
+		}
+		return NULL;
+	}
+	public static function get_session_timeout() {
+		if (defined("SESSION_TIMEOUT")) {
+			return SESSION_TIMEOUT;
+		}
+		return self::SESSION_TIMEOUT;
 	}
 }
 ?>

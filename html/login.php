@@ -1,17 +1,20 @@
 <?php
-	require_once 'includes/main.inc.php';
+require_once 'includes/main.inc.php';
 
-	if(isset($_POST['login'])) {
-		$username = trim(rtrim($_POST['user_name']));
-		$password = $_POST['password'];
-
-		$loginsuccess = $authenticate->Login($username,$password);
-		if( $loginsuccess ){
+if(isset($_POST['login'])) {
+	$username = trim(rtrim($_POST['user_name']));
+	$password = $_POST['password'];
+	try {
+		$result = $authenticate->Login($username,$password);
+		if ($result) {
 			header('Location: index.php');
-		} else {
-			$message = html::error_message('Incorrect username or password.');
 		}
 	}
+	catch (Exception $e) {
+		$message = html::error_message($e->getMessage());
+	}
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

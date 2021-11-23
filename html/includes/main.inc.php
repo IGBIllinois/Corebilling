@@ -1,6 +1,4 @@
 <?php
-ob_start();
-@session_start();
 // setting up the web root and server root for
 require_once(__DIR__ . '/../../conf/app.inc.php');
 require_once(__DIR__ . '/../../conf/config.inc.php');
@@ -16,22 +14,27 @@ function my_autoloader($class_name) {
 spl_autoload_register('my_autoloader');
 
 try {
-    $db = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASSWORD);
-} catch (PDOException $e) {
-    die("Error initializing PDO: " . $e->getMessage());
+	$db = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASSWORD);
+} 
+catch (PDOException $e) {
+	die("Error initializing Database: " . $e->getMessage());
 }
 
 
 date_default_timezone_set(settings::get_timezone());
 
 //Sets up ldap connection
-$authen = new LdapAuth ( LDAP_HOST, LDAP_PEOPLE_DN, LDAP_GROUP_DN,LDAP_PORT);
+$ldap = new \IGBIllinois\ldap(settings::get_ldap_host(),
+			settings::get_ldap_base_dn(),
+			settings::get_ldap_port(),
+			settings::get_ldap_ssl(),
+			settings::get_ldap_tls());
+
+$ldapman = null;
 if(LDAPMAN_API_ENABLED){
 	$ldapman = new LdapManager(LDAPMAN_API_URL, LDAPMAN_API_USERNAME, LDAPMAN_API_PASSWORD);
-} else {
-	$ldapman = new LdapManager(LDAPMAN_API_URL);
-}
+} 
 
 //Authenticates to website database
-$authenticate = new Authenticate($db, $authen);
+$authenticate = new Authenticate($db,$ldap);
 

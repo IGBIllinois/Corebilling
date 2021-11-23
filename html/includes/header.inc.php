@@ -1,6 +1,6 @@
 <?php
-	require_once('main.inc.php');	
-	require_once 'authenticate.inc.php';
+require_once('main.inc.php');	
+require_once('authenticate.inc.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">

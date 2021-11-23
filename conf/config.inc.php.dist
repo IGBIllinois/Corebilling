@@ -5,6 +5,11 @@ define('LDAP_HOST','');
 define('LDAP_PEOPLE_DN', '');
 define('LDAP_GROUP_DN', ''); // Leave blank for no group check
 define('LDAP_PORT','389');
+define('LDAP_SSL',false);
+define('LDAP_TLS',false);
+define('LDAP_BIND_USER','');
+define('LDAP_BIND_PASS','');
+define('LDAP_BASE_DN','');
 
 define("TIMEZONE","");
 
@@ -28,7 +33,8 @@ define('DB_NAME','corebilling');
 define('TITLE', '');
 
 // Authentication timeout
-define('LOGIN_TIMEOUT', 8*60*60);
+define('SESSION_TIMEOUT', 8*60*60);
+define('SESSION_NAME','corebilling');
 
 define('CAL_DEFAULT_COLOR','#3a87ad');
 define('CAL_TRAINING_COLOR','#6c3cae');

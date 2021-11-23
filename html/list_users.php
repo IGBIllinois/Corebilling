@@ -6,8 +6,6 @@ if(!$login_user->isAdmin()){
 	exit;
 }
 
-$ldapSearchResults = array();
-
 $userDepartment = new Department($db);
 $rate = new Rate($db);
 $group = new Group($db);
