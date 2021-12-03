@@ -29,7 +29,7 @@ if (isset($_POST['ModifyDevice'])) {
 
 	foreach ($ratesArr as $key => $value) {
 		$rateId = $value;
-		$rateValue = $_POST["rate-" . $value] / 60;
+		$rateValue = $_POST["rate-" . $value];
 		$minTime = $_POST["mintime-" . $value];
 		$rateTypeId = $_POST["rate_type-" . $value];
 		$device->updateRate($rateId, $rateValue, $minTime, $rateTypeId);
@@ -243,7 +243,7 @@ if (count($harddrives)) {
 											<h5>" . $deviceRateInfo["rate_name"] . ":</h5>
 											</td>
 											<td>
-											<input type=\"text\" value=" . round($deviceRateInfo["rate"] * 60) . " name=\"rate-" . $deviceRateInfo["rate_id"] . "\" size=\"3\" maxlength=\"5\" class=\"form-control\">
+											<input type=\"text\" value='" . round($deviceRateInfo["rate"] . "' name=\"rate-" . $deviceRateInfo["rate_id"] . "\" size=\"3\" maxlength=\"5\" class=\"form-control\">
 											</td>
 											<td>
 											<input type=\"text\" value=" . $deviceRateInfo["min_use_time"] . " name=\"mintime-" . $deviceRateInfo["rate_id"] . "\" size=\"5\" maxlength=\"5\" class=\"form-control\">

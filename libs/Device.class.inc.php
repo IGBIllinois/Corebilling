@@ -6,6 +6,7 @@ class Device
 	const STATUS_DONOTTRACK = 3;
 	const STATUS_OFFLINE = 4;
 	const HARDDRIVE_WARNING = 80;
+	const MINUTES = 60;
 	private $db;
 	private $deviceId = 0;
 	private $shortName = "";
@@ -185,11 +186,13 @@ class Device
 	* @return array
 	*/
 	public function getRates() {
-		$sql = "SELECT dr.rate, dr.id, dr.rate_id, dr.min_use_time, r.rate_name, dr.rate_type_id ";
+		$sql = "SELECT ROUND(dr.rate * :minutes,2) as rate, dr.id, dr.rate_id, dr.min_use_time, r.rate_name, dr.rate_type_id ";
 		$sql .= "FROM device_rate dr, rates r ";
 		$sql .= "WHERE r.id=dr.rate_id AND dr.device_id=:device_id";
 		$query = $this->db->prepare($sql);
-		$query->execute(array(":device_id"=>$this->deviceId));
+		$parameters = array(":device_id"=>$this->deviceId,
+			":minutes"=>self::MINUTES);
+                $query->execute($parameters);	
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
@@ -200,10 +203,11 @@ class Device
 	* @param $rateTypeId
 	*/
 	public function updateRate($rateId, $rate, $minTime, $rateTypeId) {
+		$rate_per_second = $rate / self::MINUTES;
 		$sql = "UPDATE device_rate SET rate=:rate, min_use_time=:mintime, rate_type_id=:rate_type_id ";
 		$sql .= "WHERE rate_id=:rate_id AND device_id=:device_id";
 		$query = $this->db->prepare($sql);
-		$parameters = array(":rate"=>$rate,":mintime"=>$minTime,":rate_id"=>$rateId,":device_id"=>$this->deviceId,":rate_type_id"=>$rateTypeId);
+		$parameters = array(":rate"=>$rate_per_second,":mintime"=>$minTime,":rate_id"=>$rateId,":device_id"=>$this->deviceId,":rate_type_id"=>$rateTypeId);
 		return $query->execute($parameters);
 	}
 
