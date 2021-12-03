@@ -2,6 +2,7 @@
 class Device
 {
 	const STATUS_TYPE_DEVICE=1;
+	const MINUTES = 60;
 	private $db;
 	private $deviceId;
 	private $shortName;
@@ -169,15 +170,16 @@ class Device
     /**Get rates list for device
      * @return array
      */
-    public function getRates()
-    {
-        $queryDeviceRates = "SELECT dr.rate, dr.id, dr.rate_id, dr.min_use_time, r.rate_name, dr.rate_type_id FROM device_rate dr, rates r WHERE r.id=dr.rate_id AND dr.device_id=:device_id";
-        $deviceRatesPrep = $this->db->prepare($queryDeviceRates);
-        $deviceRatesPrep->execute(array(":device_id"=>$this->deviceId));
-        $deviceRatesArr = $deviceRatesPrep->fetchAll(PDO::FETCH_ASSOC);
-
-        return $deviceRatesArr;
-    }
+	public function getRates() {
+                $sql = "SELECT ROUND(dr.rate * :minutes,2) as rate, dr.id, dr.rate_id, dr.min_use_time, r.rate_name, dr.rate_type_id ";
+                $sql .= "FROM device_rate dr, rates r ";
+                $sql .= "WHERE r.id=dr.rate_id AND dr.device_id=:device_id";
+                $query = $this->db->prepare($sql);
+		$parameters = array(":device_id"=>$this->deviceId,
+				":minutes"=>self::MINUTES);
+                $query->execute($parameters);
+                return $query->fetchAll(PDO::FETCH_ASSOC);
+        }
 
     /**Update this device's rate
      * @param $rateId
@@ -185,12 +187,14 @@ class Device
      * @param $minTime
      * @param $rateTypeId
      */
-    public function updateRate($rateId, $rate, $minTime, $rateTypeId)
-    {
-        $queryUpdateDeviceRate = "UPDATE device_rate SET rate=:rate, min_use_time=:mintime, rate_type_id=:rate_type_id WHERE rate_id=:rate_id AND device_id=:device_id";
-        $updateDeviceRatePrep = $this->db->prepare($queryUpdateDeviceRate);
-        $updateDeviceRatePrep->execute(array(":rate"=>$rate,":mintime"=>$minTime,":rate_id"=>$rateId,":device_id"=>$this->deviceId,":rate_type_id"=>$rateTypeId));
-    }
+	public function updateRate($rateId, $rate, $minTime, $rateTypeId) {
+		$rate_per_second = $rate / self::MINUTES;
+                $sql = "UPDATE device_rate SET rate=:rate, min_use_time=:mintime, rate_type_id=:rate_type_id ";
+                $sql .= "WHERE rate_id=:rate_id AND device_id=:device_id LIMIT 1";
+                $query = $this->db->prepare($sql);
+                $parameters = array(":rate"=>$rate_per_second,":mintime"=>$minTime,":rate_id"=>$rateId,":device_id"=>$this->deviceId,":rate_type_id"=>$rateTypeId);
+                return $query->execute($parameters);
+        }
 
     public static function deviceStatusList($db)
     {
