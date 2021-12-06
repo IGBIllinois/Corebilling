@@ -481,7 +481,7 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
     });
 
     var seqnum = 0;
-    $('#user_name').on('input', function () {
+    $('#user_name').on('change', function () {
         var $this = $(this);
         seqnum++;
         var currentseqnum = seqnum;

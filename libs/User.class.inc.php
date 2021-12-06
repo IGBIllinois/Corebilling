@@ -8,7 +8,8 @@ class User
 	const DISABLED = 0;
 	const ROLE_ADMIN = 1;
 	const ROLE_SUPERVISOR = 2;
-	const ROLE_USER = 3;	
+	const ROLE_USER = 3;
+	const LDAP_ATTRIBUTES = array('uid','cn','sn','givenName','mail');	
 	private $userId = 0;
 	private $username = "";
 	private $first = "";
@@ -166,7 +167,7 @@ class User
         if ( $this->isAdmin() ) { // Admins can access everything
             return true;
         } else {
-            $query = "select * from access_control where device_id=:resource_id and user_id=:user_id limit 1";
+            $query = "SELECT * FROM access_control WHERE device_id=:resource_id AND user_id=:user_id LIMIT 1";
             $stmt = $this->db->prepare($query);
             $stmt->execute(array(":resource_id" => $deviceId, ":user_id" => $this->getId()));
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -567,6 +568,23 @@ class User
 	public function is_ldap_user() {
 		return $this->ldap->is_ldap_user($this->getUsername());
 
+	}
+
+	public static function get_ldap_info($ldap,$username) {
+		$username = trim(rtrim($username));
+		$filter = "(uid=" . $username . ")";
+		$ou = settings::get_ldap_base_dn();	
+		$ldap_info = $ldap->search($filter,$ou,self::LDAP_ATTRIBUTES);
+		$formatted_info = array();
+		if ($ldap_info['count'] == 1) {
+			$formatted_info['dn'] = $ldap_info[0]['dn'];
+			foreach (self::LDAP_ATTRIBUTES as $attribute) {
+				$formatted_info[$attribute] = $ldap_info[0][strtolower($attribute)][0];
+
+			}
+		}
+		return $formatted_info;
+		
 	}
 }
 
