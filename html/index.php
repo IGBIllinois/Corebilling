@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/header.inc.php';
 
-$user = new User($db);
+$user = new User($db,$ldap);
 $articlesList = Article::getAllArticles($db,settings::get_news_age());
 
 $articles_html = "";

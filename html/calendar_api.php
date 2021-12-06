@@ -1,10 +1,10 @@
 <?php
 set_time_limit(20);
-include('includes/main.inc.php');
+require_once('includes/main.inc.php');
 
 if (isset($_REQUEST['action']) && isset($_REQUEST['user_id']) && isset($_REQUEST['key'])) {
     //Load User information for user_id
-    $user = new User ($db);
+    $user = new User($db,$ldap);
     $user->load($_REQUEST['user_id']);
 
     //Verify the user is who is is saying he is by comparing the user key from the database to key given to the api

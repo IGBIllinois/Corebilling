@@ -10,7 +10,7 @@ $adminType = 1;
 $selectedArticle = 0;
 
 $article = new Article($db);
-$user = new User($db);
+$user = new User($db,$ldap);
 
 if (isset($_GET['edit'])) {
 	$selectedArticle = $_GET['edit'];

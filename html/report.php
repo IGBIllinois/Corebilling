@@ -1,14 +1,11 @@
 <?php
 ob_start();
 require_once 'includes/main.inc.php';
+require_once 'includes/authenticate.inc.php';
 ob_clean();
 
 if (isset($_POST['create_cal_report'])) {
-    $user = new User ($db);
-    $user->load($_REQUEST['user_id']);
 
-    //Verify the user is who is is saying he is by comparing the user key from the database to key given to the api
-    if ($user->getSecureKey() == $_REQUEST ['key']) {
         // TODO set start and end based on month and year
         $month = $_POST['month'];
         $year = $_POST['year'];
@@ -30,7 +27,6 @@ if (isset($_POST['create_cal_report'])) {
             $_POST['training']
         );
         $filename = "calendar-" . $month . "-" . $year . "." . $type;
-    }
 }
 
 elseif (isset($_POST['create_data_report'])) {

@@ -7,17 +7,15 @@ if (!$login_user->isAdmin()) {
     exit;
 }
 
-$selectedUser = new User($db);
+$selectedUser = new User($db,$ldap);
 $userCfop = new UserCfop($db);
 $userDepartment = new Department($db);
 $rate = new Rate($db);
 $group = new Group($db);
 
-$ldapinfo = null;
 if (isset($_REQUEST['user_id'])) {
     $selectedUser->load($_REQUEST['user_id']);
 	
-    $ldapinfo = $ldapman->getUser($selectedUser->getUsername());
 }
 
 if (isset($_POST['cancel_user'])) {
@@ -136,7 +134,6 @@ if (isset($_POST['create_user'])) {
 
         $_REQUEST['user_id'] = $selectedUser->getId();
         $message .= html::success_message("User " . $_POST['user_name'] . " added to database.");
-        $ldapinfo = $ldapman->getUser($selectedUser->getUsername());
     }
 }
 
@@ -149,7 +146,7 @@ if (isset($_REQUEST['user_id'])) {
 <h3><?php
     echo $selectedUser->getId() > 0 ? 'Edit' : 'Add'; ?> User</h3>
 <?php
-if ($selectedUser->getId() > 0 && $ldapinfo == null) {
+if (!$selectedUser->is_ldap_user()) {
     echo html::error_message(
         "This user does not have an IGB account. Any changes made to their device access will not take effect. Please make sure to get their IGB account created before making changes here.",
         "No IGB Account"
@@ -416,7 +413,7 @@ if ($selectedUser->getId() > 0 && $ldapinfo == null) {
                         } else {
                             $deviceList = Device::getAllDevices($db);
                             foreach ($deviceList as $deviceInfo) {
-                                if ($deviceInfo['status_id'] == 1 || $deviceInfo['status_id'] == 3) {
+                                if ($deviceInfo['status_id'] == Device::STATUS_ONLINE || $deviceInfo['status_id'] == Device::STATUS_DONOTTRACK) {
                                     $checked = "";
                                     if ($selectedUser->hasAccessTo($deviceInfo['id'])) {
                                         $checked = " checked='checked'";
@@ -495,7 +492,7 @@ if ($selectedUser->getId() > 0 && $ldapinfo == null) {
                     if (data != null) {
                         $('#first').val(data.givenName);
                         $('#last').val(data.sn);
-                        $('#email').val(data.email);
+                        $('#email').val(data.mail);
                     } else {
                         $('#first').val("");
                         $('#last').val("");

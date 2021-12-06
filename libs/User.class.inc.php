@@ -24,9 +24,12 @@ class User
 	private $time_created = "";
 	private $demographics = null;
 	private $log_file = null;
+	private $ldap = null;
+	private $ldap_info = array();
 
-	public function __construct(PDO $db) {
+	public function __construct(PDO $db,\IGBIllinois\ldap $ldap = null) {
 		$this->db = $db;
+		$this->ldap = $ldap;
 		$this->userCfop = new UserCfop($this->db);
 		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
 	}
@@ -103,6 +106,10 @@ class User
 		$this->userRoleId = $result["user_role_id"];
 		$this->time_created = $result["time_created"];
 		$this->certified = $result['certified'];
+		if ($this->ldap != null && is_resource($this->ldap)) {
+
+
+		}
     }
 
     /**
@@ -414,7 +421,7 @@ class User
 		$query->execute([':user_id' => $this->getId()]);
 
 		$ids = [];
-		while ( $row = $stmt->fetch() ) {
+		while ( $row = $query->fetch() ) {
 			$ids[] = $row['group_id'];
 		}
 		return $ids;
@@ -482,7 +489,13 @@ class User
 	public function setStatus($status) {
 		if ( $this->status != $status ) {
 			$this->status = $status;
-			$this->log_file->send_log("Set status of user '" . $this->username . "' to '$statusid'");
+			$status_name = "";
+			foreach ($this->getUserStatusList() as $status_list) {
+				if ($status_list['id'] == $status) {
+					$status_name = $status_list['name'];
+				}
+			}
+			$this->log_file->send_log("Set status of user " . $this->username . " to " . $status_name);
 		}
 	}
 
@@ -548,6 +561,11 @@ class User
 
 		}
 		return false;
+
+	}
+
+	public function is_ldap_user() {
+		return $this->ldap->is_ldap_user($this->getUsername());
 
 	}
 }

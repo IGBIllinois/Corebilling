@@ -10,7 +10,6 @@ if (isset($_POST['json']) && !isset($_POST['username']) && !isset($_POST['key'])
 	$json = json_decode($json_string);
 	$key = $json->{'key'};
 	$username = $json->{'username'};
-	error_log($json_string);	
 }
 
 //If CoreBillingService >=1.0 < 2.0

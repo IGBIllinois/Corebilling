@@ -1,6 +1,7 @@
 <?php
-require_once('main.inc.php');	
-require_once('authenticate.inc.php');
+require_once(__DIR__ . '/main.inc.php');	
+require_once(__DIR__ . '/authenticate.inc.php');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,7 +59,6 @@ require_once('authenticate.inc.php');
 		
 		<div class="container-fluid">
 			<div class="row">
-				<?php if ($authenticate->isVerified()) { ?>
 	                        <div class="col-2 col-md-2">
 					<ul class="nav nav-pills nav-stacked">
                                         	<li><a href="index.php">Home</a></li>
@@ -86,6 +86,5 @@ require_once('authenticate.inc.php');
 						<?php } ?>
                                  	</ul>
                         	</div>
-				<?php } ?>
 
 				<div class="col-10 col-md-10">

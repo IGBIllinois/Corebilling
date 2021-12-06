@@ -22,7 +22,7 @@ class Authenticate {
 		$this->db = $db;
 		$this->ldap = $ldap;
 		$this->verified = false;
-		$this->authenticatedUser = new User($this->db);
+		$this->authenticatedUser = new User($this->db,$this->ldap);
 	}
 
 	public function __destruct() {
@@ -48,6 +48,10 @@ class Authenticate {
 		
 		if (!$this->ldap->bind($this->get_user_rdn(),$password)) {
 			throw new Exception('Invalid Username or Password');
+			return false;
+		}
+		if ($this->authenticatedUser->getStatus() != $this->authenticatedUser::ACTIVE) {
+			throw new Exception('You do not have permissions to login');
 			return false;
 		}
 		$this->SetSession();
@@ -103,6 +107,7 @@ class Authenticate {
 				'lastpage'=>substr($_SERVER['PHP_SELF'],strrpos($_SERVER['PHP_SELF'],"/") + 1)
 			);
 		$session->set_session($session_vars);
+		$this->verified = true;
 	}
     
 	private function load() {

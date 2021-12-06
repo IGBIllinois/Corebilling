@@ -3,7 +3,7 @@ require_once 'includes/header.inc.php';
 
 $rateTypesList = array(Bills::CONTINUOUS_RATE => "Continuous", Bills::MONTHLY_RATE => "Monthly");
 
-$userToBill = new User($db);
+$userToBill = new User($db,$ldap);
 $bills = new Bills($db);
 $userCfop = new UserCfop($db);
 
