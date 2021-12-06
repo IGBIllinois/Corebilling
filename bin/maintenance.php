@@ -46,13 +46,13 @@ else {
 	$ldap->connect();
 
         //attempt to connect to ldap server
-	$sql = "SELECT * FROM users WHERE status_id='6' OR status_id='7'";
+	$sql = "SELECT * FROM users WHERE status_id=0";
 	$query = $db->prepare($sql);
 	$result = $query->execute();
 	$all_users = $query->fetchAll(PDO::FETCH_ASSOC);
 	$deviceList = Device::getAllDevices($db);
 	foreach ($all_users as $user) {
-		if (($user['status_id'] == 6) || ($user['status_id'] == 7)) {
+		if ($user['status_id'] == User::DISABLED)  {
 			$user_obj = new User($db);
 			$user_obj->load($user['id']);
 			$search_filter = "(uid=".$user_obj->getUsername() .")";

@@ -13,8 +13,6 @@ $stats = new Statistics($db);
 
 $sessionIdSelected = 0;
 
-//TODO check permissions here
-
 if (isset($_POST['startMonthSelected'])) {
 	list($startmonth, $startyear) = explode(" ", $_POST['startMonthSelected']);
 }
@@ -76,7 +74,7 @@ if (isset($_POST['endMonthSelected'])) {
 	?>
 	<div class="panel panel-default">
 		<div id="user_list_heading" class="panel-heading">
-			<h3>Active Users:</h3>
+			<h3>Reservations:</h3>
 		</div>
 		<div class="panel-body">				
 			<div class="row">

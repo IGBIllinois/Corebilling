@@ -54,7 +54,7 @@ if (isset ($_POST ['deviceSelected'])) {
 				foreach ($deviceList as $id => $availDevices) {
 					
 					// For now, let anyone schedule any device
-					if ( $availDevices['status_id']==1 || $availDevices['status_id']==3 ) {
+					if ( $availDevices['status_id']==Device::STATUS_ONLINE || $availDevices['status_id']==Device::STATUS_DONOTTRACK ) {
 						echo "<option value=" . $availDevices ['id'];
 						if ($availDevices['id'] == $device->getId()) {
 							echo " SELECTED";

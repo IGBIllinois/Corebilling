@@ -113,37 +113,37 @@ class User
 		}
     }
 
-    /**
-     * Update user into database based on changes made to this object
-     */
-    // TODO the db should be updated on *every* set function, not just when this update function is called.
-    public function update() {
-        $queryUpdateUser = "update users set
-							user_name=:user_name,
-							first=:first,
-							last=:last,
-							email=:email,
-							department_id=:department_id,
-							rate_id=:rate_id,
-							status=:status,
-							user_role_id=:user_role_id,
-							certified=:certified
-							where id=:user_id";
-        $updateUserPrep = $this->db->prepare($queryUpdateUser);
-        return $updateUserPrep->execute(
-            array(
-                ':user_name' => $this->username,
-                ':first' => $this->first,
-                ':last' => $this->last,
-                ':email' => $this->email,
-                ':department_id' => $this->departmentId,
-                ':rate_id' => $this->rateid,
-                ':status' => $this->status,
-                ':user_role_id' => $this->userRoleId,
-                ':certified' => $this->certified ? 1 : 0,
-                ':user_id' => $this->userId,
-            ));
-    }
+	/**
+	* Update user into database based on changes made to this object
+	*/
+	// TODO the db should be updated on *every* set function, not just when this update function is called.
+	public function update() {
+		$sql = "UPDATE users SET ";
+		$sql .= "user_name=:user_name,first=:first,last=:last,";
+		$sql .= "email=:email,department_id=:department_id,rate_id=:rate_id,";
+		$sql .= "status=:status,user_role_id=:user_role_id,certified=:certified ";
+		$sql .= "WHERE id=:user_id LIMIT 1";
+
+		$query = $this->db->prepare($sql);
+		$paramters = array(
+			':user_name' => $this->username,
+			':first' => $this->first,
+			':last' => $this->last,
+			':email' => $this->email,
+			':department_id' => $this->departmentId,
+			':rate_id' => $this->rateid,
+			':status' => $this->status,
+			':user_role_id' => $this->userRoleId,
+			':certified' => $this->certified ? 1 : 0,
+			':user_id' => $this->userId,
+		);
+		$result =  $query->execute($paramters);
+		if ($query->rowCount()) {
+			return true;
+		}
+		return false;
+
+	}
 
 	/**Check if a user exists by netid
 	* @param PDO $db
@@ -161,53 +161,79 @@ class User
 		} 
 		return 0;
 
-    }
+	}
 
-    public function hasAccessTo($deviceId) {
-        if ( $this->isAdmin() ) { // Admins can access everything
-            return true;
-        } else {
-            $query = "SELECT * FROM access_control WHERE device_id=:resource_id AND user_id=:user_id LIMIT 1";
-            $stmt = $this->db->prepare($query);
-            $stmt->execute(array(":resource_id" => $deviceId, ":user_id" => $this->getId()));
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $result !== false;
-        }
-    }
+	public function hasAccessTo($deviceId) {
+		if ( $this->isAdmin() ) { // Admins can access everything
+			return true;
+		} 
+		else {
+			$sql = "SELECT * FROM access_control WHERE device_id=:resource_id AND user_id=:user_id LIMIT 1";
+			$query = $this->db->prepare($sql);
+			$parameters = array(":resource_id" => $deviceId, 
+					":user_id" => $this->getId());
+			$query->execute($parameters);
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			return $result !== false;
+		}
+	}
 
-    public function giveAccessTo($deviceId) {
-        $query = "insert into access_control (user_id, device_id) values (:userid,:deviceid)";
-	$device = new Device($this->db);
-	$device->load($deviceId);
-        $stmt = $this->db->prepare($query);
-        if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
-		$device = new Device($this->db);
-		$device->load($deviceId);
-		$this->log_file->send_log("Gave user '" . $this->getUsername() . "' access to device " . $device->getShortName());
-        }
-    }
+	public function giveAccessTo($deviceId) {
+        	$sql = "INSERT INTO access_control(user_id, device_id) VALUES(:userid,:deviceid)";
+		$query = $this->db->prepare($sql);
+		$parameters = array(":userid" => $this->getId(), ":deviceid" => $deviceId);
+		if ($query->execute($parameters)) {
+			$device = new Device($this->db);
+			$device->load($deviceId);
+			$this->log_file->send_log("Gave user '" . $this->getUsername() . "' access to device " . $device->getShortName());
+			return true;
+		}
+		return false;
+	}
 
-    public function removeAccessTo($deviceId) {
-        $query = "delete from access_control where user_id=:userid and device_id=:deviceid limit 1";
-        $stmt = $this->db->prepare($query);
-        if ( $stmt->execute(array(":userid" => $this->getId(), ":deviceid" => $deviceId)) ) {
-		$device = new Device($this->db);
-		$device->load($deviceId);		
-		$this->log_file->send_log("Removed access to device " . $device->getShortName() . " for user " . $this->getUsername());
-        }
-    }
+	public function removeAccessTo($deviceId) {
+		$sql = "DELETE FROM access_control WHER user_id=:userid AND device_id=:deviceid LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$parameters = array(":userid" => $this->getId(), ":deviceid" => $deviceId);
+		if ($query->execute($parameters)) {
+			$device = new Device($this->db);
+			$device->load($deviceId);		
+			$this->log_file->send_log("Removed access to device " . $device->getShortName() . " for user " . $this->getUsername());
+			return true;
+		}
+		return false;
+	}
 
-    /**List all users by id and username on the application
-     * @param PDO $db
-     * @return array
-     */
-    public static function getAllUsers($db) {
-        $queryAllUsers = "SELECT id, user_name FROM users ORDER BY user_name";
-        $allUsers = $db->prepare($queryAllUsers);
-        $allUsers->execute();
-        $allUsersArr = $allUsers->fetchAll(PDO::FETCH_ASSOC);
-        return $allUsersArr;
-    }
+	/**List all users by id and username on the application
+	* @param PDO $db
+	* @return array
+	*/
+	public static function getAllUsers($db,$status = null,$role_id = false) {
+		$sql = "SELECT id, user_name FROM users ";
+		if ($status || $role_id) {
+			$sql .= "WHERE 1=1 ";
+		}
+		if ($status) {
+			$sql .= "AND user_status=:status ";
+		}
+		if ($role_id) {
+			$sql .= "AND user_role_id=:role_id ";
+		}
+		$sql .= "ORDER BY user_name";
+		$query = $db->prepare($sql);
+		$parameters = array(':status'=>$status,':role_id'=>$role_id);
+		$query->execute($parameters);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	public static function getSupervisors($db) {
+		return self::getAllUsers($db,self::ACTIVE,self::ROLE_SUPERVISOR);
+
+	}
+	
+	public static function getAdministrators($db) {
+		return self::getAllUsers($db,self::ACTIVE,self::ROLE_ADMIN);
+	}
 
 	/**List all active users by id and username on the application
 	* @param PDO $db

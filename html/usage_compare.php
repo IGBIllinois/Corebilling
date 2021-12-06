@@ -28,7 +28,7 @@ $sessions = Session::getSessions($db, $date->format("Y-m-d"), $device->getId());
 				<?php
 				$deviceList = Device::getAllDevices($db);
 				foreach ($deviceList as $id => $availDevices) {
-					if (($availDevices['status_id']==1 || $availDevices['status_id']==3)) {
+					if (($availDevices['status_id']==Device::STATUS_ONLINE || $availDevices['status_id']==Device::STATUS_DONOTTRACK)) {
 						echo "<option value=" . $availDevices ['id'];
 						if ($availDevices['id'] == $device->getId()) {
 							echo " SELECTED";

@@ -183,7 +183,7 @@ if ($sessionIdSelected > 0) {
 				<option value="">All</option>
 				<?php
 					foreach($devicesList as $device){
-						if($device['status_id']==1 || $device['status_id']==2 || $device['status_id']==4){
+						if($device['status_id']==Device::STATUS_ONLINE || $device['status_id']==Device::STATUS_REPAIR || $device['status_id']==Device::STATUS_OFFLINE){
 							echo "<option>".$device['full_device_name']."</option>";
 						}
 					}
