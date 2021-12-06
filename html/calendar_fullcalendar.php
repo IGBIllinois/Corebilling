@@ -30,7 +30,7 @@ if (isset ($_POST ['deviceSelected'])) {
 			<input type="hidden" name="month" id="excelmonth"/>
 			<input type="hidden" name="year" id="excelyear"/>
 			<input type="hidden" name="user_id" value="<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>"/>
-            <input type="hidden" name="key" value="<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>"/>
+			<input type="hidden" name="login_session_id" value="<?php echo $login_session->get_session_id(); ?>"/>
 			<input type="hidden" name="device_id" value="<?php echo $device->getId(); ?>"/>
 			<input type="hidden" name="training" value="<?php echo isset($_POST['filterTraining'])?1:0; ?>"/>
 			<select name="report_type" class="form-control">
@@ -105,7 +105,7 @@ $(document).ready(function () {
 				action: 'get_events',
 				device_id: '<?php echo $device->getId(); ?>',
 				user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-				key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>',
+				login_session_id: '<?php echo $login_session->get_session_id(); ?>',
 				training: '<?php echo isset($_POST['filterTraining'])?1:0; ?>'
 			}
 		},
@@ -294,7 +294,7 @@ $(document).ready(function () {
 					id: event.id,
 					device_id: '<?php echo $device->getId(); ?>',
 					user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-					key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>'
+					login_session_id: '<?php echo $login_session->get_session_id(); ?>'
 				},
 				type: "POST",
 				success: function (json) {
@@ -313,7 +313,7 @@ $(document).ready(function () {
 					id: event.id,
 					device_id: '<?php echo $device->getId(); ?>',
 					user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-					key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>'
+					login_session_id: '<?php echo $login_session->get_session_id(); ?>'
 				},
 				type: "POST",
 				success: function (json) {
@@ -367,7 +367,7 @@ $(document).ready(function () {
 					action: "delete_event",
 					id: reservationId,
 					user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-					key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>'
+					login_session_id: '<?php echo $login_session->get_session_id(); ?>'
 				},
                 success: function(data) {
                     console.log(data);
@@ -405,7 +405,7 @@ $(document).ready(function () {
 				res_user_id: reservationUser,
 				device_id: '<?php echo $device->getId(); ?>',
 				user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-				key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>'
+				login_session_id: '<?php echo $login_session->get_session_id(); ?>'
 			},
 			success: function(data){
 				console.log(data);
@@ -433,7 +433,7 @@ $(document).ready(function () {
 				action: "finish_early",
 				id: reservationId,
 				user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-				key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>'
+				login_session_id: '<?php echo $login_session->get_session_id(); ?>'
 			},
 			success: function(data){
 				console.log(data);
@@ -473,7 +473,7 @@ $(document).ready(function () {
 					training: reservationTraining,
 					device_id: '<?php echo $device->getId(); ?>',
 					user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-					key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>',
+					login_session_id: '<?php echo $login_session->get_session_id(); ?>',
 					interval: reservationRepeatInterval,
 					repeat: reservationRepeat,
                     staffNotes: staffNotes
@@ -496,7 +496,7 @@ $(document).ready(function () {
 					training: reservationTraining,
 					device_id: '<?php echo $device->getId(); ?>',
 					user_id: '<?php echo $authenticate->getAuthenticatedUser()->getId(); ?>',
-					key: '<?php echo $authenticate->getAuthenticatedUser()->getSecureKey(); ?>',
+					login_session_id: '<?php echo $login_session->get_session_id(); ?>',
 					interval: reservationRepeatInterval,
 					repeat: reservationRepeat
 				},

@@ -237,19 +237,12 @@ if (count($harddrives)) {
 						if ($device->getId() > 0) {
 							$deviceRates = $device->getRates();
 							foreach ($deviceRates as $id => $deviceRateInfo) {
-								echo "<tr>
-										<td>
-											<input type=\"checkbox\" name=\"ratesBox[]\" value=\"" . $deviceRateInfo["rate_id"] . "\" style=\"display:none;\" CHECKED>
-											<h5>" . $deviceRateInfo["rate_name"] . ":</h5>
-											</td>
-											<td>
-											<input type=\"text\" value='" . round($deviceRateInfo["rate"] . "' name=\"rate-" . $deviceRateInfo["rate_id"] . "\" size=\"3\" maxlength=\"5\" class=\"form-control\">
-											</td>
-											<td>
-											<input type=\"text\" value=" . $deviceRateInfo["min_use_time"] . " name=\"mintime-" . $deviceRateInfo["rate_id"] . "\" size=\"5\" maxlength=\"5\" class=\"form-control\">
-											</td>";
-								echo "  <td>
-											<select name=\"rate_type-" . $deviceRateInfo["rate_id"] . "\" class=\"form-control\">";
+								echo "<tr><td>
+									<input type='checkbox' name='ratesBox[]' value='" . $deviceRateInfo["rate_id"] . "' style='display:none;' checked='checked'>
+									<h5>" . $deviceRateInfo['rate_name'] . ":</h5></td>
+									<td><input type='text' value='" . $deviceRateInfo["rate"] . "' name='rate-" . $deviceRateInfo["rate_id"] . "' size='3' maxlength='5' class='form-control'></td>
+									<td><input type='text' value='" . $deviceRateInfo["min_use_time"] . "' name='mintime-" . $deviceRateInfo["rate_id"] . "' size='5' maxlength='5' class='form-control'></td>";
+								echo "<td><select name='rate_type-" . $deviceRateInfo["rate_id"] . "' class='form-control'>";
 	
 								$rateTypeNotSelected = true;
 	

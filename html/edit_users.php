@@ -146,14 +146,14 @@ if (isset($_REQUEST['user_id'])) {
 <h3><?php
     echo $selectedUser->getId() > 0 ? 'Edit' : 'Add'; ?> User</h3>
 <?php
-if (!$selectedUser->is_ldap_user()) {
+if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
     echo html::error_message(
         "This user does not have an IGB account. Any changes made to their device access will not take effect. Please make sure to get their IGB account created before making changes here.",
         "No IGB Account"
     );
 }
 ?>
-<form action="edit_users.php" method=POST>
+<form action="edit_users.php" method='POST'>
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-default">
@@ -169,6 +169,7 @@ if (!$selectedUser->is_ldap_user()) {
                                     <div class="col-sm-10">
                                         <input name="user_name" id="user_name" type="text" class="form-control" value='<?php
                                         echo $selectedUser->getUsername(); ?>'>
+					<input type='hidden' name='login_session_id' id='login_session_id' value='<?php echo $login_session->get_session_id(); ?>'>
                                         <input type="hidden" name="user_id" value="<?php
                                         if (isset($_REQUEST['user_id'])) {
                                             echo $_REQUEST['user_id'];
@@ -485,7 +486,9 @@ if (!$selectedUser->is_ldap_user()) {
         seqnum++;
         var currentseqnum = seqnum;
         $.ajax('ldap_user_info.php', {
-            data: {'uid': $this.val()},
+            data: {'uid': $this.val(), 
+		'login_session_id': $('#login_session_id').val()
+		},
             method: 'post',
             success: function (data) {
                 if (seqnum == currentseqnum) {

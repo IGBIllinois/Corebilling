@@ -42,18 +42,19 @@ class Authenticate {
 			$this->get_user($username);
 		}
 		else {
-			throw new Exception('Invalid Username or Password'); 
-			return false;
-		}
-		
-		if (!$this->ldap->bind($this->get_user_rdn(),$password)) {
-			throw new Exception('Invalid Username or Password');
+			throw new Exception('You do not have permissions to login'); 
 			return false;
 		}
 		if ($this->authenticatedUser->getStatus() != $this->authenticatedUser::ACTIVE) {
-			throw new Exception('You do not have permissions to login');
+                        throw new Exception('You do not have permissions to login');
+                        return false;
+                }
+	
+		if (!$this->ldap->authenticate($username,$password)) {
+			throw new Exception('Invalid Username or Password');
 			return false;
 		}
+		$this->session = new \IGBIllinois\session(settings::get_session_name());
 		$this->SetSession();
 		return true;
 
@@ -87,11 +88,11 @@ class Authenticate {
 			return false;
 		}
 		elseif (!$this->login) {
+			$this->verified = false;
 			return false;
 		}
 		$this->authenticatedUser->load($this->user_id);
 		$this->SetSession();
-		$this->verified = true;
                 return true;
 	}
 
@@ -99,14 +100,13 @@ class Authenticate {
 	* @param $userId
 	*/
 	private function SetSession() {
-		$session = new \IGBIllinois\session(settings::get_session_name());
 		$session_vars = array('user_id'=> $this->user_id,
 				'timeout'=>time(),
 				'ipaddress'=>$_SERVER['REMOTE_ADDR'],
 				'login'=>true,
 				'lastpage'=>substr($_SERVER['PHP_SELF'],strrpos($_SERVER['PHP_SELF'],"/") + 1)
 			);
-		$session->set_session($session_vars);
+		$this->session->set_session($session_vars);
 		$this->verified = true;
 	}
     
@@ -154,6 +154,10 @@ class Authenticate {
 		$filter = "(uid=" . $username . ")";
 		$user_info = $this->ldap->search($filter);
 		$this->user_info = $user_info[0];
+	}
+
+	public function getSession() {
+		return $this->session;
 	}
 
 }

@@ -1,27 +1,29 @@
 <?php
 set_time_limit(20);
 require_once('includes/main.inc.php');
+require_once('includes/authenticate.inc.php');
 
-if (isset($_REQUEST['action']) && isset($_REQUEST['user_id']) && isset($_REQUEST['key'])) {
-    //Load User information for user_id
-    $user = new User($db,$ldap);
-    $user->load($_REQUEST['user_id']);
+if (isset($_REQUEST['action']) && isset($_REQUEST['user_id']) && isset($_REQUEST['login_session_id'])) {
 
-    //Verify the user is who is is saying he is by comparing the user key from the database to key given to the api
-    if ($user->getSecureKey() == $_REQUEST ['key']) {
+	//Verify Session id to ensure a hacker isn't trying to access this page
+	if (isset($_REQUEST['login_session_id']) && ($login_session->get_session_id() == $_REQUEST['login_session_id'])) {
 
-        //Create reservation object and load reservation info if we are given a reservation id
-        $reservation = new Reservation ($db);
-        if (isset($_REQUEST['id'])) {
-            $reservation->load($_REQUEST ['id']);
-        }
+		//Load User information for user_id
+		$user = new User($db,$ldap);
+		$user->load($_REQUEST['user_id']);
 
-        if ($user->isAdmin() // Admins can do anything
-            || $user->getId() == $reservation->getUserId() // Users can edit their own res
-            || ($_REQUEST['action'] == 'update_event_info' && $_REQUEST['user_id']==$user->getId() && $reservation->getReservationId()==0) // Users can create their own res
-            || ($_REQUEST['action'] == 'check_conflicts' && $_REQUEST['res_user_id']==$user->getId()) // Users can check conflicts
-            || ($_REQUEST['action']=='get_events' )) // Users can display events
-        {
+		//Create reservation object and load reservation info if we are given a reservation id
+		$reservation = new Reservation ($db);
+		if (isset($_REQUEST['id'])) {
+			$reservation->load($_REQUEST ['id']);
+		}
+
+		if ($user->isAdmin() // Admins can do anything
+			|| $user->getId() == $reservation->getUserId() // Users can edit their own res
+			|| ($_REQUEST['action'] == 'update_event_info' && $_REQUEST['user_id']==$user->getId() && $reservation->getReservationId()==0) // Users can create their own res
+			|| ($_REQUEST['action'] == 'check_conflicts' && $_REQUEST['res_user_id']==$user->getId()) // Users can check conflicts
+			|| ($_REQUEST['action']=='get_events' )) // Users can display events
+		{
             switch ($_REQUEST['action']) {
                 case 'get_events':
                     echo Reservation::getEventsInRangeJSON($db,$_REQUEST['start'], $_REQUEST['end'], $_REQUEST ['user_id'], $_REQUEST ['device_id'],$_REQUEST['training']==1);
