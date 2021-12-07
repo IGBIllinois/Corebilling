@@ -39,7 +39,7 @@ class Statistics
 			$deletedResStmt->execute(array(':userid'=>$userArr[$i]['id'],':startyear'=>$startyear,':startmonth'=>$startmonth,':endyear'=>$endyear,':endmonth'=>$endmonth));
 			$deletedResArr = $deletedResStmt->fetch();
 			
-			$statsArr[$i] = array('user_name'=>$userArr[$i]['user_name'], 'res_time'=>$resTimeArr['res_time']/3600, 'used_time'=>$usedTimeArr['used_time']/3600, 'used_ratio'=>$usedTimeArr['used_time']/$resTimeArr['res_time'], 'missed_res'=>$missedResArr['missed_res'], 'deleted_res'=>$deletedResArr['del_res']);
+			$statsArr[$i] = array('user_name'=>$userArr[$i]['user_name'], 'res_time'=>round($resTimeArr['res_time']/3600,2), 'used_time'=>round($usedTimeArr['used_time']/3600,2), 'used_ratio'=>round($usedTimeArr['used_time']/$resTimeArr['res_time'],2), 'missed_res'=>$missedResArr['missed_res'], 'deleted_res'=>$deletedResArr['del_res']);
 		}
 		
 		return $statsArr;

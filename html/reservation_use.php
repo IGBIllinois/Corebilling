@@ -74,7 +74,7 @@ if (isset($_POST['endMonthSelected'])) {
 	?>
 	<div class="panel panel-default">
 		<div id="user_list_heading" class="panel-heading">
-			<h3>Reservations:</h3>
+			<h3>Reservation Usage:</h3>
 		</div>
 		<div class="panel-body">				
 			<div class="row">
