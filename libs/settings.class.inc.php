@@ -150,5 +150,12 @@ class settings {
 		}
 		return self::SESSION_TIMEOUT;
 	}
+
+	public static function get_corebillingservice_url() {
+		if (defined("COREBILLINGSERVICE_URL")) {
+			return COREBILLINGSERVICE_URL;
+		}
+		return false;
+	}
 }
 ?>

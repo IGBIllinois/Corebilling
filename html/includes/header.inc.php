@@ -81,6 +81,7 @@ require_once(__DIR__ . '/authenticate.inc.php');
         	                                <li><a href="reservation_use.php">Reservation Usage Data</a></li>
                 	                        <li><a href="usage_compare.php">Reservation-Usage Comparison</a></li>
 						<li><a href='data_cost.php'>Data Cost</a></li>
+						<li><a href='downloads.php'>Client Downloads</a></li>
 						<li><a href='logs.php'>View Logs</a></li>
                         	                <li><a href='about.php'>About</a></li>
 						<?php } ?>
