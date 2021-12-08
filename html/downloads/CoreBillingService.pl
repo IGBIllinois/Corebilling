@@ -1,10 +1,16 @@
 #!/usr/bin/env perl
-$noUserLogged = "0";
-$deviceId = 0;
-$deviceKey = "";
-$interactiveUserQuery = `who | grep&nbsp;:0`;
-@connectedUsers = split /\s+/, $interactiveUserQuery;
-$connectedUserName = $connectedUsers[0];
+
+use strict;
+use warnings;
+use LWP::UserAgent;
+
+my $noUserLogged = "0";
+my $deviceId = ; 
+my $deviceKey = "";
+my $apiUrl = "";
+my $interactiveUserQuery = `who | grep "[(]:[0-9]"`;
+my @connectedUsers = split /\s+/, $interactiveUserQuery;
+my $connectedUserName = $connectedUsers[0];
 
 if($connectedUserName) {
 	#do nothing
@@ -13,7 +19,18 @@ else {
 	$connectedUserName=$noUserLogged;
 }
 
-$wgetString = "wget -O - \"http://core.igb.illinois.edu/coreapp/session.php?deviceid=".$deviceId."&username=".$connectedUserName."&key=".$deviceKey."\" > /dev/null";
+my $ua = LWP::UserAgent->new();
 
-system($wgetString);
-print $wgetString;
+my %form;
+$form{'username'} = $connectedUserName;
+$form{'key'} = $deviceKey;
+
+my $response = $ua->post($apiUrl,\%form);
+
+if ($response->is_success) {
+	print "success\n";
+}
+else {
+	print STDERR $response->status_line, "\n";
+}
+
