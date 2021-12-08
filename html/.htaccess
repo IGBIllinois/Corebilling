@@ -1,0 +1,8 @@
+<ifmodule mod_rewrite.c="">
+RewriteEngine on
+
+
+RewriteCond "%{REQUEST_URI}" "^/api/v1"
+RewriteRule "^/api/v1/(.+)$" "/api/v1/index.php$" [QSA,L]
+
+</ifmodule>

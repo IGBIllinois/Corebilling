@@ -57,7 +57,7 @@ INSERT INTO users(user_name,user_role_id) VALUES('<USERNAME>',1);
 ```
 Alias /corebilling /var/www/corebilling/html
 <Directory /var/www/corebilling/html>
-	Allowoverride none
+	Allowoverride All
 	Require all granted
 </Directory>
 ```
