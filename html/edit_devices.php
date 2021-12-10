@@ -36,7 +36,14 @@ if (isset($_POST['ModifyDevice'])) {
 	}
 
 }
+elseif (isset($_POST['regenerate_key'])) {
+	$device->load($_POST['device_id']);
+	if ($device->regenerateToken()) {
+		$message = html::success_message("Device Auth Token Successfully Regenerated");
+	}
 
+	
+}
 if (isset($_POST['add_rate'])) {
 
 	$rate->create($_POST['new_rate_name'], $_POST['new_rate_type']);
@@ -138,9 +145,14 @@ if (count($harddrives)) {
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-3 control-label" for="editDevice">Auth. Token:</label>
-					<div class="col-sm-9">
+					<label class="col-sm-3 control-label" for="editDevice">Auth Token:</label>
+					<div class="col-sm-6">
 						<input type="text" name="auth_key" value="<?php echo $device->getDeviceToken(); ?>" class="form-control" readonly>
+						
+					</div>
+					<div class='col-sm-3'>
+				 <?php if ($device->getId()) { echo "<input class='btn btn-sm' type='submit' name='regenerate_key' 
+									value='Generate New Key' onClick='return confirm_regenerate_key();'>"; } ?>
 					</div>
 				</div>
 				<div class="form-group">

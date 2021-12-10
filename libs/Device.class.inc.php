@@ -299,32 +299,39 @@ class Device
 		return $this->status;
 	}	
 
-	public function setStatus($status)
-	{
+	public function setStatus($status) {
 		if($this->status != $status){
 			$this->status = $status;
 			$this->log_file->send_log("Set status of device '".$this->shortName."' to $status");
 		}
 	}
 
-	public function setDescription($description)
-	{
+	public function setDescription($description) {
 		if($this->description != $description){
 			$this->description = $description;
 			$this->log_file->send_log("Set description of device '".$this->shortName."' to '$description'");
 		}
 	}
 
-	public function getDescription()
-	{
+	public function getDescription() {
 		return $this->description;
 	}
 
-	public function getDeviceToken()
-	{
+	public function getDeviceToken() {
 		return $this->deviceToken;
 	}
 
+	public function regenerateToken() {
+		$this->deviceToken = md5(uniqid(mt_rand(), true));
+		$sql = "UPDATE device SET device_token=:device_token WHERE id=:device_id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$parameters = array(':device_token'=>$this->deviceToken,':device_id'=>$this->getId());
+		$query->execute($parameters);
+		if ($query->rowCount())	{
+			return true;
+		}
+		return false;
+	}
 	public function getClientVersion() {
 		if (isset($this->json['version'])) {
 			return $this->json['version'];
