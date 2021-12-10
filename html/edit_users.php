@@ -485,17 +485,17 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
         var $this = $(this);
         seqnum++;
         var currentseqnum = seqnum;
-        $.ajax('ldap_user_info.php', {
-            data: {'uid': $this.val(), 
-		'login_session_id': $('#login_session_id').val()
-		},
-            method: 'post',
-            success: function (data) {
+        $.ajax('api/v1/index.php/ldapuser/' + $this.val(), {
+            method: 'get',
+	    datatype: 'json',
+	    contentType: 'application/json',
+	    headers: { "Authorization": "Basic " + btoa('' + ":" + $('#login_session_id').val()) },
+            success: function (response) {
                 if (seqnum == currentseqnum) {
-                    if (data != null) {
-                        $('#first').val(data.givenName);
-                        $('#last').val(data.sn);
-                        $('#email').val(data.mail);
+                    if (response != null) {
+                        $('#first').val(response.givenName);
+                        $('#last').val(response.sn);
+                        $('#email').val(response.mail);
                     } else {
                         $('#first').val("");
                         $('#last').val("");

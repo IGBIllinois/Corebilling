@@ -601,16 +601,27 @@ class User
 		$filter = "(uid=" . $username . ")";
 		$ou = settings::get_ldap_base_dn();	
 		$ldap_info = $ldap->search($filter,$ou,self::LDAP_ATTRIBUTES);
-		$formatted_info = array();
+		$formatted_info = self::get_ldap_attributes();
 		if ($ldap_info['count'] == 1) {
 			$formatted_info['dn'] = $ldap_info[0]['dn'];
-			foreach (self::LDAP_ATTRIBUTES as $attribute) {
-				$formatted_info[$attribute] = $ldap_info[0][strtolower($attribute)][0];
+			foreach ($formatted_info as $key=>$value) {
+				$formatted_info[$key] = $ldap_info[0][strtolower($key)][0];
 
 			}
 		}
 		return $formatted_info;
 		
+	}
+
+	public static function get_ldap_attributes() {
+		$formatted_info = array();
+		$formatted_info['dn'] = null;
+		foreach (self::LDAP_ATTRIBUTES as $attribute) {
+                                $formatted_info[$attribute] = null;
+
+		}
+		return $formatted_info;
+
 	}
 }
 

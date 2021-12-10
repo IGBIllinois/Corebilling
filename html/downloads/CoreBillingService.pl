@@ -18,11 +18,9 @@ sub help() {
 }
 
 sub get_ipaddress() {
-        my $address = inet_ntoa(
-                scalar gethostbyname( my $host || 'localhost' )
-        );
-        return $address;
-
+        my $address = `hostname -i`;
+	chomp $address;
+	return $address;
 }
 
 sub get_os() {
@@ -58,7 +56,7 @@ if (!$url || !$deviceId || !$deviceKey) {
 	die("\n");
 }
 
-my $apiUrl = $url . "/api/" . $apiversion . "/index.php/" . $noun . "/{" . $deviceId . "}";
+my $apiUrl = $url . "/api/" . $apiversion . "/index.php/" . $noun . "/" . $deviceId;
 
 my $connectedUserName = get_user();
 
@@ -74,10 +72,9 @@ my $ipaddress = get_ipaddress();
 my $os = get_os();
 my %json_hash = ('username'=>$connectedUserName,'ipaddress'=>$ipaddress,'os'=>$os,'version'=>$version);
 my $json = encode_json \%json_hash;
-
 my $request = HTTP::Request->new(POST => $apiUrl);
 $request->content($json);
-$request->authorization_basic($deviceId,$deviceKey); 
+$request->authorization_basic("",$deviceKey); 
 $request->header('Content-Type'=>'application/json');
 $request->header('Accept'=>'application/json');
 
@@ -87,7 +84,8 @@ if ($response->is_success) {
 	print $response->decoded_content;
 }
 else {
-	print STDERR $response->status_line, "\n";
+	#print STDERR $response->status_line, "\n";
+	print $response->decoded_content, "\n";
 }
 
 
