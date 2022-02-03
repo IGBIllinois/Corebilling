@@ -19,7 +19,7 @@ if (isset($_POST['device_option'])) {
 
 if (isset($_POST['ModifyDevice'])) {
 	$device->load($_POST['device_id']);
-	$device->setShortName($_POST['dnsName']);
+	$device->setShortName($_POST['shortName']);
 	$device->setFullName($_POST['deviceName']);
 	$device->setLocation($_POST['location']);
 	$device->setDescription($_POST['description']);
@@ -58,7 +58,7 @@ if (isset($_POST['CreateNewDevice'])) {
 		$error = true;
 		$message .= "<div class='alert alert-danger'>Please enter a device name</div>";
 	}
-	if ($_POST['dnsName'] == "") {
+	if ($_POST['shortName'] == "") {
 		$error = true;
 		$message .= "<div class='alert alert-danger'>Please enter a device ID</div>";
 	}
@@ -67,7 +67,7 @@ if (isset($_POST['CreateNewDevice'])) {
 		$message .= "<div class='alert alert-danger'>Please enter a device location</div>";
 	}
 	if (!$error) {
-		if ($device->create($_POST['dnsName'], $_POST['deviceName'], $_POST['location'], $_POST['description'], $_POST['status'])) {
+		if ($device->create($_POST['shortName'], $_POST['deviceName'], $_POST['location'], $_POST['description'], $_POST['status'])) {
 			$message .= "<div class='alert alert-success'>Device " . $_POST['deviceName'] . " succssfully created";
 		}
 	}
@@ -135,14 +135,18 @@ if (count($harddrives)) {
 			<div class="well form-horizontal">
 				<div class="form-group">
 					<label class="col-sm-3 control-label" for="editDevice">
-						Device ID (
-						<?php echo $device->getId(); ?>
-						):
+						Device ID
 					</label>
 					<div class="col-sm-9">
-						<input name="device_id" type="hidden" value="<?php echo $device->getId(); ?>">
-						<input name="dnsName" type="text" value="<?php echo $device->getShortName(); ?>" class="form-control" <?php if($device->getId()){ echo 'readonly'; }?>>
+						<input class='form-control' name="device_id" type="text" value="<?php echo $device->getId(); ?>" readonly>
 					</div>
+				</div>
+				<div class='form-group'>
+					<label class='col-sm-3 control-label' for='editDevice'>Device Name</label>
+					<div class='col-sm-9'>
+						<input name="shortName" type="text" value="<?php echo $device->getShortName(); ?>" class="form-control" <?php if($device->getId()){ echo 'readonly'; }?>>
+					</div>
+
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label" for="editDevice">Auth Token:</label>
@@ -156,7 +160,7 @@ if (count($harddrives)) {
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-3 control-label" for="editDevice">Device Name:</label>
+					<label class="col-sm-3 control-label" for="editDevice">Device Full Name:</label>
 					<div class="col-sm-9">
 						<input type="text" name="deviceName" class="form-control" value="<?php echo $device->getFullName(); ?>">
 					</div>
