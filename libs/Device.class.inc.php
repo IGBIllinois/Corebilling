@@ -322,12 +322,14 @@ class Device
 	}
 
 	public function regenerateToken() {
-		$this->deviceToken = md5(uniqid(mt_rand(), true));
+		$new_token = md5(uniqid(mt_rand(), true));
 		$sql = "UPDATE device SET device_token=:device_token WHERE id=:device_id LIMIT 1";
 		$query = $this->db->prepare($sql);
-		$parameters = array(':device_token'=>$this->deviceToken,':device_id'=>$this->getId());
+		$parameters = array(':device_token'=>$new_token,':device_id'=>$this->getId());
 		$query->execute($parameters);
 		if ($query->rowCount())	{
+			$this->deviceToken = $new_token;
+			$this->log_file->send_log("Device Auth Token updated for " . $this->shortName);
 			return true;
 		}
 		return false;

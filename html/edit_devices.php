@@ -151,7 +151,7 @@ if (count($harddrives)) {
 						
 					</div>
 					<div class='col-sm-3'>
-				 <?php if ($device->getId()) { echo "<input class='btn btn-sm' type='submit' name='regenerate_key' 
+				 <?php if ($device->getId()) { echo "<input class='btn btn-sm btn-primary' type='submit' name='regenerate_key' 
 									value='Generate New Key' onClick='return confirm_regenerate_key();'>"; } ?>
 					</div>
 				</div>
@@ -216,20 +216,19 @@ if (count($harddrives)) {
 						Rate
 					</label>
 					<div class="col-sm-4">
-						<input type="text" name="new_rate_name" class="form-control">
+						<input type="text" name="new_rate_name" class="form-control" <?php if (!$device->getId()) { echo 'readonly'; } ?>>
 					</div>
 					<div class="col-sm-4">
-						<select name="new_rate_type" class="form-control">
+						<select name="new_rate_type" class="form-control" <?php if (!$device->getId()) { echo 'readonly'; } ?>> 
 							<?php
-							foreach ($rateTypes as $id => $rateTypeInfo)
-							{
+							foreach ($rateTypes as $id => $rateTypeInfo) {
 								echo "<option value=" . $rateTypeInfo['id'].">". $rateTypeInfo['rate_type_name'] . "</option>";
 							}
 							?>
 						</select>
 					</div>
 					<div class="col-sm-2">
-						<input type="submit" class="btn btn-primary" value="Add" name="add_rate">
+						<input type="submit" class="btn btn-primary" value="Add" name="add_rate" <?php if (!$device->getId()) { echo 'disabled'; } ?>>
 					</div>
 				</div>
 			</div>
