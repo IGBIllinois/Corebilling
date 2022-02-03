@@ -9,7 +9,7 @@ IGB Core Facilities Instrument Tracking
  * Permissions (Pages,Instrument Schedules)
  ...Allow or deny access to instruments by roles, groups, or individual users
  * Active Directory Integration / LDAP (easily modified)
- ...Users log in with their existing IGB credentials
+ ...Users log in with their existing LDAP/AD credentials
  * User Groups
  ...Users can be organized in groups. Group supervisors can monitor billing for the users in their group.
  * View which devices are in use and by whom
