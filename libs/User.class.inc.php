@@ -27,6 +27,8 @@ class User
 	private $log_file = null;
 	private $ldap = null;
 	private $ldap_info = array();
+	private $supervisor_id = 0;
+	private $suervisor_username = "";
 
 	public function __construct(PDO $db,\IGBIllinois\ldap $ldap = null) {
 		$this->db = $db;
@@ -92,7 +94,9 @@ class User
 	* @param $id
 	*/
 	public function load($id) {
-		$sql = "SELECT * FROM users WHERE id=:user_id LIMIT 1";
+		$sql = "SELECT users.*,supervisor.id as supervisor_id,supervisor.user_name as supervisor_username FROM users ";
+		$sql .= "LEFT JOIN users AS supervisor ON supervisor.id=users.supervisor_id ";
+		$sql .= "WHERE users.id=:user_id LIMIT 1";
 		$query = $this->db->prepare($sql);
 		$query->execute(array(":user_id" => $id));
 		$result = $query->fetch(PDO::FETCH_ASSOC);
@@ -107,6 +111,8 @@ class User
 		$this->userRoleId = $result["user_role_id"];
 		$this->time_created = $result["time_created"];
 		$this->certified = $result['certified'];
+		$this->supervisor_id = $result['supervisor_id'];
+		$this->supervisor_username = $result['supervisor_username'];
 		if ($this->ldap != null && is_resource($this->ldap)) {
 
 
@@ -429,6 +435,13 @@ class User
 			$this->email = $email;
 			$this->log_file->send_log("Set email of user '" . $this->username . "' to '$email'");
 		}
+	}
+
+	public function get_supervisor_usernam() {
+		return $this->supervisor_username;
+	}
+	public function get_supervisor_id() {
+		return $this->supervisor_id;
 	}
 
 	public function getDepartmentId() {

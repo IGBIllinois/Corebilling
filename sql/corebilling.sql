@@ -149,6 +149,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL DEFAULT '',
   `first` varchar(45) NOT NULL DEFAULT '',
   `last` varchar(45) NOT NULL DEFAULT '',
+  `supervisor_id` INT DEFAULT 0 REFERENCES users(id),
   `rate` varchar(45) NOT NULL DEFAULT '',
   `hidden` tinyint(1) DEFAULT 0,
   `rate_id` int(11) DEFAULT NULL,
