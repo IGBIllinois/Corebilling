@@ -28,6 +28,10 @@ IGB Core Facilities Instrument Tracking
 ## Requirements
 * Apache
 * PHP 7.2 or higher
+* PHP ldap module
+* PHP json module
+* PHP pdo module
+* PHP mysqlnd module
 * MySQL/MariaDB >= 5.5
 * PHP Composer
 
