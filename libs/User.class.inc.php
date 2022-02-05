@@ -217,7 +217,7 @@ class User
 	* @return array
 	*/
 	public static function getUsers($db,$status = null,$role_id = false) {
-		$sql = "SELECT id, user_name FROM users ";
+		$sql = "SELECT * FROM users ";
 		if ($status || $role_id) {
 			$sql .= "WHERE 1=1 ";
 		}
