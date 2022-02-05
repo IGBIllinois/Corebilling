@@ -10,6 +10,7 @@ if (isset ($_POST ['deviceSelected'])) {
 	}
 }
 
+$timepicker_html = "";
 foreach (html::get_times() as $timepicker) {
 	$timepicker_html .= "<option value='" . $timepicker . "'>" . $timepicker . "</option>";
 

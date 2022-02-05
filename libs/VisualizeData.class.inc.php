@@ -6,18 +6,20 @@
  * smart graphs and tables
  */
 class VisualizeData {
-    /** returns a databale which is sortable, searchable and exportable using the datatables jquery module
-     * @param $tableData
-     * @param $tableHeaders
-     * @param $dataColumns
-     * @param $tableNameId
-     * @param bool $checkBoxes
-     * @return string
-     */
-    public static function ListSessionsTable($tableData,$tableHeaders,$dataColumns,$tableNameId,$checkBoxes=false,$filter=true)
-    {
-	    $buttonLocation = ".prependTo($('#".$tableNameId."_heading'))";
-	    if($filter){$buttonLocation = ".appendTo($('#".$tableNameId."_filter'))";}
+	/** returns a databale which is sortable, searchable and exportable using the datatables jquery module
+	* @param $tableData
+	* @param $tableHeaders
+	* @param $dataColumns
+	* @param $tableNameId
+	* @param bool $checkBoxes
+	* @return string
+	*/
+	public static function ListSessionsTable($tableData,$tableHeaders,$dataColumns,$tableNameId,$checkBoxes=false,$filter=true) {
+		$buttonLocation = ".prependTo($('#".$tableNameId."_heading'))";
+		if($filter) {
+			$buttonLocation = ".appendTo($('#".$tableNameId."_filter'))";
+		}
+
         $tableString =  " <script type=\"text/javascript\" class=\"init\">
         var Rate1;
             $(document).ready( function () {\n
@@ -31,7 +33,7 @@ class VisualizeData {
                 	dom: {container:{className:'btn-group pull-right'}}
                 }
                     });\n
-			".$tableNameId.".buttons().container()$buttonLocation;
+		" . $tableNameId . ".buttons().container()$buttonLocation;
             $(\"#checkAll\").click(function(){
             $('input:checkbox').prop('checked', this.checked);
                 });

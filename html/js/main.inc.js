@@ -25,5 +25,6 @@ function confirm_group_delete() {
 function confirm_regenerate_key() {
 	return confirm("Are you sure you want to regenerate device key?  This will cause existing device to not work till new key is input");
 }
+
 $.fn.select2.defaults.set( "theme", "bootstrap" );
 $.fn.select2.defaults.set( "width", null );
