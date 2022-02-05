@@ -7,156 +7,139 @@
  */
 class Article
 {
-    private $db;
-    
-    private $userId;
-    private $title;
-    private $description;
-    private $articleId;
+	private $db;
+	private $userId;
+	private $title;
+	private $description;
+	private $articleId;
 
-    public function __construct(PDO $db)
-    {
-        $this->db = $db;
-    }
-
-    public function __destruct()
-    {
-
-    }
-
-    /** Create a new new article
-     * @param $userId
-     * @param $title
-     * @param $description
-     */
-    public function create($userId, $title, $description)
-    {
-        $this->userId = $userId;
-        $this->title = $title;
-        $this->description = $description;
-
-        $queryAddArticle = "INSERT INTO articles (text,title,user_id)VALUES(:description, :title, :user_id)";
-
-        $addArticle = $this->db->prepare($queryAddArticle);
-        $addArticle->execute(array(':description' => $description, ':title' => $title, ':user_id' => $userId));
-        $this->articleId = $this->db->lastInsertId();
-    }
-
-    /**Load an article using the article ID
-     * @param $articleId
-     */
-    public function load($articleId)
-    {
-        $queryLoadArticle = "SELECT * FROM articles WHERE id=:article_id";
-        $loadArticle = $this->db->prepare($queryLoadArticle);
-        $loadArticle->execute(array(':article_id' => $articleId));
-        $loadArticleArr = $loadArticle->fetch(PDO::FETCH_ASSOC);
-        if ($loadArticleArr) {
-            $this->articleId = $articleId;
-            $this->title = $loadArticleArr['title'];
-            $this->description = $loadArticleArr['text'];
-            $this->userId = $loadArticleArr['user_id'];
-        }
-    }
-
-    /** Delete and article from the database
-     * @param $articleId
-     */
-    public static function removeArticle($db, $articleId)
-    {
-        $queryDeleteArticle = "UPDATE articles SET enabled='0' WHERE id=:article_id limit 1";
-        $deleteArticle = $db->prepare($queryDeleteArticle);
-        $deleteArticle->execute(array('article_id' => $articleId));
-    }
-
-    /**
-     * Update an article after setters were used to change the variables
-     */
-    public function update()
-    {
-        $queryUpdateArticle = "UPDATE articles SET created=NOW(), text=:description, title=:title, user_id=:user_id WHERE id=:articleid";
-        $updateArticle = $this->db->prepare($queryUpdateArticle);
-        $updateArticle->execute(array(':description' => $this->description, ':title' => $this->title, ':user_id' => $this->userId, ':articleid' => $this->articleId));
-    }
-
-    /** Get a list of all articles
-     * @return PDOStatement
-     */
-    public static function getAllArticles($db,$age = 0)
-    {
-        $sql = "SELECT * FROM articles WHERE enabled='1' ";
-	if ($age) {
-		$sql .= "AND created >=DATE_SUB(NOW(),INTERVAL :age DAY) ";
+	public function __construct(PDO $db) {
+		$this->db = $db;
 	}
-	$sql .= "ORDER BY created DESC";
-        $query = $db->prepare($sql);
-	$result = $query->execute(array(':age'=>$age));
-        return $query->fetchAll(PDO::FETCH_ASSOC);
-    }
 
-    /**
-     * @param mixed $title
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-    }
+	public function __destruct() {
 
-    /**
-     * @return mixed
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
+	}
 
-    /**
-     * @param mixed $userId
-     */
-    public function setUserid($userId)
-    {
-        $this->userId = $userId;
-    }
+	/** Create a new new article
+	* @param $userId
+	* @param $title
+	* @param $description
+	*/
+	public function create($userId, $title, $description) {
+		$this->userId = $userId;
+		$this->title = $title;
+		$this->description = $description;
 
-    /**
-     * @return mixed
-     */
-    public function getUserid()
-    {
-        return $this->userId;
-    }
+		$queryAddArticle = "INSERT INTO articles (text,title,user_id)VALUES(:description, :title, :user_id)";
+		$addArticle = $this->db->prepare($queryAddArticle);
+		$addArticle->execute(array(':description' => $description, ':title' => $title, ':user_id' => $userId));
+		$this->articleId = $this->db->lastInsertId();
+	}
 
-    /**
-     * @param mixed $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
+	/**Load an article using the article ID
+	* @param $articleId
+	*/
+	public function load($articleId) {
+		$queryLoadArticle = "SELECT * FROM articles WHERE id=:article_id";
+		$loadArticle = $this->db->prepare($queryLoadArticle);
+		$loadArticle->execute(array(':article_id' => $articleId));
+		$loadArticleArr = $loadArticle->fetch(PDO::FETCH_ASSOC);
+		if ($loadArticleArr) {
+			$this->articleId = $articleId;
+			$this->title = $loadArticleArr['title'];
+			$this->description = $loadArticleArr['text'];
+			$this->userId = $loadArticleArr['user_id'];
+		}
+	}
 
-    /**
-     * @return mixed
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
+	/** Delete and article from the database
+	* @param $articleId
+	*/
+	public static function removeArticle($db, $articleId) {
+		$queryDeleteArticle = "UPDATE articles SET enabled='0' WHERE id=:article_id limit 1";
+		$deleteArticle = $db->prepare($queryDeleteArticle);
+		$deleteArticle->execute(array('article_id' => $articleId));
+	}
 
-    /**
-     * @param mixed $articleId
-     */
-    public function setArticleId($articleId)
-    {
-        $this->articleId = $articleId;
-    }
+	/**
+	* Update an article after setters were used to change the variables
+	*/
+	public function update() {
+		$queryUpdateArticle = "UPDATE articles SET created=NOW(), text=:description, title=:title, user_id=:user_id WHERE id=:articleid";
+		$updateArticle = $this->db->prepare($queryUpdateArticle);
+		$updateArticle->execute(array(':description' => $this->description, ':title' => $this->title, ':user_id' => $this->userId, ':articleid' => $this->articleId));
+	}
 
-    /**
-     * @return mixed
-     */
-    public function getArticleId()
-    {
-        return $this->articleId;
-    }
+	/** Get a list of all articles
+	* @return PDOStatement
+	*/
+	public static function getAllArticles($db,$age = 0) {
+		$sql = "SELECT * FROM articles WHERE enabled='1' ";
+		if ($age) {
+			$sql .= "AND created >=DATE_SUB(NOW(),INTERVAL :age DAY) ";
+		}
+		$sql .= "ORDER BY created DESC";
+		$query = $db->prepare($sql);
+		$result = $query->execute(array(':age'=>$age));
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	/**
+	* @param mixed $title
+	*/
+	public function setTitle($title) {
+		$this->title = $title;
+	}
+
+	/**
+	* @return mixed
+	*/
+	public function getTitle() {
+		return $this->title;
+	}
+
+	/**
+	* @param mixed $userId
+	*/
+	public function setUserid($userId) {
+		$this->userId = $userId;
+	}
+
+	/**
+	* @return mixed
+	*/
+	public function getUserid() {
+		return $this->userId;
+	}
+
+	/**
+	* @param mixed $description
+	*/
+	public function setDescription($description) {
+		$this->description = $description;
+	}
+
+	/**
+	* @return mixed
+	*/
+	public function getDescription() {
+		return $this->description;
+	}
+
+	/**
+	* @param mixed $articleId
+	*/
+	public function setArticleId($articleId) {
+		$this->articleId = $articleId;
+	}
+
+	/**
+	* @return mixed
+	*/
+	public function getArticleId() {
+		return $this->articleId;
+	}
 }
 
 ?>

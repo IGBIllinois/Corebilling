@@ -1,8 +1,8 @@
 <?php
 class UserCfop {
-	const DEFAULT_CFOP=1
-	const NON_DEFAULT_CFOP=0
-	const ACTIVE_CFOP=1
+	const DEFAULT_CFOP=1;
+	const NON_DEFAULT_CFOP=0;
+	const ACTIVE_CFOP=1;
 	const NON_ACTIVE_CFOP=0;
 
 	private $userId;

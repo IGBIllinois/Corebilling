@@ -2,67 +2,66 @@
 
 class Reservation
 {
-    const ALL = 1, NON_TRAINING = 2, TRAINING = 3;
-    private $db;
-    private $reservationId;
-    private $deviceId;
-    private $userId;
-    private $start;
-    private $stop;
-    private $description;
-    private $training;
-    private $dateCreated;
-    private $deleted;
-    private $finishedEarly;
-    private $masterReservationId;
-    private $staffNotes;
+	const ALL = 1;
+	const NON_TRAINING = 2;
+	const TRAINING = 3;
+	private $db;
+	private $reservationId;
+	private $deviceId;
+	private $userId;
+	private $start;
+	private $stop;
+	private $description;
+	private $training;
+	private $dateCreated;
+	private $deleted;
+	private $finishedEarly;
+	private $masterReservationId;
+	private $staffNotes;
 
-    public function __construct(PDO $db)
-    {
-        $this->db = $db;
-        $this->reservationId = 0;
-        $this->userId = 0;
-        $this->deviceId = 0;
-    }
+	public function __construct(PDO $db) {
+		$this->db = $db;
+		$this->reservationId = 0;
+		$this->userId = 0;
+		$this->deviceId = 0;
+	}
+
+	public function __destruct() {
+
+	}
 
 
-    public function __destruct()
-    {
+	/**Create a new reservation on the calendar
+	* @param $deviceId
+	* @param $userId
+	* @param $start
+	* @param $stop
+	* @param $description
+	* @param $training
+	* @param null $masterReservationId
+	* @return int
+	*/
+	public function create($deviceId, $userId, $start, $stop, $description, $training, $masterReservationId = null) {
+		$this->deviceId = $deviceId;
+		$this->userId = $userId;
+		$this->start = $start;
+		$this->stop = $stop;
+		$this->description = $description;
+		$this->training = $training;
+		$this->masterReservationId = $masterReservationId;
 
-    }
-
-
-    /**Create a new reservation on the calendar
-     * @param $deviceId
-     * @param $userId
-     * @param $start
-     * @param $stop
-     * @param $description
-     * @param $training
-     * @param null $masterReservationId
-     * @return int
-     */
-    public function create($deviceId, $userId, $start, $stop, $description, $training, $masterReservationId = null)
-    {
-        $this->deviceId = $deviceId;
-        $this->userId = $userId;
-        $this->start = $start;
-        $this->stop = $stop;
-        $this->description = $description;
-        $this->training = $training;
-        $this->masterReservationId = $masterReservationId;
-
-        if (self::checkEventConflicts($this->db, $this->deviceId, $this->userId, $this->start, $this->stop) == 1) {
-            $queryCreateReservation = "INSERT INTO reservation_info (device_id,user_id,start,stop,description,training,date_created,master_reservation_id)
+		if (self::checkEventConflicts($this->db, $this->deviceId, $this->userId, $this->start, $this->stop) == 1) {
+			$queryCreateReservation = "INSERT INTO reservation_info (device_id,user_id,start,stop,description,training,date_created,master_reservation_id)
 										VALUES(:device_id,:user_id,:start,:stop,:description,:training,NOW(),:master)";
-            $createReservation = $this->db->prepare($queryCreateReservation);
-            $createReservation->execute(array(':device_id' => $this->deviceId, ':user_id' => $this->userId, ':start' => $this->start, ':stop' => $this->stop, ':description' => $this->description, ':training' => $this->training, ':master' => $this->masterReservationId));
-            $this->reservationId = $this->db->lastInsertId();
-            return 1;
-        } else {
-            return 0;
-        }
-    }
+			$createReservation = $this->db->prepare($queryCreateReservation);
+			$createReservation->execute(array(':device_id' => $this->deviceId, ':user_id' => $this->userId, ':start' => $this->start, ':stop' => $this->stop, ':description' => $this->description, ':training' => $this->training, ':master' => $this->masterReservationId));
+			$this->reservationId = $this->db->lastInsertId();
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
 
 
     /**
@@ -425,149 +424,114 @@ class Reservation
     }
 
 
-    //Getters Setters
-    public function getReservationId()
-    {
-        return $this->reservationId;
-    }
+	//Getters Setters
+	public function getReservationId() {
+		return $this->reservationId;
+	}
+
+	public function getDeviceId() {
+		return $this->deviceId;
+	}
+
+	public function getUserId() {
+		return $this->userId;
+	}
+
+	public function getStart() {
+		return $this->start;
+	}
+
+	public function getStop() {
+		return $this->stop;
+	}
+
+	public function getDescription() {
+		return $this->description;
+	}
 
 
-    public function getDeviceId()
-    {
-        return $this->deviceId;
-    }
+	public function getTraining() {
+		return $this->training;
+	}
+
+	public function getDateCreated() {
+		return $this->dateCreated;
+	}
+
+	public function getReservationTypeId() {
+		return $this->reservationTypeId;
+	}
 
 
-    public function getUserId()
-    {
-        return $this->userId;
-    }
+	public function getValue() {
+		return $this->value;
+	}
 
 
-    public function getStart()
-    {
-        return $this->start;
-    }
+	public function getDisplay() {
+		return $this->display;
+	}
 
 
-    public function getStop()
-    {
-        return $this->stop;
-    }
+	public function setDeviceId($device_id) {
+		$this->deviceId = $device_id;
+	}
 
 
-    public function getDescription()
-    {
-        return $this->description;
-    }
+	public function setUserId($user_id) {
+		$this->userId = $user_id;
+	}
 
 
-    public function getTraining()
-    {
-        return $this->training;
-    }
+	public function setStart($x) {
+		$x = $this->start = $x;
+	}
+
+	public function setStop($x) {
+		$x = $this->stop = $x;
+	}
+
+	public function setDescription($x) {
+		$this->description = $x;
+	}
 
 
-    public function getDateCreated()
-    {
-        return $this->dateCreated;
-    }
+	public function setTraining($x) {
+		$this->training = $x;
+	}
 
+	public function setDateCreated($x) {
+		$this->dateCreated = $x;
+	}
 
-    public function getReservationTypeId()
-    {
-        return $this->reservationTypeId;
-    }
+	public function setReservationTypeId($x) {
+		$this->reservationTypeId = $x;
+	}
 
+	public function setValue($x) {
+		$this->value = $x;
+	}
 
-    public function getValue()
-    {
-        return $this->value;
-    }
+	/**
+	* @return int
+	*/
+	public function getMasterReservationId() {
+		return $this->masterReservationId;
+	}
 
+	/**
+	* @return mixed
+	*/
+	public function getStaffNotes() {
+		return $this->staffNotes;
+	}
 
-    public function getDisplay()
-    {
-        return $this->display;
-    }
-
-
-    public function setDeviceId($x)
-    {
-        $this->deviceId = $x;
-    }
-
-
-    public function setUserId($x)
-    {
-        $this->userId = $x;
-    }
-
-
-    public function setStart($x)
-    {
-        $x = $this->start = $x;
-    }
-
-
-    public function setStop($x)
-    {
-        $x = $this->stop = $x;
-    }
-
-
-    public function setDescription($x)
-    {
-        $this->description = $x;
-    }
-
-
-    public function setTraining($x)
-    {
-        $this->training = $x;
-    }
-
-
-    public function setDateCreated($x)
-    {
-        $this->dateCreated = $x;
-    }
-
-
-    public function setReservationTypeId($x)
-    {
-        $this->reservationTypeId = $x;
-    }
-
-
-    public function setValue($x)
-    {
-        $this->value = $x;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMasterReservationId()
-    {
-        return $this->masterReservationId;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getStaffNotes()
-    {
-        return $this->staffNotes;
-    }
-
-    /**
-     * @param mixed $staffNotes
-     */
-    public function setStaffNotes($staffNotes): void
-    {
-        $this->staffNotes = $staffNotes;
-    }
+	/**
+	* @param mixed $staffNotes
+	*/
+	public function setStaffNotes($staffNotes): void {
+		$this->staffNotes = $staffNotes;
+	}
 
 
 
