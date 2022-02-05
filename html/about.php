@@ -77,7 +77,7 @@ echo $extensions_string;
 <tr><td>RESERVE_ROOM</td><td><?php echo RESERVE_ROOM ? 'true' : 'false'; ?></td></tr>
 <tr><td>USER_EXCEPTIONS_ARRAY</td><td><?php echo implode(',',USER_EXCEPTIONS_ARRAY); ?></td></tr>
 <tr><td>ENABLE_LOG</td><td><?php echo settings::get_log_enabled() ? 'true' : 'false'; ?></td></tr>
-<tr><td>PASSWORD_RESET_URL</td><td><?php settings::get_password_reset_url(); ?></td></tr>
+<tr><td>PASSWORD_RESET_URL</td><td><?php echo settings::get_password_reset_url(); ?></td></tr>
 <tr><td>NEWS_AGE (days)</td><td><?php echo settings::get_news_age(); ?></td></tr>
 </table>
 </div>

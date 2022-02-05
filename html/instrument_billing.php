@@ -8,7 +8,7 @@ if(!$login_user->isAdmin()){
 //Declare objects
 $rateTypesList = array(Bills::CONTINUOUS_RATE => "Continuous", Bills::MONTHLY_RATE => "Monthly");
 $devicesList = Device::getAllDevices($db);
-$userList = User::getAllUsers($db);
+$userList = User::getUsers($db);
 $groupList = Group::getAllGroups($db);
 $bills = new Bills($db);
 $session = new Session($db);

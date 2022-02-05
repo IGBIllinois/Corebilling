@@ -32,6 +32,7 @@ if (isset($_POST['update_user'])) {
 	$selectedUser->setLastName($_POST['last']);
 	$selectedUser->setEmail($_POST['email']);
 	$selectedUser->setDepartmentId($_POST['department']);
+	$selectedUser->setSupervisorId($_POST['supervisor']);
         $selectedUser->setUsername($_POST['user_name']);
         $selectedUser->setRateId($_POST['rate']);
         $selectedUser->setStatus($_POST['status']);
@@ -100,41 +101,38 @@ if (isset($_POST['add_cfop'])) {
 
 // Submitted New User
 if (isset($_POST['create_user'])) {
-    if (User::exists($db, $_POST['user_name'])) {
-        $message .= html::error_message("User " . $_POST['user_name'] . " already exists in database.");
-    } else {
-        $selectedUser->create(
-            $_POST['user_name'],
-            $_POST['first'],
-            $_POST['last'],
-            $_POST['email'],
-            $_POST['department'],
-            $_POST['rate'],
-            $_POST['status'],
-            $_POST['user_role_id'],
-            isset($_POST['safetyquiz'])
-        );
-        $selectedUser->setGroupIds($_POST['group']);
-        $selectedUser->addCFOP($_POST['cfop_to_add']);
-        if (isset($_POST['access'])) {
-            $deviceList = Device::getAllDevices($db);
-            foreach ($deviceList as $deviceInfo) {
-                if (array_key_exists($deviceInfo['id'], $_POST['access'])) {
-                    $selectedUser->giveAccessTo($deviceInfo['id']);
-                }
-            }
-        }
-        $selectedUser->update();
+	if (User::exists($db, $_POST['user_name'])) {
+		$message .= html::error_message("User " . $_POST['user_name'] . " already exists in database.");
+	}
+	else {
+		$safetyquiz = 0;
+		if (isset($_POST['safetyquiz'])) {
+			$safetyquiz = 1;
+		}
+		$selectedUser->create($_POST['user_name'],$_POST['first'],$_POST['last'],
+			$_POST['email'],$_POST['department'],$_POST['rate'],$_POST['status'],
+			$_POST['user_role_id'],$safetyquiz,$_POST['supervisor']);
+        	$selectedUser->setGroupIds($_POST['group']);
+	        $selectedUser->addCFOP($_POST['cfop_to_add']);
+        	if (isset($_POST['access'])) {
+			$deviceList = Device::getAllDevices($db);
+			foreach ($deviceList as $deviceInfo) {
+				if (array_key_exists($deviceInfo['id'], $_POST['access'])) {
+					$selectedUser->giveAccessTo($deviceInfo['id']);
+				}
+			}
+		}
+		$selectedUser->update();
 
-        $demo = $selectedUser->getDemographics();
-        $demo->setEdulevel($_POST['edulevel']);
-        $demo->setGender($_POST['gender']);
-        $demo->setUnderrep($_POST['underrep']);
-        $demo->update();
+		$demo = $selectedUser->getDemographics();
+		$demo->setEdulevel($_POST['edulevel']);
+		$demo->setGender($_POST['gender']);
+		$demo->setUnderrep($_POST['underrep']);
+		$demo->update();
 
-        $_REQUEST['user_id'] = $selectedUser->getId();
-        $message .= html::success_message("User " . $_POST['user_name'] . " added to database.");
-    }
+		$_REQUEST['user_id'] = $selectedUser->getId();
+		$message .= html::success_message("User " . $_POST['user_name'] . " added to database.");
+	}
 }
 
 if (isset($_REQUEST['user_id'])) {
@@ -228,6 +226,25 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
                         </div>
                         <div class="col-md-6">
                             <div class="form-horizontal">
+				<div class='form-group'>
+					<label class='col-sm-2 control-label' for='edutUser'>Supervisor</label>
+					<div class='col-sm-10'>
+						<select name="supervisor" class="form-control" id="supervisor-select" 
+							<?php if ($selectedUser->isSupervisor()) { echo 'disabled'; }?>>
+						<option value=""></option>
+						<?php
+                                            foreach (User::getSupervisors($db) as $supervisor) {
+                                                echo "<option value=" . $supervisor['id'];
+                                                if ($supervisor['id'] == $selectedUser->getSupervisorId()) {
+                                                    echo " selected='selected'";
+                                                }
+                                                echo " >" . $supervisor['user_name'] . "</option>";
+                                            }
+                                            ?>
+                                        </select>
+
+					</div>
+				</div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label" for="editUser">Rate</label>
                                     <div class="col-sm-10">
@@ -451,10 +468,15 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
 </form>
 
 <script type="text/javascript">
-    $('#depart-select').select2({
-        placeholder: "Select a Department"
-    });
-    $('#group-select').select2();
+	$('#depart-select').select2({
+		placeholder: 'Select a Department'
+	});
+	$('#supervisor-select').select2({
+		placeholder: 'Select a Supervisor'
+	}),
+	$('#group-select').select2({
+		placeholder: 'Select a Group'
+	});
     $('#copy-button').click(function (e) {
         var cfop = $('#cfop').text();
         var $textarea = $('#cfop-copy-area');

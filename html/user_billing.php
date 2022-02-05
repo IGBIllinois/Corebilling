@@ -9,7 +9,7 @@ $userCfop = new UserCfop($db);
 
 $selectableUsersList = array();
 if($login_user->isAdmin()) {
-	$selectableUsersList = User::getAllUsers($db);
+	$selectableUsersList = User::getUsers($db);
 } 
 elseif($login_user->isSupervisor()) {
 	$group = new Group($db);

@@ -52,7 +52,7 @@ class User
 	* @param $certified
 	*/
 	public function create($username,$first,$last,$email,
-		$departmentId,$rateId,$status,$userRoleId,$certified) {
+		$departmentId,$rateId,$status,$userRoleId,$certified,$supervisorId) {
 
 		$this->username = $username;
 		$this->first = $first;
@@ -63,9 +63,10 @@ class User
 		$this->status = $status;
 		$this->userRoleId = $userRoleId;
 		$this->certified = $certified;
+		$this->supervisor_id = $supervisorId;
 		if ( User::exists($this->db, $this->username) == 0 ) {
-			$sql = "INSERT INTO users (user_name, first,last,email,department_id,rate_id,status,user_role_id,certified) ";
-			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified)";
+			$sql = "INSERT INTO users (user_name, first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
+			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified,:supervisor_id)";
 
 			try {
 				$query = $this->db->prepare($sql);
@@ -79,6 +80,7 @@ class User
 					':status' => $status,
 					':user_role_id' => $this->userRoleId,
 					':certified' => $this->certified ? 1 : 0,
+					':supervisor_id' => $this->supervisor_id
 				);
 				$result = $query->execute($parameters);
 				$this->userId = $this->db->lastInsertId();
@@ -127,7 +129,7 @@ class User
 		$sql = "UPDATE users SET ";
 		$sql .= "user_name=:user_name,first=:first,last=:last,";
 		$sql .= "email=:email,department_id=:department_id,rate_id=:rate_id,";
-		$sql .= "status=:status,user_role_id=:user_role_id,certified=:certified ";
+		$sql .= "status=:status,user_role_id=:user_role_id,certified=:certified,supervisor_id=:supervisor_id ";
 		$sql .= "WHERE id=:user_id LIMIT 1";
 
 		$query = $this->db->prepare($sql);
@@ -142,6 +144,7 @@ class User
 			':user_role_id' => $this->userRoleId,
 			':certified' => $this->certified ? 1 : 0,
 			':user_id' => $this->userId,
+			':supervisor_id' => $this->supervisor_id
 		);
 		$result =  $query->execute($paramters);
 		if ($query->rowCount()) {
@@ -157,12 +160,11 @@ class User
 	* @return int
 	*/
 	public static function exists($db, $username) {
-		$sql = "SELECT id FROM users WHERE user_name=:user_name";
+		$sql = "SELECT id FROM users WHERE user_name=:user_name LIMIT 1";
 		$query = $db->prepare($sql);
 		$query->execute(array(":user_name" => $username));
 		$result = $query->fetch(PDO::FETCH_ASSOC);
-
-		if (count($result)) {
+		if ($result['id']) {
 			return $result["id"];
 		} 
 		return 0;
@@ -214,13 +216,13 @@ class User
 	* @param PDO $db
 	* @return array
 	*/
-	public static function getAllUsers($db,$status = null,$role_id = false) {
+	public static function getUsers($db,$status = null,$role_id = false) {
 		$sql = "SELECT id, user_name FROM users ";
 		if ($status || $role_id) {
 			$sql .= "WHERE 1=1 ";
 		}
 		if ($status) {
-			$sql .= "AND user_status=:status ";
+			$sql .= "AND status=:status ";
 		}
 		if ($role_id) {
 			$sql .= "AND user_role_id=:role_id ";
@@ -233,12 +235,12 @@ class User
 	}
 
 	public static function getSupervisors($db) {
-		return self::getAllUsers($db,self::ACTIVE,self::ROLE_SUPERVISOR);
+		return self::getUsers($db,self::ACTIVE,self::ROLE_SUPERVISOR);
 
 	}
 	
 	public static function getAdministrators($db) {
-		return self::getAllUsers($db,self::ACTIVE,self::ROLE_ADMIN);
+		return self::getUsers($db,self::ACTIVE,self::ROLE_ADMIN);
 	}
 
 	/**List all active users by id and username on the application
@@ -437,13 +439,20 @@ class User
 		}
 	}
 
-	public function get_supervisor_usernam() {
+	public function getSupervisorUsernam() {
 		return $this->supervisor_username;
 	}
-	public function get_supervisor_id() {
+	public function getSupervisorId() {
 		return $this->supervisor_id;
 	}
 
+	public function setSupervisorId($supervisorId) {
+		if ($this->getSupervisorId != $supervisorId) {
+			$this->supervisor_id = $supervisorId;
+			$this->log_file->send_log("Set Supervisor of user " . $this->username . " to " . $supervisorId);
+		}
+
+	}
 	public function getDepartmentId() {
 		return $this->departmentId;
 	}
