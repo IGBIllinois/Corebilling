@@ -14,8 +14,9 @@ require_once(__DIR__ . '/authenticate.inc.php');
 		<link href="css/fullcalendar.css" rel='stylesheet' />
 		<link href="css/fullcalendar.print.css" rel='stylesheet' media='print' />
 		<link rel="stylesheet" href="css/datatables.min.css">
-		<link rel="stylesheet" href="includes/select2/css/select2.css" type="text/css" />
-		<link rel="stylesheet" href="includes/select2/css/select2-bootstrap.css" type="text/css" />
+		<link rel="stylesheet" href="vendor/select2/select2/dist/css/select2.min.css" type="text/css" />
+		<link rel="stylesheet" href="vendor/intelogie/select2-bootstrap-theme/dist/select2-bootstrap.min.css" type="text/css" />
+		<link rel="stylesheet" href="includes/select2/css/select2-bootstrap.css" type="text/css" />-->
 		<link href="css/jquery.timepicker.css" rel="stylesheet" />
 		<link href="css/jquery-ui.css" rel="stylesheet" />
 		<link href="css/jquery-ui.theme.css" rel="stylesheet" />
@@ -23,7 +24,7 @@ require_once(__DIR__ . '/authenticate.inc.php');
 	
 		<script type='text/javascript' src='vendor/components/jquery/jquery.min.js'></script>
 		<script type='text/javascript' src='vendor/components/jqueryui/jquery-ui.min.js'></script>
-		<script type="text/javascript" src="includes/select2/js/select2.full.js"></script>
+		<script type="text/javascript" src='vendor/select2/select2/dist/js/select2.min.js'></script>
 		<script type='text/javascript' src='js/datatables.min.js'></script>
 		<script type="text/javascript" src="js/jquery.timepicker.js"></script>
 		<script src='js/full_calendar/moment.min.js' type="text/javascript"></script>

@@ -468,6 +468,7 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
 </form>
 
 <script type="text/javascript">
+	$.fn.select2.defaults.set( "theme", "bootstrap" );
 	$('#depart-select').select2({
 		placeholder: 'Select a Department'
 	});
