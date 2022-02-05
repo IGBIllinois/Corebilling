@@ -10,6 +10,10 @@ if (isset ($_POST ['deviceSelected'])) {
 	}
 }
 
+foreach (html::get_times() as $timepicker) {
+	$timepicker_html .= "<option value='" . $timepicker . "'>" . $timepicker . "</option>";
+
+}
 ?>
 <h3>Reservation Calendar</h3>
 <div class="panel panel-info">
@@ -605,7 +609,9 @@ $(document).ready(function () {
 
 						<div class="col-sm-9">
 							<input type="hidden" name="reservationStartDate" id="reservationStartDate">
-							<input type="text" name="reservationStartTime" id="reservationStartTime" class="form-control">
+							<select name='reservationStartTime' id='reservationStartTime' class='form-control'>
+								<?php echo $timepicker_html; ?>
+							</select>
 						</div>
 					</div>
 					
@@ -613,7 +619,9 @@ $(document).ready(function () {
 						<label class="col-sm-3 control-label">End</label>
 						<div class="col-sm-9">
 							<input type="hidden" name="reservationEndDate" id="reservationEndDate">
-							<input type="text" name="reservationEndTime" id="reservationEndTime" class="form-control">
+							<select name='reservationEndTime' id='reservationEndTime' class='form-control'>
+								<?php echo $timepicker_html; ?>
+							</select>
 						</div>
 					</div>
 
@@ -655,7 +663,7 @@ $(document).ready(function () {
 </div>
 
 <script type="text/javascript">
-	$('#reservationStartTime, #reservationEndTime').timepicker({'step':15,'disableTextInput':true});
+	
 </script>
 <?php
 	require_once 'includes/footer.inc.php';

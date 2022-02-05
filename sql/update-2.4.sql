@@ -13,5 +13,5 @@ ALTER TABLE users ADD supervisor_id INT DEFAULT 0 REFERENCES users(id) AFTER las
 DELETE FROM status WHERE type=2;
 ALTER TABLE status DROP COLUMN `type`;
 RENAME TABLE status TO device_status;
-
+DROP VIEW access_control_hr;
 

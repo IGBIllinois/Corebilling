@@ -212,9 +212,6 @@ CREATE TABLE data_bill (
 
 INSERT INTO data_cost(data_cost_value) VALUES(0.00);
 
-CREATE VIEW access_control_hr AS
-SELECT `users`.`user_name` AS `user_name`,`device`.`full_device_name` AS `full_device_name` from ((`access_control` join `users` on(`users`.`id` = `access_control`.`user_id`)) join `device` on(`device`.`id` = `access_control`.`device_id`))\p;
-
 INSERT INTO rate_types(rate_type_name) VALUES('Continuous')\p;
 INSERT INTO rate_types(rate_type_name) VALUES('Monthly')\p;
 INSERT INTO device_status(statusname) VALUES('Online')\p;

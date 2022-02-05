@@ -26,7 +26,6 @@ require_once(__DIR__ . '/authenticate.inc.php');
 		<script type='text/javascript' src='vendor/components/jqueryui/jquery-ui.min.js'></script>
 		<script type="text/javascript" src='vendor/select2/select2/dist/js/select2.min.js'></script>
 		<script type='text/javascript' src='js/datatables.min.js'></script>
-		<script type="text/javascript" src="js/jquery.timepicker.js"></script>
 		<script src='js/full_calendar/moment.min.js' type="text/javascript"></script>
 		<script src='js/full_calendar/fullcalendar.min.js' type="text/javascript"></script>
 		<script type='text/javascript' src='vendor/twbs/bootstrap/dist/js/bootstrap.min.js'></script>
