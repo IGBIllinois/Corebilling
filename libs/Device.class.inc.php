@@ -261,41 +261,36 @@ class Device
 	
 	}
 
-	public function setLDAPGroup($ldap_group){
+	public function setLDAPGroup($ldap_group) {
 		if($this->ldap_group != $ldap_group){
 			$this->ldap_group = $ldap_group;
 			$this->log_file->send_log("Set LDAP group of device '".$this->shortName."' to $ldap_group");
 		}
 	}
 
-	public function setFullName($name)
-	{
+	public function setFullName($name) {
 		if($this->full_name != $name){
 			$this->full_name = $name;
 			$this->log_file->send_log("Set full name of device '".$this->shortName."' to '$name'");
 		}
 	}
 	
-	public function getFullName()
-	{
+	public function getFullName() {
 		return $this->full_name;
 	}
 
-	public function setLocation($location)
-	{
+	public function setLocation($location) {
 		if($this->location != $location){
 			$this->location = $location;
 			$this->log_file->send_log("Set location of device '".$this->shortName."' to $location");
 		}
 	}
 
-	public function getLocation()
-	{
+	public function getLocation() {
 		return $this->location;
 	}
 
-	public function getStatus()
-	{
+	public function getStatus() {
 		return $this->status;
 	}	
 
