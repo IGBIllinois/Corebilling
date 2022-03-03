@@ -16,11 +16,11 @@ dnf -y install perl-JSON perl-LWP-UserAgent-Determined perl-LWP-Protocol-https r
 ```
 
 ## Installation
-* Download CoreBillingService.pl from the '''Download''' page in Core Billing Application into /usr/local/sbin
+* Download CoreBillingService.pl from the ***Download*** page in Core Billing Application into /usr/local/sbin
 ```
 wget https://example.com/corebilling/download/CoreBillingService.pl
 ```
-* Create Device in '''Devices''' Page in Core Billing Application
+* Create Device in ***Devices*** Page in Core Billing Application
 * Add to crontab to run every minute
 ```
 * * * * * root source /etc/profile && perl /usr/local/sbin/CoreBillingService.pl --url URL --device DEVICE_ID --key KEY
