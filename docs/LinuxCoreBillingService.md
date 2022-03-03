@@ -6,6 +6,11 @@
 * Perl LWP UserAgent
 * Perl LWP Protocol Https
 * lsb_release command
+### CentOS 7
+```
+yum -y install perl-JSON perl-LWP-UserAgent-Determined perl-LWP-Protocol-https redhat-lsb-core
+```
+### Rocky 8
 ```
 dnf -y install perl-JSON perl-LWP-UserAgent-Determined perl-LWP-Protocol-https redhat-lsb-core
 ```
