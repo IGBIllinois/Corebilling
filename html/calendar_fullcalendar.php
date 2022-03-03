@@ -39,7 +39,7 @@ foreach (html::get_times() as $timepicker) {
 			<input type="hidden" name="device_id" value="<?php echo $device->getId(); ?>"/>
 			<input type="hidden" name="training" value="<?php echo isset($_POST['filterTraining'])?1:0; ?>"/>
 			<select name="report_type" class="form-control">
-				<option value="xlsx" selected>Excel 2007</option>
+				<option value="xlsx" selected>Excel</option>
 				<option value="csv">CSV</option>
 			</select>
 			<input class="btn btn-primary" type="submit" name="create_cal_report" value="Download Spreadsheet"/>
