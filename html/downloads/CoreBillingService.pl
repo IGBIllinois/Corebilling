@@ -6,6 +6,7 @@ use LWP::UserAgent;
 use JSON;
 use Socket;
 use Getopt::Long;
+use Data::Dumper;
 
 sub help() {
         print "Usage: $0\n";
@@ -31,6 +32,20 @@ sub get_os() {
 
 }
 
+sub get_harddrives() {
+	my @disks = `df -l -x tmpfs -x devtmpfs --output=target,size,avail -B1 | tail -n +2`;
+	my %disks_hash;
+	my $i = 0;
+	for my $disk (@disks) {
+		$disk =~ s/^\s+|\s+$//g;
+		my @tokens = split(' ',$disk);
+		$disks_hash{$i}->{'volume'} = $tokens[0];
+		$disks_hash{$i}->{'size'} = $tokens[1];
+		$disks_hash{$i}->{'free'} = $tokens[2];
+		$i++;
+	}
+	return %disks_hash;
+}
 sub get_user() {
 	my $users = `who | grep "[(]:[0-9]"`;
 	my @users_array = split /\s+/, $users;
@@ -68,13 +83,19 @@ else {
 }
 
 my $ua = LWP::UserAgent->new();
-my $ipaddress = get_ipaddress();
-my $os = get_os();
-my %json_hash = ('username'=>$connectedUserName,'ipaddress'=>$ipaddress,'os'=>$os,'version'=>$version);
+my %harddrives = get_harddrives();
+
+my %json_hash = ('username'=>$connectedUserName,
+	'ipaddress'=>get_ipaddress(),
+	'os'=>get_os(),
+	'version'=>$version,
+	'hard_drives'=>\%harddrives
+);
+
 my $json = encode_json \%json_hash;
 my $request = HTTP::Request->new(POST => $apiUrl);
 $request->content($json);
-$request->authorization_basic("",$deviceKey); 
+$request->authorization_basic($deviceId,$deviceKey); 
 $request->header('Content-Type'=>'application/json');
 $request->header('Accept'=>'application/json');
 
@@ -84,8 +105,13 @@ if ($response->is_success) {
 	print $response->decoded_content;
 }
 else {
-	#print STDERR $response->status_line, "\n";
-	print $response->decoded_content, "\n";
+	if (!$response->is_success) {
+		print STDERR $response->status_line, "\n";
+		print "Error contacting address $apiUrl\n";
+	}
+	else {
+		print $response->decoded_content, "\n";
+	}
 }
 
 

@@ -8,17 +8,15 @@ class restapi {
 	const RESPONSE_UNAUTHORIZED = 401;
 	const RESPONSE_FORBIDDEN = 403;
 	const RESPONSE_NOTFOUND = 404;
-	const RESPONSE_UNSUPORRTEDMEDIATYPE = 415;
-	const VALID_MEDIATYPE = "application/json";
+	const RESPONSE_UNSUPORRTEDCONTENTTYPE = 415;
+	const VALID_CONTENTTYPE = "application/json";
 	private $db;
 	private $ldap;
-	private $current_session;
 
 
-	public function __construct(PDO $db,\IGBIllinois\ldap $ldap, \IGBIllinois\session $current_session) {
+	public function __construct(PDO $db,\IGBIllinois\ldap $ldap) {
 		$this->db = $db;
 		$this->ldap = $ldap;
-		$this->current_session = $current_session;
 	}
 
 	public function __destruct() {
@@ -37,21 +35,26 @@ class restapi {
 
 	}
 
-	public function received_data($secure_key,$verb,$noun,$index,$json) {
+	public function received_data($secure_key,$verb,$noun,$index,$json,$server) {
 		$result = json_encode(array());
-		if ($noun == 'ldapuser') {
-			$result = $this->api_ldapuser($secure_key,$verb,$index,$json);
+		switch ($noun) {
+			case 'ldapuser':
+				$result = $this->api_ldapuser($secure_key,$verb,$index,$json);
+				break;
+			case 'session':
+				$result = $this->api_device_session($secure_key,$verb,$index,$json,$server);
+				break;
+			default:
+				$result = array('response_code'=>'','json'=>array());
 
 		}
-		elseif ($noun == 'session') {
-			$result = $this->api_device_session($secure_key,$verb,$index,$json); 
 
-		}	
 		return $result;
 
 	}
 	public function verifySession($session_id) {
-		if ($this->current_session->get_session_id() == $session_id) {
+		$login_session = new \IGBIllinois\session(settings::get_session_name());
+		if ($login_session->get_session_id() == $session_id) {
 			return true;
 		}
 		return false;
@@ -89,11 +92,11 @@ class restapi {
 
 	}
 
-	private function api_device_session($secure_key,$verb,$index,$json) {
+	private function api_device_session($secure_key,$verb,$index,$json,$server) {
 		$device = new Device($this->db);
 		if (!$device->load($index)) {
 			$json_array = array('result'=>false,
-					'message'=>'Device ' . $index . ' not found');
+				'message'=>'Device ' . $index . ' not found');
 			return array('response_code'=>self::RESPONSE_SUCCESS,'json'=>$json_array);	
 		}
 		elseif ($device->getDeviceToken() != $secure_key) {
@@ -102,8 +105,26 @@ class restapi {
 			
 			return array('response_code'=>self::RESPONSE_UNAUTHORIZED,'json'=>$json_array);
 		}
-
-	}
+		else {
+			$userId = User::exists($this->db,$json->{'username'});
+			if ($userId) {
+                        	Session::trackSession($this->db,$device->getId(), $userId,$server['REMOTE_ADDR'],json_encode($json));
+			}
+			else {
+				//User was not found in website database so check for user exceptions
+				if (in_array(strtolower($json->{'username'}), array_map('strtolower', $USER_EXCEPTIONS_ARRAY))){
+                                	$device->updateLastTick('',$server['REMOTE_ADDR'],json_encode($json));
+				}
+				else {
+                        		$device->updateLastTick($json->{'username'},$server['REMOTE_ADDR'],json_encode($json));
+				}
+			}
+			$json_array = array('result'=>true,
+				'message'=>'Success');
+			return array('response_code'=>self::RESPONSE_SUCCESS,'json'=>$json_array);
+			
+		}
+	}	
 }
 
 ?>

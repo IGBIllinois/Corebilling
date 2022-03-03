@@ -1,5 +1,9 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 ob_start();
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -14,12 +18,12 @@ $message = "";
 
 $verb = $_SERVER['REQUEST_METHOD'];
 $json = json_decode('{}');
-
 if ($verb != 'GET')  {
 	$json = json_decode(file_get_contents('php://input'));
 }
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+error_log(print_r($uri));
 $uri = explode('/', $uri);
 $noun = "";
 $index = "";
@@ -39,9 +43,9 @@ if (!isset($_SERVER['PHP_AUTH_PW'])) {
 }
 
 //Didn't receive an application/json content type
-elseif ($_SERVER['CONTENT_TYPE'] != restapi::VALID_MEDIATYPE) {
-        $response_code = restapi::RESPONSE_UNSUPORRTEDMEDIATYPE;
-        $message = "Content-type not set to application/json";
+elseif ($_SERVER['CONTENT_TYPE'] != restapi::VALID_CONTENTTYPE) {
+        $response_code = restapi::RESPONSE_UNSUPORRTEDCONTENTTYPE;
+        $message = "Content-type not set to " . restapi::VALID_CONTENTTYPE;
 }
 
 //No Valid noun sent
@@ -57,21 +61,21 @@ elseif ($json == null) {
 	$message = "Malformed json received";
 }
 
-ob_clean();
 if ($response_code != restapi::RESPONSE_SUCCESS) {
-	http_response_code($response_code);
-	$json_array = array('status'=>$response_code,'messsage'=>$message,$_SERVER);
+	$json_array = array('status'=>$response_code,'messsage'=>$message);
+	ob_clean();
+	http_response_code((int)$response_code);
 	echo json_encode($json_array);
 	exit;
 }
-ob_start();
-require_once __DIR__ . '/../../includes/authenticate.inc.php';
-$restapi = new restapi($db,$ldap,$login_session);
+else {
+	$restapi = new restapi($db,$ldap);
+	error_log($_SERVER['PHP_AUTH_PW'],0);
+	$result = $restapi->received_data($_SERVER['PHP_AUTH_PW'],$verb,$noun,$index,$json,$_SERVER);
 
-$result = $restapi->received_data($_SERVER['PHP_AUTH_PW'],$verb,$noun,$index,$json);
-
-ob_clean();
-http_response_code((int)$result['response_code']);
-echo json_encode($result['json']);
+	ob_clean();
+	http_response_code((int)$result['response_code']);
+	echo json_encode($result['json']);
+}
 ?>
 
