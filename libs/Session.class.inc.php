@@ -5,39 +5,30 @@
  * Used to keep create,delete and update user instrument sessions
  *
  */
-class Session
-{
-    private $db;
+class Session {
+	
+	private $db;
+	private $sessionId = 0;
+	private $userId = 0;
+	private $start = "";
+	private $stop = "";
+	private $status = "";
+	private $deviceId = 0;
+	private $elapsed = 0;
+	private $rateId = 0;
+	private $description = "";
+	private $cfopId = 0;
+	private $rate;
 
-    private $sessionId;
-    private $userId;
-    private $start;
-    private $stop;
-    private $status;
-    private $deviceId;
-    private $elapsed;
-    private $rateId;
-    private $description;
-    private $cfopId;
-    private $rate;
 
+	public function __construct(PDO $db) {
+		$this->db = $db;
 
-    public function __construct(PDO $db) {
-        $this->db = $db;
-        $this->sessionId = 0;
-        $this->userId = 0;
-        $this->start = "";
-        $this->stop = "";
-        $this->status = "";
-        $this->deviceId = 0;
-        $this->cfopId = "";
-        $this->rateid = 0;
-        $this->description = "";
-    }
+	}
 
-    public function __destruct() {
+	public function __destruct() {
 
-    }
+	}
 
     /**Session tracker keeps track of session on each device
      * Used in session.php to track how long a person has been logged
@@ -94,92 +85,86 @@ class Session
 	return true;
     }
 
-    /**Create a new session in the database
-     * @param $userId
-     * @param $start
-     * @param $stop
-     * @param $status
-     * @param $deviceId
-     * @param $description
-     * @param $cfop
-     */
-    public function create($userId, $start, $stop, $status, $deviceId, $description, $cfop) {
-        $this->userId = $userId;
-        $this->start = $start;
-        $this->stop = $stop;
-        $this->status = $status;
-        $this->deviceId = $deviceId;
-        $this->description = $description;
-        $this->cfopId = $cfop;
+	/**Create a new session in the database
+	* @param $userId
+	* @param $start
+	* @param $stop
+	* @param $status
+	* @param $deviceId
+	* @param $description
+	* @param $cfop
+	*/
+	public function create($userId, $start, $stop, $status, $deviceId, $description, $cfop) {
+		$this->userId = $userId;
+		$this->start = $start;
+		$this->stop = $stop;
+		$this->status = $status;
+		$this->deviceId = $deviceId;
+		$this->description = $description;
+		$this->cfopId = $cfop;
 
-        $queryInsertSession = "insert into session (user_id,start,stop,status,device_id,description,elapsed,cfop_id)
-		                        values(:user_id,:start,:stop,:status,device_id,:description,TIMESTAMPDIFF(minute,:start,:stop),:cfop_id)";
+		$sql = "INSERT INTO session (user_id,start,stop,status,device_id,description,elapsed,cfop_id) ";
+		$sql .= "VALUES(:user_id,:start,:stop,:status,device_id,:description,TIMESTAMPDIFF(minute,:start,:stop),:cfop_id)";
 
-        $insertSessionInfo = $this->db->prepare($queryInsertSession);
-        $insertSessionInfo->execute(
-            array(
-                ':user_id' => $this->userId,
-                ':start' => $this->start,
-                ':stop' => $this->stop,
-                ':status' => $this->status,
-                ':device_id' => $this->deviceId,
-                ':description' => $this->description,
-                ':cfop_id' => $this->cfopId,
-            ));
+		$parameters = array(
+                	':user_id' => $this->userId,
+	                ':start' => $this->start,
+        	        ':stop' => $this->stop,
+                	':status' => $this->status,
+	                ':device_id' => $this->deviceId,
+        	        ':description' => $this->description,
+                	':cfop_id' => $this->cfopId,
+		);
 
-        $this->sessionId;
-    }
+		$query = $this->db->prepare($sql);
+		$query->execute($paramaters);
+		return $this->db->lastInsertId();
+	}
 
-    /**Load a session form the database into this object
-     * @param $id
-     */
-    public function load($id) {
-        $querySessionInfo = "select * from session where id=:session_id";
-        $sessionInfo = $this->db->prepare($querySessionInfo);
-        $sessionInfo->execute(array(':session_id' => $id));
-        $sessionInfoArr = $sessionInfo->fetch(PDO::FETCH_ASSOC);
-        $this->sessionId = $sessionInfoArr["id"];
-        $this->userId = $sessionInfoArr["user_id"];
-        $this->start = $sessionInfoArr["start"];
-        $this->stop = $sessionInfoArr["stop"];
-        $this->status = $sessionInfoArr["status"];
-        $this->deviceId = $sessionInfoArr["device_id"];
-        $this->elapsed = $sessionInfoArr["elapsed"];
-        $this->rate = $sessionInfoArr["rate"];
-        $this->description = $sessionInfoArr["description"];
-        $this->cfopId = $sessionInfoArr["cfop_id"];
-    }
+	/**Load a session form the database into this object
+	* @param $id
+	*/
+	public function load($id) {
+		$sql = "SELECT * from session where id=:session_id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':session_id' => $id));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		$this->sessionId = $result["id"];
+		$this->userId = $result["user_id"];
+		$this->start = $result["start"];
+		$this->stop = $result["stop"];
+		$this->status = $result["status"];
+		$this->deviceId = $result["device_id"];
+		$this->elapsed = $result["elapsed"];
+		$this->rate = $result["rate"];
+		$this->description = $result["description"];
+		$this->cfopId = $result["cfop_id"];
+	}
 
-    /**
-     * Update the session with variables changed using the Setters
-     */
-    public function update() {
-        $queryUpdateSession = "UPDATE session SET
-		                        user_id=" . $this->userId . ",
-		                        start=\"" . $this->start . "\",
-		                        stop=\"" . $this->stop . "\",
-		                        status=\"" . $this->status . "\",
-		                        device_id=" . $this->deviceId . ",
-		                        elapsed=" . $this->elapsed . ",
-		                        description=\"" . $this->description . "\",
-		                        cfop_id=\"" . $this->cfopId . "\",
-		                        rate=" . $this->rate . "
-		                       WHERE id=" . $this->sessionId;
-        $updateSession = $this->db->prepare($queryUpdateSession);
-        $updateSession->execute(
-            array(
-                ':user_id' => $this->userId,
-                ':start' => $this->start,
-                ':stop' => $this->stop,
-                ':status' => $this->status,
-                ':device_id' => $this->deviceId,
-                ':elapsed' => $this->elapsed,
-                ':description' => $this->description,
-                ':cfop_id' => $this->cfopId,
-                ':rate' => $this->rate,
-                ':id' => $this->sessionId,
-            ));
-    }
+	/**
+	* Update the session with variables changed using the Setters
+	*/
+	public function update() {
+		$sql = "UPDATE session SET user_id=:user_id,start=:start,stop=:stop,status=:status,";
+		$sql .= "device_id=:device_id,elapsed=:elapsed,description=:description,cfop_id=:cfop_id,";
+		$sql .= "rate=:rate ";
+		$sql .= "WHERE id=:id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$parameters = array(
+                	':user_id' => $this->userId,
+	                ':start' => $this->start,
+        	        ':stop' => $this->stop,
+                	':status' => $this->status,
+	                ':device_id' => $this->deviceId,
+        	        ':elapsed' => $this->elapsed,
+                	':description' => $this->description,
+	                ':cfop_id' => $this->cfopId,
+        	        ':rate' => $this->rate,
+                	':id' => $this->sessionId,
+		);
+
+		$query->execute($parameters);
+	}
 
 	/**
 	 * @param PDO $db
@@ -188,89 +173,92 @@ class Session
 	 * @return mixed
 	 */
 	public static function getSessions($db, $date, $device) {
-        $query = "select u.user_name, g.group_name, s.device_id, d.device_name, s.start, s.stop 
-		from session s inner join users u on u.id=s.user_id inner join device d on d.id=s.device_id left join user_groups ug on u.id=ug.user_id left join `groups` g on g.id=ug.group_id 
-		where d.id=:device and (DATE(s.start)=:date or DATE(s.stop)=:date)";
-        $stmt = $db->prepare($query);
-        $stmt->execute(array(":date" => $date, ":device" => $device));
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$sql = "SELECT u.user_name, g.group_name, s.device_id, d.device_name, s.start, s.stop ";
+		$sql .= "FROM session s inner join users u on u.id=s.user_id ";
+		$sql .= "INNER JOIN device d on d.id=s.device_id ";
+		$sql .= "LEFT JOIN user_groups ug on u.id=ug.user_id ";
+		$sql .= "LEFT JOIN `groups` g on g.id=ug.group_id ";
+		$sql .= "WHERE d.id=:device and (DATE(s.start)=:date or DATE(s.stop)=:date)";
+		$query = $db->prepare($sql);
+		$query->execute(array(":date" => $date, ":device" => $device));
+		return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getId() {
-        return $this->sessionId;
-    }
+	public function getId() {
+		return $this->sessionId;
+	}
 
-    public function getUserId() {
-        return $this->userId;
-    }
+	public function getUserId() {
+		return $this->userId;
+	}
 
-    public function setUserId($userId) {
-        $this->userId = $userId;
-    }
+	public function setUserId($userId) {
+		$this->userId = $userId;
+	}
 
-    public function getStart() {
-        return $this->start;
-    }
+	public function getStart() {
+		return $this->start;
+	}
 
-    public function setStart($start) {
-        $this->start = $start;
-    }
+	public function setStart($start) {
+		$this->start = $start;
+	}
 
-    public function getStop() {
-        return $this->stop;
-    }
+	public function getStop() {
+		return $this->stop;
+	}
 
-    public function setStop($stop) {
-        $this->stop = $stop;
-    }
+	public function setStop($stop) {
+		$this->stop = $stop;
+	}
 
-    public function getStatus() {
-        return $this->status;
-    }
+	public function getStatus() {
+		return $this->status;
+	}
 
-    public function setStatus($status) {
-        $this->status = $status;
-    }
+	public function setStatus($status) {
+		$this->status = $status;
+	}
 
-    public function getDeviceId() {
-        return $this->deviceId;
-    }
+	public function getDeviceId() {
+		return $this->deviceId;
+	}
 
-    public function setDeviceId($deviceId) {
-        $this->deviceId = $deviceId;
-    }
+	public function setDeviceId($deviceId) {
+		$this->deviceId = $deviceId;
+	}
 
-    public function getElapsed() {
-        return $this->elapsed;
-    }
+	public function getElapsed() {
+		return $this->elapsed;
+	}
 
-    public function setElapsed($elapsed) {
-        $this->elapsed = $elapsed;
-    }
+	public function setElapsed($elapsed) {
+		$this->elapsed = $elapsed;
+	}
 
-    public function getRate() {
-        return $this->rate;
-    }
+	public function getRate() {
+		return $this->rate;
+	}
 
-    public function setRate($rate) {
-        $this->rate = $rate;
-    }
+	public function setRate($rate) {
+		$this->rate = $rate;
+	}
 
-    public function getDescription() {
-        return $this->description;
-    }
+	public function getDescription() {
+		return $this->description;
+	}
 
-    public function setDescription($description) {
-        $this->description = $description;
-    }
+	public function setDescription($description) {
+		$this->description = $description;
+	}
 
-    public function getCfopId() {
-        return $this->cfopId;
-    }
+	public function getCfopId() {
+		return $this->cfopId;
+	}
 
-    public function setCfopId($cfopId) {
-        $this->cfopId = $cfopId;
-    }
+	public function setCfopId($cfopId) {
+		$this->cfopId = $cfopId;
+	}
 }
 
 ?>

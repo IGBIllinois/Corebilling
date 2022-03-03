@@ -93,12 +93,29 @@ class restapi {
 	}
 
 	private function api_device_session($secure_key,$verb,$index,$json,$server) {
-		$device = new Device($this->db);
-		if (!$device->load($index)) {
-			$json_array = array('result'=>false,
-				'message'=>'Device ' . $index . ' not found');
-			return array('response_code'=>self::RESPONSE_SUCCESS,'json'=>$json_array);	
+
+		switch ($verb) {
+			case 'OPTIONS':
+				break;
+			case 'POST':
+				$json_array = $this->api_device_start_session($secure_key,$index,$json,$server);
+				break;
+			default:
+				break;
+
+
 		}
+		return $json_array;
+	}
+
+	private function api_device_start_session($secure_key,$index,$json,$server) {
+		$device = new Device($this->db);
+                if (!$device->load($index)) {
+                        $json_array = array('result'=>false,
+                                'message'=>'Device ' . $index . ' not found');
+                        return array('response_code'=>self::RESPONSE_SUCCESS,'json'=>$json_array);
+                }
+
 		elseif ($device->getDeviceToken() != $secure_key) {
 			$json_array = array('result'=>false,
 					'message'=>'Invalid Access Key');
@@ -108,7 +125,8 @@ class restapi {
 		else {
 			$userId = User::exists($this->db,$json->{'username'});
 			if ($userId) {
-                        	Session::trackSession($this->db,$device->getId(), $userId,$server['REMOTE_ADDR'],json_encode($json));
+				Session::trackSession($this->db,$device->getId(), $userId,$server['REMOTE_ADDR'],json_encode($json));
+				$json_array = array('result'=>true,'message'=>'');
 			}
 			else {
 				//User was not found in website database so check for user exceptions
@@ -118,9 +136,8 @@ class restapi {
 				else {
                         		$device->updateLastTick($json->{'username'},$server['REMOTE_ADDR'],json_encode($json));
 				}
+				$json_array = array('result'=>true);
 			}
-			$json_array = array('result'=>true,
-				'message'=>'Success');
 			return array('response_code'=>self::RESPONSE_SUCCESS,'json'=>$json_array);
 			
 		}
