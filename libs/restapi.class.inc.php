@@ -9,7 +9,7 @@ class restapi {
 	const RESPONSE_FORBIDDEN = 403;
 	const RESPONSE_NOTFOUND = 404;
 	const RESPONSE_UNSUPORRTEDCONTENTTYPE = 415;
-	const VALID_CONTENTTYPE = "application/json";
+	const VALID_CONTENTTYPE = array("application/json","application/json; charset=UTF-8");
 	private $db;
 	private $ldap;
 
@@ -126,7 +126,7 @@ class restapi {
 			$userId = User::exists($this->db,$json->{'username'});
 			if ($userId) {
 				Session::trackSession($this->db,$device->getId(), $userId,$server['REMOTE_ADDR'],json_encode($json));
-				$json_array = array('result'=>true,'message'=>'');
+				$json_array = array('result'=>true,'message'=>'Tracking Session for user ' . $json->{'username'});
 			}
 			else {
 				//User was not found in website database so check for user exceptions
@@ -136,7 +136,7 @@ class restapi {
 				else {
                         		$device->updateLastTick($json->{'username'},$server['REMOTE_ADDR'],json_encode($json));
 				}
-				$json_array = array('result'=>true);
+				$json_array = array('result'=>true,'message'=>'No User Logged in');
 			}
 			return array('response_code'=>self::RESPONSE_SUCCESS,'json'=>$json_array);
 			

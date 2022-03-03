@@ -1,9 +1,5 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 ob_start();
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -21,9 +17,7 @@ $json = json_decode('{}');
 if ($verb != 'GET')  {
 	$json = json_decode(file_get_contents('php://input'));
 }
-
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-error_log(print_r($uri));
 $uri = explode('/', $uri);
 $noun = "";
 $index = "";
@@ -43,9 +37,9 @@ if (!isset($_SERVER['PHP_AUTH_PW'])) {
 }
 
 //Didn't receive an application/json content type
-elseif ($_SERVER['CONTENT_TYPE'] != restapi::VALID_CONTENTTYPE) {
+elseif (!in_array($_SERVER['CONTENT_TYPE'],restapi::VALID_CONTENTTYPE)) {
         $response_code = restapi::RESPONSE_UNSUPORRTEDCONTENTTYPE;
-        $message = "Content-type not set to " . restapi::VALID_CONTENTTYPE;
+        $message = "Content-type not set to " . implode(",",restapi::VALID_CONTENTTYPE);
 }
 
 //No Valid noun sent
@@ -70,7 +64,6 @@ if ($response_code != restapi::RESPONSE_SUCCESS) {
 }
 else {
 	$restapi = new restapi($db,$ldap);
-	error_log($_SERVER['PHP_AUTH_PW'],0);
 	$result = $restapi->received_data($_SERVER['PHP_AUTH_PW'],$verb,$noun,$index,$json,$_SERVER);
 
 	ob_clean();
