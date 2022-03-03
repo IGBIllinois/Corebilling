@@ -1,6 +1,6 @@
-Linux Core Billing Service
+#Linux Core Billing Service
 
-# Requirements
+## Requirements
 * Perl
 * Perl JSON
 * Perl LWP UserAgent
@@ -10,7 +10,7 @@ Linux Core Billing Service
 dnf -y install perl-JSON perl-LWP-UserAgent-Determined perl-LWP-Protocol-https redhat-lsb-core
 ```
 
-# Installation
+## Installation
 * Download CoreBillingService.pl from the '''Download''' page in Core Billing Application into /usr/local/sbin
 ```
 wget https://example.com/corebilling/download/CoreBillingService.pl
