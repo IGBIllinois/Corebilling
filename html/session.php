@@ -19,7 +19,7 @@ if (isset($_POST['username']) && $_POST['username']!="" && isset($_POST['key']))
 		}
 		else {
 		//User was not found in website database so check for user exceptions
-			if (in_array(strtolower($_POST['username']), array_map('strtolower', $USER_EXCEPTIONS_ARRAY))){
+			if (in_array(strtolower($_POST['username']), settings::get_user_exceptions())){
 				$deviceInfo->updateLastTick();
 		}
 		else {

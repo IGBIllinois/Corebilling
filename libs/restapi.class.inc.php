@@ -130,7 +130,7 @@ class restapi {
 			}
 			else {
 				//User was not found in website database so check for user exceptions
-				if (in_array(strtolower($json->{'username'}), array_map('strtolower', $USER_EXCEPTIONS_ARRAY))){
+				if (in_array(strtolower($json->{'username'}), settings::get_user_exceptions())){
                                 	$device->updateLastTick('',$server['REMOTE_ADDR'],json_encode($json));
 				}
 				else {

@@ -121,8 +121,7 @@ class Device
 		return $query->execute($parameters);
 	}
 
-	public function updateLastTick($username="",$ipaddress,$json)
-	{
+	public function updateLastTick($username="",$ipaddress = "",$json = "{}") {
 		if($username==""){
 			$loggeduser = 0;
 		} else {
@@ -134,7 +133,10 @@ class Device
 		$query = $this->db->prepare($sql);
 		$parameters = array(':username'=>$username,
 				':id'=>$this->deviceId,
-				':loggeduser'=>$loggeduser);
+				':loggeduser'=>$loggeduser,
+				':ipaddress'=>$ipaddress,
+				':json'=>$json
+		);
 		return $query->execute($parameters);
 	}
 
