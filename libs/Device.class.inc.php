@@ -21,7 +21,8 @@ class Device
 	private $ipaddress;
 	private $log_file = null;
 	private $json = null;
-	
+	private $lasttick;
+
 	public function __construct(PDO $db) {
 		$this->db = $db;
 		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
@@ -94,6 +95,7 @@ class Device
 			$this->ldap_group = $result['ldap_group'];
 			$this->ipaddress = $result['ipaddress'];
 			$this->json = json_decode($result['json'],true);
+			$this->lasttick = $result['lasttick'];
 			return true;
         	}
 		return false;
@@ -358,6 +360,11 @@ class Device
 			return $this->json['computer_name'];
 		}
 		return false;
+	}
+
+	public function getLastTick() {
+		return $this->lasttick;
+			
 	}
 }
 ?>
