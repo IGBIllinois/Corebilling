@@ -447,7 +447,7 @@ class User
 	}
 
 	public function setSupervisorId($supervisorId) {
-		if ($this->getSupervisorId != $supervisorId) {
+		if ($this->supervisor_id != $supervisorId) {
 			$this->supervisor_id = $supervisorId;
 			$this->log_file->send_log("Set Supervisor of user " . $this->username . " to " . $supervisorId);
 		}

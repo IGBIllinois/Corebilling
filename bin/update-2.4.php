@@ -101,6 +101,8 @@ else {
 		}
 
 	}
+
+	//change useer to supervisor if they have an account already and own a group
 	foreach ($users as $user) {
 		foreach ($groups as $group) {
 			if ($group['netid'] && ($user['user_role_id'] != User::ROLE_SUPERVISOR) && ($group['netid'] == $user['user_name'])) {
@@ -114,6 +116,30 @@ else {
 		}
 	}
 
+	//Set supervusor for each user based on the group they belong to
+	foreach ($users as $user) {
+		$user_obj = new user($db);
+		$user_obj->load($user['id']);
+		$user_groups = $user_obj->getGroupIds();
+		if (count($user_groups) > 1) {
+			echo "User: " . $user['user_name'];
+		}
+		elseif (count($user_groups) == 1) {
+			$group_obj = new Group($db);
+			$group_obj->load($user_groups[0]);
+			if ($group_obj->getNetid() != "") {
+				echo $group_obj->getNetid() . "\n";
+				$sql = "SELECT id FROM users WHERE user_name=:user_name LIMIT 1";
+				$query = $db->prepare($sql);
+				$query->execute(array(":user_name"=>$group_obj->getNetId()));
+				$result = $query->fetch(PDO::FETCH_ASSOC);
+				$supervisor_id = $result['id'];
+				$user_obj->setSupervisorId($supervisor_id);
+				$user_obj->update();
+			}
+		}
+
+	}
 }
 ?>
 
