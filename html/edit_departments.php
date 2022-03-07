@@ -109,7 +109,7 @@ if (isset($_POST['Select'])) {
 							<th>Full Name</th>
 						</tr>
 						<?php
-						$members = $department->getMembers();
+							$members = $department->getMembers();
 						if (count($members)) { 
 							foreach($members as $id=>$member) {
 								echo "<tr><td>".$member['user_name']."</td><td>".$member['first']." ".$member['last']."</td></tr>";

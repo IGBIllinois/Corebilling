@@ -82,7 +82,7 @@ class Department {
 	*/
 	public function getMembers() {
 		if($this->getDepartmentId()) {
-			$sql = "SELECT * FROM users WHERE department_id=:department_id AND users.status_id=:status_id ORDER BY user_name";
+			$sql = "SELECT * FROM users WHERE department_id=:department_id AND users.status=:status_id ORDER BY user_name";
 			$query = $this->db->prepare($sql);
 			$query->execute(array(":department_id"=>$this->getDepartmentId(),":status_id"=>User::ACTIVE));
 			return $query->fetchAll(PDO::FETCH_ASSOC);
