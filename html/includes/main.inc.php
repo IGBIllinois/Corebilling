@@ -30,6 +30,9 @@ $ldap = new \IGBIllinois\ldap(settings::get_ldap_host(),
 			settings::get_ldap_port(),
 			settings::get_ldap_ssl(),
 			settings::get_ldap_tls());
+if (settings::get_ldap_bind_user() != "") {
+	$ldap->bind(LDAP_BIND_USER,LDAP_BIND_PASS);
+}
 
 $ldapman = null;
 if(LDAPMAN_API_ENABLED){

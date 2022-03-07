@@ -218,29 +218,31 @@ class User
 	*/
 	public static function getUsers($db,$status = null,$role_id = false) {
 		$sql = "SELECT * FROM users ";
+		$parameters = array();
 		if ($status || $role_id) {
 			$sql .= "WHERE 1=1 ";
 		}
-		if ($status) {
+		if ($status != null) {
 			$sql .= "AND status=:status ";
+			$parameters[':status'] = $status;
 		}
 		if ($role_id) {
 			$sql .= "AND user_role_id=:role_id ";
+			$parameters[':role_id'] = $role_id;
 		}
 		$sql .= "ORDER BY user_name";
 		$query = $db->prepare($sql);
-		$parameters = array(':status'=>$status,':role_id'=>$role_id);
 		$query->execute($parameters);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
-	public static function getSupervisors($db) {
-		return self::getUsers($db,self::ACTIVE,self::ROLE_SUPERVISOR);
+	public static function getSupervisors($db,$status = null) {
+		return self::getUsers($db,$status,self::ROLE_SUPERVISOR);
 
 	}
 	
-	public static function getAdministrators($db) {
-		return self::getUsers($db,self::ACTIVE,self::ROLE_ADMIN);
+	public static function getAdministrators($db,$status = null) {
+		return self::getUsers($db,$status,self::ROLE_ADMIN);
 	}
 
 	/**List all active users by id and username on the application

@@ -23,10 +23,6 @@ class restapi {
 
 	}
 
-	public static function parseUri($uri) {
-
-
-	}
 	public static function isValidNoun($noun) {
 		if (in_array($noun,self::valid_nouns)) {
 			return true;
