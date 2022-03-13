@@ -19,7 +19,7 @@ class Session {
 	private $description = "";
 	private $cfopId = 0;
 	private $rate;
-
+	private CONST SESSION_TIMEOUT = 15;
 
 	public function __construct(PDO $db) {
 		$this->db = $db;
@@ -35,9 +35,12 @@ class Session {
      * @param $deviceId
      * @param $userId
      */
-    public static function trackSession($db, $deviceId, $userId,$ipaddress,$json) {
+    public static function trackSession($db, $deviceId, $userId,$ipaddress,$json = "{}") {
         if ( $userId > 0 ) {
-            $queryOpenSession = "select id from session where user_id=:user_id and device_id=:device_id and (TIMESTAMPDIFF(minute,stop,NOW()) < 15) order by id desc";
+		$queryOpenSession = "SELECT id FROM session ";
+		$queryOpenSession .= "WHERE user_id=:user_id AND device_id=:device_id ";
+		$queryOpenSession .= "AND (TIMESTAMPDIFF(minute,stop,NOW()) < " . self::SESSION_TIMEOUT . ") ";
+		$queryOpenSession .= "ORDER BY id DESC";
 
             $openSession = $db->prepare($queryOpenSession);
             $openSession->execute(array(':device_id' => $deviceId, ':user_id' => $userId));

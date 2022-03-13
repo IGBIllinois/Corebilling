@@ -3,7 +3,8 @@
     rotate 10
     notifempty
     missingok
-    create 0660 apache apache
+    create 0664 apache apache
+    su apache apache
 }
 
 
