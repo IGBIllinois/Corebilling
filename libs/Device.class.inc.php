@@ -1,11 +1,15 @@
 <?php
 class Device
 {
+<<<<<<< HEAD
 	const STATUS_ONLINE = 1;
 	const STATUS_REPAIR = 2;
 	const STATUS_DONOTTRACK = 3;
 	const STATUS_OFFLINE = 4;
 	const HARDDRIVE_WARNING = 80;
+=======
+	const STATUS_TYPE_DEVICE=1;
+>>>>>>> 09d84842c14dba7dbe3e15b71cc03e75f68b5312
 	const MINUTES = 60;
 	private $db;
 	private $deviceId = 0;
@@ -167,6 +171,7 @@ class Device
 	 * @param int $id
 	 * @return mixed
 	 */
+<<<<<<< HEAD
 	public static function getDevicesInSameRoom($db, $id){
 		$sql = "select id from device where location = (select location from device where id=:id limit 1) and id != :id";
 		$query = $db->prepare($sql);
@@ -227,6 +232,66 @@ class Device
 	public function setDeviceId($id){
 		if($this->deviceId != $id){
 			$this->deviceId = $id;
+=======
+    public static function getDevicesInSameRoom($db, $id){
+    	$query = "select id from device where location = (select location from device where id=? limit 1) and id != ?";
+    	$devices = $db->prepare($query);
+    	$devices->execute(array($id, $id));
+		return $devices->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+    public static function getAllDevicesStatus($db)
+    {
+        $queryDevicesUse = "SELECT d.full_device_name, d.ipaddress, d.location, u.user_name, d.loggeduser,u.first, u.last, TIMESTAMPDIFF(SECOND, lasttick, NOW()) AS lastseen , unauthorized FROM users u RIGHT JOIN device d ON u.id=d.loggeduser WHERE d.status_id=1 OR d.status_id=2 order by d.full_device_name";
+        $devicesUse = $db->prepare($queryDevicesUse);
+        $devicesUse->execute();
+        $devicesUseArr = $devicesUse->fetchAll(PDO::FETCH_ASSOC);
+        return $devicesUseArr;
+    }
+    /**Get rates list for device
+     * @return array
+     */
+	public function getRates() {
+                $sql = "SELECT ROUND(dr.rate * :minutes,2) as rate, dr.id, dr.rate_id, dr.min_use_time, r.rate_name, dr.rate_type_id ";
+                $sql .= "FROM device_rate dr, rates r ";
+                $sql .= "WHERE r.id=dr.rate_id AND dr.device_id=:device_id";
+                $query = $this->db->prepare($sql);
+		$parameters = array(":device_id"=>$this->deviceId,
+				":minutes"=>self::MINUTES);
+                $query->execute($parameters);
+                return $query->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+    /**Update this device's rate
+     * @param $rateId
+     * @param $rate
+     * @param $minTime
+     * @param $rateTypeId
+     */
+	public function updateRate($rateId, $rate, $minTime, $rateTypeId) {
+		$rate_per_second = $rate / self::MINUTES;
+                $sql = "UPDATE device_rate SET rate=:rate, min_use_time=:mintime, rate_type_id=:rate_type_id ";
+                $sql .= "WHERE rate_id=:rate_id AND device_id=:device_id LIMIT 1";
+                $query = $this->db->prepare($sql);
+                $parameters = array(":rate"=>$rate_per_second,":mintime"=>$minTime,":rate_id"=>$rateId,":device_id"=>$this->deviceId,":rate_type_id"=>$rateTypeId);
+                return $query->execute($parameters);
+        }
+
+    public static function deviceStatusList($db)
+    {
+        $queryDeviceStatusList = "SELECT * FROM status WHERE type=:type";
+        $deviceStatusList = $db->prepare($queryDeviceStatusList);
+        $deviceStatusList->execute(array('type'=>Device::STATUS_TYPE_DEVICE));
+        $deviceStatusListArr = $deviceStatusList->fetchAll(PDO::FETCH_ASSOC);
+
+        return $deviceStatusListArr;
+    }
+
+    //Getters and setters for device
+    public function setDeviceId($id){
+	    if($this->deviceId != $id){
+		    $this->deviceId = $id;
+>>>>>>> 09d84842c14dba7dbe3e15b71cc03e75f68b5312
 			$this->log_file->send_log("Set id of device '".$this->shortName."' to $id");
 		}
 	}

@@ -244,7 +244,7 @@ if (count($harddrives)) {
 					<table class="table table-hover">
 						<tr>
 							<th>Rate Name</th>
-							<th>Rate ($)</th>
+							<th>Rate Per Hour ($)</th>
 							<th>Min. Time</th>
 							<th>Usage Period</th>
 						</tr>
@@ -252,12 +252,28 @@ if (count($harddrives)) {
 						if ($device->getId() > 0) {
 							$deviceRates = $device->getRates();
 							foreach ($deviceRates as $id => $deviceRateInfo) {
+<<<<<<< HEAD
 								echo "<tr><td>
 									<input type='checkbox' name='ratesBox[]' value='" . $deviceRateInfo["rate_id"] . "' style='display:none;' checked='checked'>
 									<h5>" . $deviceRateInfo['rate_name'] . ":</h5></td>
 									<td><input type='text' value='" . $deviceRateInfo["rate"] . "' name='rate-" . $deviceRateInfo["rate_id"] . "' size='3' maxlength='5' class='form-control'></td>
 									<td><input type='text' value='" . $deviceRateInfo["min_use_time"] . "' name='mintime-" . $deviceRateInfo["rate_id"] . "' size='5' maxlength='5' class='form-control'></td>";
 								echo "<td><select name='rate_type-" . $deviceRateInfo["rate_id"] . "' class='form-control'>";
+=======
+								echo "<tr>
+										<td>
+											<input type=\"checkbox\" name=\"ratesBox[]\" value=\"" . $deviceRateInfo["rate_id"] . "\" style=\"display:none;\" CHECKED>
+											<h5>" . $deviceRateInfo["rate_name"] . ":</h5>
+											</td>
+											<td>
+											<input type=\"text\" value='" . $deviceRateInfo["rate"] . "' name=\"rate-" . $deviceRateInfo["rate_id"] . "\" size=\"3\" maxlength=\"5\" class=\"form-control\">
+											</td>
+											<td>
+											<input type=\"text\" value=" . $deviceRateInfo["min_use_time"] . " name=\"mintime-" . $deviceRateInfo["rate_id"] . "\" size=\"5\" maxlength=\"5\" class=\"form-control\">
+											</td>";
+								echo "  <td>
+											<select name=\"rate_type-" . $deviceRateInfo["rate_id"] . "\" class=\"form-control\">";
+>>>>>>> 09d84842c14dba7dbe3e15b71cc03e75f68b5312
 	
 								$rateTypeNotSelected = true;
 	
