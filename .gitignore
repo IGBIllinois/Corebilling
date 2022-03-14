@@ -1,4 +1,4 @@
-/log/*.log
+/log/*
 /vendor
 /html/vendor
 /conf/config.inc.php
