@@ -32,7 +32,9 @@ if (isset($_POST['update_user'])) {
 	$selectedUser->setLastName($_POST['last']);
 	$selectedUser->setEmail($_POST['email']);
 	$selectedUser->setDepartmentId($_POST['department']);
-	$selectedUser->setSupervisorId($_POST['supervisor']);
+	if (isset($_POST['supervisor'])) {
+		$selectedUser->setSupervisorId($_POST['supervisor']);
+	}
         $selectedUser->setUsername($_POST['user_name']);
         $selectedUser->setRateId($_POST['rate']);
         $selectedUser->setStatus($_POST['status']);
