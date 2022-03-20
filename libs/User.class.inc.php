@@ -146,11 +146,7 @@ class User
 			':user_id' => $this->userId,
 			':supervisor_id' => $this->supervisor_id
 		);
-		$result =  $query->execute($paramters);
-		if ($query->rowCount()) {
-			return true;
-		}
-		return false;
+		return $query->execute($paramters);
 
 	}
 
@@ -200,7 +196,7 @@ class User
 	}
 
 	public function removeAccessTo($deviceId) {
-		$sql = "DELETE FROM access_control WHER user_id=:userid AND device_id=:deviceid LIMIT 1";
+		$sql = "DELETE FROM access_control WHERE user_id=:userid AND device_id=:deviceid LIMIT 1";
 		$query = $this->db->prepare($sql);
 		$parameters = array(":userid" => $this->getId(), ":deviceid" => $deviceId);
 		if ($query->execute($parameters)) {
