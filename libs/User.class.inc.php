@@ -215,10 +215,10 @@ class User
 	public static function getUsers($db,$status = null,$role_id = false) {
 		$sql = "SELECT * FROM users ";
 		$parameters = array();
-		if ($status || $role_id) {
+		if ($status !== null || $role_id) {
 			$sql .= "WHERE 1=1 ";
 		}
-		if ($status != null) {
+		if ($status !== null) {
 			$sql .= "AND status=:status ";
 			$parameters[':status'] = $status;
 		}
@@ -227,6 +227,7 @@ class User
 			$parameters[':role_id'] = $role_id;
 		}
 		$sql .= "ORDER BY user_name";
+		
 		$query = $db->prepare($sql);
 		$query->execute($parameters);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
