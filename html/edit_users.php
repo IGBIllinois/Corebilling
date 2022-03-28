@@ -32,7 +32,10 @@ if (isset($_POST['update_user'])) {
 	$selectedUser->setLastName($_POST['last']);
 	$selectedUser->setEmail($_POST['email']);
 	$selectedUser->setDepartmentId($_POST['department']);
-	if (isset($_POST['supervisor'])) {
+	if ($_POST['user_role_id'] == User::ROLE_SUPERVISOR) {
+		$selectedUser->setSupervisorId(0);
+	}
+	elseif (isset($_POST['supervisor'])) {
 		$selectedUser->setSupervisorId($_POST['supervisor']);
 	}
         $selectedUser->setUsername($_POST['user_name']);
@@ -111,9 +114,13 @@ if (isset($_POST['create_user'])) {
 		if (isset($_POST['safetyquiz'])) {
 			$safetyquiz = 1;
 		}
+		$supervisor_id = 0;
+		if (isset($_POST['supervisor'])) {
+	                $supervisor_id = $_POST['supervisor'];
+		}
 		$selectedUser->create($_POST['user_name'],$_POST['first'],$_POST['last'],
 			$_POST['email'],$_POST['department'],$_POST['rate'],$_POST['status'],
-			$_POST['user_role_id'],$safetyquiz,$_POST['supervisor']);
+			$_POST['user_role_id'],$safetyquiz,$supervisor_id);
         	$selectedUser->setGroupIds($_POST['group']);
 	        $selectedUser->addCFOP($_POST['cfop_to_add']);
         	if (isset($_POST['access'])) {

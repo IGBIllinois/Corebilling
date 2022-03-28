@@ -52,7 +52,7 @@ class User
 	* @param $certified
 	*/
 	public function create($username,$first,$last,$email,
-		$departmentId,$rateId,$status,$userRoleId,$certified,$supervisorId) {
+		$departmentId,$rateId,$status,$userRoleId,$certified,$supervisorId = 0) {
 
 		$this->username = $username;
 		$this->first = $first;
@@ -63,11 +63,15 @@ class User
 		$this->status = $status;
 		$this->userRoleId = $userRoleId;
 		$this->certified = $certified;
-		$this->supervisor_id = $supervisorId;
+		if ($userRoleId == self::ROLE_SUPERVISOR) {
+			$this->supervisor_id = 0;
+		}
+		else {
+			$this->supervisor_id = $supervisorId;
+		}
 		if ( User::exists($this->db, $this->username) == 0 ) {
 			$sql = "INSERT INTO users (user_name, first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
 			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified,:supervisor_id)";
-
 			try {
 				$query = $this->db->prepare($sql);
 			
