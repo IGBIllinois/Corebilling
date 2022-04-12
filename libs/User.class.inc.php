@@ -52,7 +52,7 @@ class User
 	* @param $certified
 	*/
 	public function create($username,$first,$last,$email,
-		$departmentId,$rateId,$status,$userRoleId,$certified,$supervisorId = 0) {
+		$departmentId = 0,$rateId,$status,$userRoleId,$certified,$supervisorId = 0) {
 
 		$this->username = $username;
 		$this->first = $first;
@@ -63,16 +63,28 @@ class User
 		$this->status = $status;
 		$this->userRoleId = $userRoleId;
 		$this->certified = $certified;
-		if ($userRoleId == self::ROLE_SUPERVISOR) {
-			$this->supervisor_id = 0;
-		}
-		else {
+
+		$this->supervisor_id = 0;
+		if (($userRoleId == self::ROLE_USER) && $supervisorId != 0) {
 			$this->supervisor_id = $supervisorId;
 		}
-		if ( User::exists($this->db, $this->username) == 0 ) {
+		elseif ($userRoleID == self::ROLE_USER && $superisorId == 0) {
+			throw new Exception("Please specify a supervisor");
+			return false;
+		}
+
+		if ($departmentId == 0) {
+			throw new Exception("Please specify a department");
+			return false;
+		}
+		if ( User::exists($this->db,$username)) {
+			throw new Exception("User " . $username . " already exists");
+			return false;
+		}
+
+		try {
 			$sql = "INSERT INTO users (user_name, first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
 			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified,:supervisor_id)";
-			try {
 				$query = $this->db->prepare($sql);
 			
 				$parameters = array(':user_name' => $this->username,
@@ -88,42 +100,41 @@ class User
 				);
 				$result = $query->execute($parameters);
 				$this->userId = $this->db->lastInsertId();
-			}
-			catch (PDOException $e) {
-				echo "Database Error: " . $e->getMessage();
-			}
-			$this->log_file->send_log("Added user " . $username);
-	        }
+				$this->log_file->send_log("Successfully added user " . $username);
+				return $this->userId;
+		}
+		catch (PDOException $e) {
+			throw new Exception("Error adding user: " . $e->getMessage());
+			return false;
+		}
 	}
 
 	/**Load user into this object
 	* @param $id
 	*/
 	public function load($id) {
-		$sql = "SELECT users.*,supervisor.id as supervisor_id,supervisor.user_name as supervisor_username FROM users ";
-		$sql .= "LEFT JOIN users AS supervisor ON supervisor.id=users.supervisor_id ";
-		$sql .= "WHERE users.id=:user_id LIMIT 1";
-		$query = $this->db->prepare($sql);
-		$query->execute(array(":user_id" => $id));
-		$result = $query->fetch(PDO::FETCH_ASSOC);
-		$this->userId = $result["id"];
-		$this->username = $result["user_name"];
-		$this->first = $result["first"];
-		$this->last = $result["last"];
-		$this->email = $result["email"];
-		$this->departmentId = $result["department_id"];
-		$this->rateid = $result["rate_id"];
-		$this->status = $result["status"];
-		$this->userRoleId = $result["user_role_id"];
-		$this->time_created = $result["time_created"];
-		$this->certified = $result['certified'];
-		$this->supervisor_id = $result['supervisor_id'];
-		$this->supervisor_username = $result['supervisor_username'];
-		if ($this->ldap != null && is_resource($this->ldap)) {
-
-
+		if ($id) {
+			$sql = "SELECT users.*,supervisor.id as supervisor_id,supervisor.user_name as supervisor_username FROM users ";
+			$sql .= "LEFT JOIN users AS supervisor ON supervisor.id=users.supervisor_id ";
+			$sql .= "WHERE users.id=:user_id LIMIT 1";
+			$query = $this->db->prepare($sql);
+			$query->execute(array(":user_id" => $id));
+			$result = $query->fetch(PDO::FETCH_ASSOC);
+			$this->userId = $result["id"];
+			$this->username = $result["user_name"];
+			$this->first = $result["first"];
+			$this->last = $result["last"];
+			$this->email = $result["email"];
+			$this->departmentId = $result["department_id"];
+			$this->rateid = $result["rate_id"];
+			$this->status = $result["status"];
+			$this->userRoleId = $result["user_role_id"];
+			$this->time_created = $result["time_created"];
+			$this->certified = $result['certified'];
+			$this->supervisor_id = $result['supervisor_id'];
+			$this->supervisor_username = $result['supervisor_username'];
 		}
-    }
+	}
 
 	/**
 	* Update user into database based on changes made to this object
@@ -500,7 +511,7 @@ class User
 							data_dir::createDirectory($gid, $group->getNetid(), $this->getUsername());
 						}
 						catch (Exception $e) {
-							$this->log_file->send_log($e->getMesage(),\IGBIllinois\log::ERROR);
+							$this->log_file->send_log($e->getMessage(),\IGBIllinois\log::ERROR);
 							throw $e;
 						}
 					}

@@ -32,7 +32,7 @@ if (isset($_POST['update_user'])) {
 	$selectedUser->setLastName($_POST['last']);
 	$selectedUser->setEmail($_POST['email']);
 	$selectedUser->setDepartmentId($_POST['department']);
-	if ($_POST['user_role_id'] == User::ROLE_SUPERVISOR) {
+	if (($_POST['user_role_id'] == User::ROLE_SUPERVISOR) || ($_POST['user_role_id'] == User::ROLE_ADMIN)) {
 		$selectedUser->setSupervisorId(0);
 	}
 	elseif (isset($_POST['supervisor'])) {
@@ -118,36 +118,51 @@ if (isset($_POST['create_user'])) {
 		if (isset($_POST['supervisor'])) {
 	                $supervisor_id = $_POST['supervisor'];
 		}
-		$selectedUser->create($_POST['user_name'],$_POST['first'],$_POST['last'],
-			$_POST['email'],$_POST['department'],$_POST['rate'],$_POST['status'],
-			$_POST['user_role_id'],$safetyquiz,$supervisor_id);
-        	$selectedUser->setGroupIds($_POST['group']);
-	        $selectedUser->addCFOP($_POST['cfop_to_add']);
-        	if (isset($_POST['access'])) {
-			$deviceList = Device::getAllDevices($db);
-			foreach ($deviceList as $deviceInfo) {
-				if (array_key_exists($deviceInfo['id'], $_POST['access'])) {
-					$selectedUser->giveAccessTo($deviceInfo['id']);
+		try {
+			$result = $selectedUser->create($_POST['user_name'],
+				$_POST['first'],$_POST['last'],
+				$_POST['email'],
+				$_POST['department'],
+				$_POST['rate'],
+				$_POST['status'],
+				$_POST['user_role_id'],
+				$safetyquiz,
+				$supervisor_id);
+
+			if ($result) {
+        			$selectedUser->setGroupIds($_POST['group']);
+		        	$selectedUser->addCFOP($_POST['cfop_to_add']);
+	        		if (isset($_POST['access'])) {
+					$deviceList = Device::getAllDevices($db);
+					foreach ($deviceList as $deviceInfo) {
+						if (array_key_exists($deviceInfo['id'], $_POST['access'])) {
+							$selectedUser->giveAccessTo($deviceInfo['id']);
+						}
+					}
 				}
+				$selectedUser->update();
+	
+				$demo = $selectedUser->getDemographics();
+				$demo->setEdulevel($_POST['edulevel']);
+				$demo->setGender($_POST['gender']);
+				$demo->setUnderrep($_POST['underrep']);
+				$demo->update();
+	
+				$_REQUEST['user_id'] = $selectedUser->getId();
+	
+				$message .= html::success_message("User " . $_POST['user_name'] . " added to database.");
 			}
 		}
-		$selectedUser->update();
+		catch (Exception $e) {
+                        $message .= html::error_message($e->getMessage());
+                }
 
-		$demo = $selectedUser->getDemographics();
-		$demo->setEdulevel($_POST['edulevel']);
-		$demo->setGender($_POST['gender']);
-		$demo->setUnderrep($_POST['underrep']);
-		$demo->update();
-
-		$_REQUEST['user_id'] = $selectedUser->getId();
-		$message .= html::success_message("User " . $_POST['user_name'] . " added to database.");
 	}
 }
 
 if (isset($_REQUEST['user_id'])) {
     $selectedUser->load($_REQUEST['user_id']);
 }
-
 ?>
 
 <h3><?php
@@ -186,15 +201,15 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label" for="editUser">First</label>
                                     <div class="col-sm-10">
-                                        <input name="first" id="first" type="text" class="form-control" value='<?php
-                                        echo $selectedUser->getFirstName(); ?>'>
+                                        <input name="first" id="first" type="text" class="form-control" value="<?php
+                                        echo $selectedUser->getFirstName(); ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label" for="editUser">Last</label>
                                     <div class="col-sm-10">
-                                        <input name="last" id="last" type="text" class="form-control" value='<?php
-                                        echo $selectedUser->getLastName(); ?>'>
+                                        <input name="last" id="last" type="text" class="form-control" value="<?php
+                                        echo $selectedUser->getLastName(); ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
