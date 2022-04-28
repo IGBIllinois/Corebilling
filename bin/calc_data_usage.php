@@ -2,7 +2,7 @@
 <?php 
 chdir(dirname(__FILE__));
 
-$include_paths = array(__DIR__ '/../libs');
+$include_paths = array(__DIR__ . '/../libs');
 set_include_path(get_include_path() . ":" . implode(':',$include_paths));
 
 function my_autoloader($class_name) {
