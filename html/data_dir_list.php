@@ -1,10 +1,9 @@
 <?php
 require_once 'includes/header.inc.php';
 
+$start = 0;
 if (isset($_GET['start']) && is_numeric($_GET['start'])) {
 	$start = $_GET['start'];
-}
-else { $start = 0;
 }
 
 $num_dirs = data_functions::get_num_directories($db);
@@ -54,6 +53,14 @@ else {
 	</tbody>
 </table>
 </div>
+<form class='form-inline' method='post' action='report.php'>
+	<select class='form-control' name='report_type'>
+		<option value='xlsx'>Excel (.xlsx)</option>
+		<option value='csv'>CSV (.csv)</option>
+	</select>
+	<input class='btn btn-primary' type='submit'
+	name='create_data_dir_report' value='Download Directory List'>
+</form>
 </div>
 <div class='col-xs-6 col-6 col-sm-6 col-lg-6 col-xs-offset-3 col-offset-3 col-sm-offset-3 col-lg-offset-3'>
 <div class='row'>

@@ -10,17 +10,15 @@ class data_functions {
 		$sql .= "FROM data_dir ";
 		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
 		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
-		$sql .= "WHERE data_dir_enabled='1' ";
+		$sql .= "WHERE data_dir.data_dir_enabled='1' ";
 		$sql .= "ORDER BY data_dir.data_dir_path ASC ";
-		$parameters = array();
-		if (!$count) {
-			$sql .= "LIMIT :start, :count";
-			$parameters[":start"] = $start;
-			$parameters[":count"] = $count;
+		
+		if ($count) {
+			$sql .= "LIMIT " . $start . "," . $count;
 		}
 		$query = $db->prepare($sql);
-                $query->execute($parameters);
-                $result = $query->fetchAll(PDO::FETCH_ASSOC);
+                $query->execute();
+		$result = $query->fetchAll(PDO::FETCH_ASSOC);
 		return $result;
 	}
 
@@ -44,6 +42,24 @@ class data_functions {
 	                }
                 return $result;
 		}
+	}
+
+	public static function get_dir_report($db) {
+		$sql = "SELECT data_dir.data_dir_path as 'Path', ";
+		$sql .= "groups.group_name as 'Group', ";
+		$sql .= "users.user_name as 'Owner', ";
+		$sql .= "users.email as 'Email', ";
+		$sql .= "data_dir_time as 'Time Created' ";
+                $sql .= "FROM data_dir ";
+                $sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
+                $sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
+                $sql .= "WHERE data_dir.data_dir_enabled='1' ";
+                $sql .= "ORDER BY data_dir.data_dir_path ASC ";
+		$query = $db->prepare($sql);
+		$query->execute();
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 
 	}

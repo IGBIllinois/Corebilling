@@ -37,6 +37,13 @@ elseif (isset($_POST['create_data_report'])) {
 	$filename = "data-" . $month . "-" . $year . "." . $type;
 }
 
+elseif (isset($_POST['create_data_dir_report'])) {
+	$type = $_POST['report_type'];
+	$data = data_functions::get_dir_report($db);
+	$filename = "data_dir." . $type;
+
+
+}
 switch ($type) {
 	case 'csv':
 		\IGBIllinois\report::create_csv_report($data, $filename);
