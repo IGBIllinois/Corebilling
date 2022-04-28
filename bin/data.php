@@ -6,15 +6,15 @@ $include_paths = array('../libs');
 set_include_path(get_include_path() . ":" . implode(':',$include_paths));
 
 function my_autoloader($class_name) {
-        if(file_exists("../libs/" . $class_name . ".class.inc.php")) {
+        if(file_exists(__DIR__ . "/../libs/" . $class_name . ".class.inc.php")) {
                 require_once $class_name . '.class.inc.php';
         }
 }
 spl_autoload_register('my_autoloader');
 
-require_once '../conf/app.inc.php';
-require_once '../conf/config.inc.php';
-require_once '../vendor/autoload.php';
+require_once __DIR__ . '/../conf/app.inc.php';
+require_once __DIR__ . '/../conf/config.inc.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 date_default_timezone_set(settings::get_timezone());
 
@@ -53,7 +53,8 @@ else {
 	}
 	$log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());	
 	$start_time = microtime(true);
-	$log_file->send_log("Data Usage: Start");	
+	$log_file->send_log("Data Usage: Start");
+	var_dump($log_file);	
 	$directories = data_functions::get_all_directories($db);
 	foreach ($directories as $directory) {
 			$data_dir = new data_dir($db,$directory['data_dir_id']);

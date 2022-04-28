@@ -2,7 +2,7 @@
 <?php 
 chdir(dirname(__FILE__));
 
-$include_paths = array('../libs');
+$include_paths = array(__DIR__ '/../libs');
 set_include_path(get_include_path() . ":" . implode(':',$include_paths));
 
 function my_autoloader($class_name) {
@@ -12,9 +12,9 @@ function my_autoloader($class_name) {
 }
 spl_autoload_register('my_autoloader');
 
-require_once '../conf/app.inc.php';
-require_once '../conf/config.inc.php';
-require_once '../vendor/autoload.php';
+require_once __DIR__ . '/../conf/app.inc.php';
+require_once __DIR__ . '/../conf/config.inc.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 date_default_timezone_set(settings::get_timezone());
 
