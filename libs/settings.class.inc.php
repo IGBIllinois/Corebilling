@@ -15,6 +15,8 @@ class settings {
 	private const LDAP_BIND_USER = "";
 	private const LDAP_BIND_PASS = "";
 	private const SESSION_TIMEOUT = 300;
+	private const SMTP_PORT = 25;
+	private const SMTP_HOST = "localhost";
 
 	public static function get_version() {
 		return VERSION;
@@ -157,5 +159,42 @@ class settings {
 		}
 		return false;
 	}
+
+	public static function get_from_email() {
+		if (defined("FROM")) {
+			return FROM;
+		}
+		
+
+	}
+	public static function get_smtp_host() {
+		if (defined("SMTP_HOST")) {
+			return SMTP_HOST;
+		}
+		return self::SMTP_HOST;
+
+	}
+	public static function get_smtp_port() {
+		if (defined("SMTP_PORT")) {
+			return SMTP_PORT;
+		}
+		return self::SMTP_PORT;
+
+	}
+
+	public static function get_smtp_username() {
+                if (defined("SMTP_USERNAME")) {
+                        return SMTP_USERNAME;
+                }
+                return false;
+        }
+
+        public static function get_smtp_password() {
+                if (defined("SMTP_PASSWORD")) {
+                        return SMTP_PASSWORD;
+                }
+                return false;
+
+        }
 }
 ?>

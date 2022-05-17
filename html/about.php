@@ -79,6 +79,10 @@ echo $extensions_string;
 <tr><td>ENABLE_LOG</td><td><?php echo settings::get_log_enabled() ? 'true' : 'false'; ?></td></tr>
 <tr><td>PASSWORD_RESET_URL</td><td><?php echo settings::get_password_reset_url(); ?></td></tr>
 <tr><td>NEWS_AGE (days)</td><td><?php echo settings::get_news_age(); ?></td></tr>
+<tr><td>SMTP_HOST</td><td><?php echo settings::get_smtp_host(); ?></td></tr>
+<tr><td>SMTP_PORT</td><td><?php echo settings::get_smtp_port(); ?></td></tr>
+<tr><td>SMTP_USERNAME</td><td><?php echo settings::get_smtp_username(); ?></td></tr>
+<tr><td>FROM</td><td><?php echo settings::get_from_email(); ?></td></tr>
 </table>
 </div>
 </div>
