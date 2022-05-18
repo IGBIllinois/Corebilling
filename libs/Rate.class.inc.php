@@ -19,20 +19,21 @@ class Rate {
 	* @param $rateTypeId
 	*/
 	public function create($rateName,$rateTypeId) {
-		$queryAddRate = "INSERT INTO rates (rate_name)VALUES(:rate_name)";
-		$addRate = $this->db->prepare($queryAddRate);
-		$addRate->execute(array(":rate_name"=>$rateName));
+		$sql_rate = "INSERT INTO rates (rate_name)VALUES(:rate_name)";
+		$query_rate = $this->db->prepare($sql_rate);
+		$query_rate->execute(array(":rate_name"=>$rateName));
 
 		$this->rateId = $this->db->lastInsertId();
 
 		$device = new Device($this->db);
-		$devicesArr = Device::getAllDevices($this->db);
+		$devices = Device::getAllDevices($this->db);
 
-		foreach($devicesArr as $id=>$rateDevice) {
-			$queryAddRateToDevice = "INSERT INTO device_rate (rate,device_id,rate_id,min_use_time,rate_type_id)VALUES(0,:device_id,:rate_id,0,:rate_type_id)";
-			$addRateToDevice = $this->db->prepare($queryAddRateToDevice);
-			$addRateToDevice->execute(array(':device_id'=>$rateDevice['id'],':rate_id'=>$this->rateId,':rate_type_id'=>$rateTypeId));
-			$this->rateId=$this->db->lastInsertId();
+		foreach($devices as $id=>$rateDevice) {
+			$sql_devicerate = "INSERT INTO device_rate (rate,device_id,rate_id,min_use_time,rate_type_id)VALUES(0,:device_id,:rate_id,0,:rate_type_id)";
+			$query_devicerate = $this->db->prepare($sql_device_rate);
+			$params_devicerate = array(':device_id'=>$rateDevice['id'],':rate_id'=>$this->rateId,':rate_type_id'=>$rateTypeId);
+			$query_devicerate->execute($params_devicerate);
+			$this->rateId = $this->db->lastInsertId();
 		}
 
 		$this->rateName = $rateName;
@@ -43,14 +44,14 @@ class Rate {
 	* @param $rateId
 	*/
 	public function load($rateId) {
-		$queryLoadRate = "SELECT rate_name, rateytpeid FROM rates WHERE id=:rate_id";
-		$loadRatePrep = $this->db->prepare($queryLoadRate);
-		$loadRatePrep->execute(array(":rate_id"=>$rateId));
-		$loadRateArr = $loadRatePrep->fetch(PDO::FETCH_ASSOC);
-		if($loadRateArr) {
+		$sql = "SELECT rate_name, rateytpeid FROM rates WHERE id=:rate_id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(":rate_id"=>$rateId));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if($result) {
 			$this->rateId = $rateId;
-			$this->rateName = $loadRateArr['rate_name'];
-			$this->rateTypeId = $loadRateArr['rate_type_id'];
+			$this->rateName = $result['rate_name'];
+			$this->rateTypeId = $result['rate_type_id'];
 		}
 	}
 
@@ -58,27 +59,29 @@ class Rate {
 	* Update rate rows in database with tihs object's values
 	*/
 	public function update() {
-		$queryUpdateRate = "UPDATE rates SET rate_name=:rate_name, rate_type_id=:rate_type_id";
-		$updateRatePrep = $this->db->prepare($queryUpdateRate);
-		$updateRatePrep->execute(array(":rate_name"=>$this->rateName,":rate_type_id"=>$this->rateTypeId));
+		$sql = "UPDATE rates SET rate_name=:rate_name, rate_type_id=:rate_type_id";
+		$query = $this->db->prepare($sqk);
+		$params = array(":rate_name"=>$this->rateName,
+			":rate_type_id"=>$this->rateTypeId);
+		$query->execute($params);
 	}
 
 	/**Get a list of rate types continuous, monthly etc...
 	* @return array
 	*/
 	public static function getAllRateTypes($db) {
-		$queryRateTypes = "SELECT rate_type_name, id FROM rate_types";
-		$rateTypes = $db->query($queryRateTypes);
-		return $rateTypes->fetchAll(PDO::FETCH_ASSOC);
+		$sql = "SELECT rate_type_name, id FROM rate_types";
+		$query = $db->query($sql);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
 	* @return array
 	*/
 	public static function getAllRates($db) {
-		$queryRatesList = "SELECT rate_name, id FROM rates";
-		$rateList = $db->query($queryRatesList);
-		return $rateList->fetchAll(PDO::FETCH_ASSOC);
+		$sql = "SELECT rate_name, id FROM rates";
+		$query = $db->query($sql);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
