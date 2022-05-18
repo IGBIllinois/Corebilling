@@ -29,7 +29,8 @@ class Rate {
 		$devices = Device::getAllDevices($this->db);
 
 		foreach($devices as $id=>$rateDevice) {
-			$sql_devicerate = "INSERT INTO device_rate (rate,device_id,rate_id,min_use_time,rate_type_id)VALUES(0,:device_id,:rate_id,0,:rate_type_id)";
+			$sql_devicerate = "INSERT INTO device_rate (rate,device_id,rate_id,min_use_time,rate_type_id) ";
+			$sql_devicerate. = "VALUES(0,:device_id,:rate_id,0,:rate_type_id)";
 			$query_devicerate = $this->db->prepare($sql_device_rate);
 			$params_devicerate = array(':device_id'=>$rateDevice['id'],':rate_id'=>$this->rateId,':rate_type_id'=>$rateTypeId);
 			$query_devicerate->execute($params_devicerate);
