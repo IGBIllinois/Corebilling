@@ -5,6 +5,7 @@ class UserCfop {
 	const ACTIVE_CFOP=1;
 	const NON_ACTIVE_CFOP=0;
 
+	private $db;
 	private $userId;
 	private $cfop;
 	private $description;
@@ -12,7 +13,6 @@ class UserCfop {
 	private $active;
 	private $default;
 	private $createdDate;
-	private $db;
 	private $log_file = null;
 
 	public function __construct(PDO $db) {
@@ -37,9 +37,14 @@ class UserCfop {
 		$this->cfop = $cfop;
 		$this->description = $description;
 
-		$insertUserCfopl = "INSERT INTO user_cfop (user_id,cfop,description,active,default_cfop)VALUES(:user_id,:cfop,:description,:active,:default_cfop)";
-		$userCfoplInfo = $this->db->prepare($insertUserCfopl);
-		$userCfoplInfo->execute(array(':user_id'=>$this->userId,':cfop'=>$this->cfop,':description'=>$this->description,':active'=>$this->active,':default_cfop'=>UserCfop::DEFAULT_CFOP));
+		$sql = "INSERT INTO user_cfop (user_id,cfop,description,active,default_cfop)VALUES(:user_id,:cfop,:description,:active,:default_cfop)";
+		$query = $this->db->prepare($sql);
+		$params = array(':user_id'=>$this->userId,
+			':cfop'=>$this->cfop,
+			':description'=>$this->description,
+			':active'=>$this->active,
+			':default_cfop'=>UserCfop::DEFAULT_CFOP);
+		$query->execute($params);
 		$this->userCfopId =$this->db->lastInsertId();
 		$this->load($this->userCfopId);
 		$this->setAsDefaultCFOP();
@@ -50,15 +55,17 @@ class UserCfop {
 	* @param $userCfopId
 	*/
 	public function load($userCfopId) {
-		$queryUserCfop = "SELECT * FROM user_cfop WHERE id=:user_cfop_id";
-		$userCfopInfo = $this->db->prepare($queryUserCfop);
-		$userCfopInfo->execute(array(':user_cfop_id'=>$userCfopId));
-		$userCfopArr = $userCfopInfo->fetch(PDO::FETCH_ASSOC);
-		$this->userId = $userCfopArr['user_id'];
-		$this->cfop = $userCfopArr['cfop'];
-		$this->description = $userCfopArr['description'];
-		$this->createdDate = $userCfopArr['created'];
-		$this->userCfopId = $userCfopId;
+		$sql = "SELECT * FROM user_cfop WHERE id=:user_cfop_id LIMIT 1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':user_cfop_id'=>$userCfopId));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
+			$this->userId = $result['user_id'];
+			$this->cfop = $result['cfop'];
+			$this->description = $result['description'];
+			$this->createdDate = $result['created'];
+			$this->userCfopId = $userCfopId;
+		}
 	}
 
 	/**
@@ -69,14 +76,14 @@ class UserCfop {
 			$this->log_file->send_log("Set default CFOP for user ".$this->userId." to '".$this->cfop."'");
 		}
 		//mark all other user cfopls as not default
-		$queryRemoveDefault = "UPDATE user_cfop SET default_cfop=".UserCfop::NON_DEFAULT_CFOP." WHERE user_id=:user_id";
-		$removeDefault = $this->db->prepare($queryRemoveDefault);
-		$removeDefault->execute(array(':user_id'=>$this->userId));
+		$sql_remove = "UPDATE user_cfop SET default_cfop=".UserCfop::NON_DEFAULT_CFOP." WHERE user_id=:user_id";
+		$query_remove = $this->db->prepare($sql_remove);
+		$query_remove->execute(array(':user_id'=>$this->userId));
 
 		//mark current cfop as default
-		$querySetDefault = "UPDATE user_cfop SET default_cfop=".UserCfop::DEFAULT_CFOP." WHERE id=:user_cfop_id";
-		$setDefault = $this->db->prepare($querySetDefault);
-		$setDefault->execute(array(':user_cfop_id'=>$this->userCfopId));
+		$sql_default = "UPDATE user_cfop SET default_cfop=".UserCfop::DEFAULT_CFOP." WHERE id=:user_cfop_id";
+		$query_default = $this->db->prepare($sql_default);
+		$query_default->execute(array(':user_cfop_id'=>$this->userCfopId));
 	}
 
 	/**Load default CFOPfor given user id
@@ -84,19 +91,16 @@ class UserCfop {
 	 * @return int
 	 */
 	public function loadDefaultCfop($userId) {
-		$queryDefaultCfop = "SELECT id FROM user_cfop WHERE user_id=:user_id AND default_cfop=1";
-		$defaultCfop = $this->db->prepare($queryDefaultCfop);
-		$defaultCfop->execute(array(':user_id'=>$userId));
-		$defaultCfopArr = $defaultCfop->fetch(PDO::FETCH_ASSOC);
-
-		if($defaultCfop->rowCount() > 0) {
-			$userCfopId = $defaultCfopArr['id'];
+		$sql = "SELECT id FROM user_cfop WHERE user_id=:user_id AND default_cfop=1";
+		$query = $this->db->prepare($sql);
+		$query->execute(array(':user_id'=>$userId));
+		$result = $defaultCfop->fetch(PDO::FETCH_ASSOC);
+		if($result) {
+			$userCfopId = $result['id'];
 			$this->load($userCfopId);
 			return $userCfopId;
 		}
-		else {
-			return 0;
-        	}
+		return false;
 	}
 
 	/** List available CFOPs for user id which are currently active
@@ -104,11 +108,13 @@ class UserCfop {
 	* @return array
 	*/
 	public static function getAllCFOPs($db,$userId) {
-		$queryListCfops = "SELECT * FROM user_cfop WHERE user_id=:user_id AND active=".UserCfop::ACTIVE_CFOP;
-		$listCfops = $db->prepare($queryListCfops);
-		$listCfops->execute(array(':user_id'=>$userId));
-		$listCfopsArr = $listCfops->fetchAll(PDO::FETCH_ASSOC);
-		return $listCfopsArr;
+		$sql = "SELECT * FROM user_cfop WHERE user_id=:user_id AND active=:active";
+		$query = $db->prepare($sql);
+		$params = array(':user_id'=>$userId,
+			':active'=>UserCfop::ACTIVE_CFOP
+		);
+		$query->execute($params);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**Clean up and add spaces between numbers
