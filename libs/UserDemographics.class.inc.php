@@ -146,4 +146,21 @@ class UserDemographics {
 		return array(self::UNDERREP_YES,
 			self::UNDERREP_NO);
 	}
+
+	public static function getDemographics($db,$start = 0,$count = 0) {
+		$sql = "SELECT users.id,users.user_name,users.email,users.first,users.last, ";
+		$sql .= "user_demographics.edu_level, user_demographics.gender,user_demographics.underrepresented ";
+		$sql .= "FROM users ";
+		$sql .= "LEFT JOIN user_demographics ON user_demographics.user_id=users.id ";
+		$sql .= "WHERE users.status=:active ORDER BY users.user_name ASC";
+		if ($count) {
+			$sql .= " LIMIT " . $start . "," . $count;
+		}
+		$query = $db->prepare($sql);
+		$params = array(':active'=>User::ACTIVE);
+		$query->execute($params);
+		return $query->fetchAll(PDO::FETCH_ASSOC);
+
+
+	}
 }

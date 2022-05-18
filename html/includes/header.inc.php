@@ -75,7 +75,7 @@ require_once(__DIR__ . '/authenticate.inc.php');
                                 	        <li><a href="instrument_billing.php">Instrument Billing</a></li>
 						<li><a href='data_dir_list.php'>Data Directories</a></li>
 						<li><a href='data_billing.php'>Data Billing</a></li>
-                                        	<li><a href="facility_demographics.php">Facility Demographics</a></li>
+                                        	<li><a href="demographics.php">Demographics</a></li>
 	                                        <li><a href="active_users.php">Active Users</a></li>
         	                                <li><a href="reservation_use.php">Reservation Usage Data</a></li>
                 	                        <li><a href="usage_compare.php">Reservation-Usage Comparison</a></li>

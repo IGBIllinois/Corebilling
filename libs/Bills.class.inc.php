@@ -85,15 +85,12 @@ class Bills {
 
 	}
     
-	public function GetMonthsCharges($startyear, $startmonth, $endyear, $endmonth, $rateType = null, $demographics = false) {
+	public function GetMonthsCharges($startyear, $startmonth, $endyear, $endmonth, $rateType = null) {
 		$params = array();
 		$sql = "SELECT s.id, uc.cfop,s.cfop_id, s.rate, s.user_id, s.device_id,  d.full_device_name, ";
 		$sql .= "u.user_name, s.start, s.stop,CONCAT(u.first,' ',u.last) as full_name, s.description,r.rate_name, ";
 		$sql .= "dr.min_use_time, GROUP_CONCAT(g.group_name separator ', ') as group_name, dr.rate_type_id, de.department_name ";
 
-		if($demographics) {
-			$sql .= ", ud.edu_level, ud.gender, ud.underrepresented ";
-		}
 		
 		$sql_joins = " FROM `session` s ";
 		$sql_joins .= "left join users u on u.id=s.user_id ";
@@ -105,9 +102,6 @@ class Bills {
 		$sql_joins .= "LEFT JOIN user_cfop uc ON (uc.id=s.cfop_id AND uc.default_cfop=1) ";
 		$sql_joins .= "left join departments de on de.id=u.`department_id`"; 
 
-		if($demographics){
-			$sql_joins .= " left join user_demographics ud on ud.user_id=u.id";
-		}
 		$sql_where = " WHERE ((MONTH(start)>=:startmonth AND YEAR(start)=:startyear) OR YEAR(start)>:startyear) AND ((MONTH(start)<=:endmonth AND YEAR(start)=:endyear) OR YEAR(start)<:endyear)";
 		if($rateType !== null){
 			$sql_where .= " AND dr.rate_type_id=:rate_type_id";
