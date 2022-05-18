@@ -278,14 +278,12 @@ class User
 		$sql .= "uc.cfop, d.department_name, u.time_created as date_added, ";
 		$sql .= "(select max(`stop`) from `session` where user_id=u.`id`) as last_login, ";
 		$sql .= "CONCAT(u.last, ', ', u.first) as full_name, ";
-		$sql .= "IF (u.status=:status,'Active','Disabled') as status, u.id, ud.edu_level, ud.gender, ";
-		$sql .= "ud.underrepresented ";
+		$sql .= "IF (u.status=:status,'Active','Disabled') as status, u.id ";
 		$sql .= "FROM users u ";
 		$sql .= "LEFT JOIN user_cfop uc on (uc.user_id = u.id and uc.default_cfop=1) ";
 		$sql .= "LEFT JOIN user_groups ug on (u.id=ug.user_id) ";
 		$sql .= "LEFT JOIN `groups` g on (g.id=ug.group_id) ";
 		$sql .= "LEFT JOIN departments d on (d.id=u.department_id) ";
-		$sql .= "LEFT JOIN user_demographics ud on u.id = ud.user_id ";
 		$sql .= "GROUP BY u.id";
 		$query = $db->prepare($sql);
 		$query->execute(array(':status'=>self::ACTIVE));

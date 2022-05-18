@@ -7,7 +7,6 @@ if(!$login_user->isAdmin()){
 }
 
 $user_demographics = UserDemographics::getDemographics($db);
-//Declare objects
 ?>
 	<h3>Demographics</h3>
 	<?php
