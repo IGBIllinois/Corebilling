@@ -43,11 +43,11 @@ class UserDemographics {
 	 * @return bool whether load was successful
 	 */
 	public function load($id){
-		$sql = "SELECT * from user_demographics where user_id=:userid LIMIT 1";
+		$sql = "SELECT * FROM user_demographics WHERE user_id=:user_id LIMIT 1";
 		$params = array(":user_id"=>$id);
 		$query = $this->db->prepare($sql);
 
-		if($query->execute($params){
+		if($query->execute($params)) {
 			$result = $query->fetch(PDO::FETCH_ASSOC);
 			$this->user_id = $result['user_id'];
 			$this->edulevel = $result['edu_level'];

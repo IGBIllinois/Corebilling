@@ -88,13 +88,13 @@ class UserCfop {
 
 	/**Load default CFOPfor given user id
 	* @param $userId
-	 * @return int
-	 */
+	* @return int
+	*/
 	public function loadDefaultCfop($userId) {
 		$sql = "SELECT id FROM user_cfop WHERE user_id=:user_id AND default_cfop=1";
 		$query = $this->db->prepare($sql);
 		$query->execute(array(':user_id'=>$userId));
-		$result = $defaultCfop->fetch(PDO::FETCH_ASSOC);
+		$result = $query->fetch(PDO::FETCH_ASSOC);
 		if($result) {
 			$userCfopId = $result['id'];
 			$this->load($userCfopId);
