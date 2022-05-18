@@ -9,7 +9,7 @@ class Statistics
 		$userQuery .= "where ((MONTH(r.start)>=:startmonth AND YEAR(r.start)=:startyear) ";
 		$userQuery .= "OR YEAR(r.start)>:startyear) AND ((MONTH(r.start)<=:endmonth ";
 		$userQuery .= "AND YEAR(r.start)=:endyear) OR YEAR(r.start)<:endyear) group by u.id";
-		$userStmt = $this->db->prepare($userQuery);
+		$userStmt = $db->prepare($userQuery);
 		$userStmt->execute(array(':startyear'=>$startyear,':startmonth'=>$startmonth,':endyear'=>$endyear,':endmonth'=>$endmonth));
 		$userArr = $userStmt->fetchAll();
 		
@@ -17,13 +17,13 @@ class Statistics
 		$resTimeQuery .= "from reservation_info r where r.user_id=:userid and ((MONTH(r.start)>=:startmonth ";
 		$resTimeQuery .= "AND YEAR(r.start)=:startyear) OR YEAR(r.start)>:startyear) ";
 		$resTimeQuery .= "AND ((MONTH(r.start)<=:endmonth AND YEAR(r.start)=:endyear) OR YEAR(r.start)<:endyear)";
-		$resTimeStmt = $this->db->prepare($resTimeQuery);
+		$resTimeStmt = $db->prepare($resTimeQuery);
 		
 		$usedTimeQuery = "select sum(timestampdiff(SECOND,s.start,s.stop)) as used_time from `session` s ";
-		$userTimeQuery .= "where s.user_id=:userid and ((MONTH(s.start)>=:startmonth AND YEAR(s.start)=:startyear) ";
-		$userTimeQuery .= "OR YEAR(s.start)>:startyear) AND ((MONTH(s.start)<=:endmonth ";
-		$userTimeQuery .= "AND YEAR(s.start)=:endyear) OR YEAR(s.start)<:endyear)";
-		$usedTimeStmt = $this->db->prepare($usedTimeQuery);
+		$usedTimeQuery .= "where s.user_id=:userid and ((MONTH(s.start)>=:startmonth AND YEAR(s.start)=:startyear) ";
+		$usedTimeQuery .= "OR YEAR(s.start)>:startyear) AND ((MONTH(s.start)<=:endmonth ";
+		$usedTimeQuery .= "AND YEAR(s.start)=:endyear) OR YEAR(s.start)<:endyear)";
+		$usedTimeStmt = $db->prepare($usedTimeQuery);
 		
 		$missedResQuery = "select count(id) as missed_res from reservation_info ";
 		$missedResQuery .= "where user_id=:userid and id not in (select r.id ";
@@ -34,26 +34,32 @@ class Statistics
 		$missedResQuery .= "OR YEAR(r.start)<:endyear) and r.device_id=s.device_id and r.user_id=s.user_id) ";
 		$missedResQuery .= "and ((MONTH(start)>=:startmonth AND YEAR(start)=:startyear) OR YEAR(start)>:startyear) ";
 		$missedResQuery .= "AND ((MONTH(start)<=:endmonth AND YEAR(start)=:endyear) OR YEAR(start)<:endyear) and `stop`<NOW() and deleted=0";
-		$missedResStmt = $this->db->prepare($missedResQuery);
+		$missedResStmt = $db->prepare($missedResQuery);
 		
 		$deletedResQuery = "select count(id) as del_res from reservation_info ";
 		$deletedResQuery .= "where user_id=:userid and deleted=1 and ((MONTH(start)>=:startmonth ";
 		$deletedResQuery .= "AND YEAR(start)=:startyear) OR YEAR(start)>:startyear) AND ((MONTH(start)<=:endmonth ";
 		$deletedResQuery .= "AND YEAR(start)=:endyear) OR YEAR(start)<:endyear)";
-		$deletedResStmt = $this->db->prepare($deletedResQuery);
+		$deletedResStmt = $db->prepare($deletedResQuery);
 		
 		$results = array();
 		for($i=0; $i<count($userArr); $i++){
-			$resTimeStmt->execute(array(':userid'=>$userArr[$i]['id'],':startyear'=>$startyear,':startmonth'=>$startmonth,':endyear'=>$endyear,':endmonth'=>$endmonth));
+			$params = array(':userid'=>$userArr[$i]['id'],
+				':startyear'=>$startyear,
+				':startmonth'=>$startmonth,
+				':endyear'=>$endyear,
+				':endmonth'=>$endmonth
+			);
+			$resTimeStmt->execute($params);
 			$resTimeArr = $resTimeStmt->fetch();
 			
-			$usedTimeStmt->execute(array(':userid'=>$userArr[$i]['id'],':startyear'=>$startyear,':startmonth'=>$startmonth,':endyear'=>$endyear,':endmonth'=>$endmonth));
+			$usedTimeStmt->execute($params);
 			$usedTimeArr = $usedTimeStmt->fetch(); 
 			
-			$missedResStmt->execute(array(':userid'=>$userArr[$i]['id'],':startyear'=>$startyear,':startmonth'=>$startmonth,':endyear'=>$endyear,':endmonth'=>$endmonth));
+			$missedResStmt->execute($params);
 			$missedResArr = $missedResStmt->fetch();
 			
-			$deletedResStmt->execute(array(':userid'=>$userArr[$i]['id'],':startyear'=>$startyear,':startmonth'=>$startmonth,':endyear'=>$endyear,':endmonth'=>$endmonth));
+			$deletedResStmt->execute($params);
 			$deletedResArr = $deletedResStmt->fetch();
 			
 			$results[$i] = array('user_name'=>$userArr[$i]['user_name'], 
