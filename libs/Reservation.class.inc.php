@@ -111,7 +111,8 @@ class Reservation
 	public function update() {
 		//No update feature needed yet
 		if (self::checkEventConflicts($this->db, $this->deviceId, $this->userId, $this->start, $this->stop, $this->reservationId) == 1) {
-			$sql = "UPDATE reservation_info SET start=:start, stop=:stop, description=:description, training=:training, staff_notes=:staffNotes WHERE id=:reservation_id";
+			$sql = "UPDATE reservation_info SET start=:start, stop=:stop, description=:description, ";
+			$sql .= "training=:training, staff_notes=:staffNotes WHERE id=:reservation_id";
 			$query = $this->db->prepare($sql);
 			$params = array(':start' => $this->start,
 				':stop' => $this->stop,
@@ -169,33 +170,34 @@ class Reservation
 		}
 	}
 
-    public static function checkEventTime($db, $startTimeUnix, $stopTimeUnix, $reservationId = 0)
-    {
-        if ($startTimeUnix > $stopTimeUnix || $startTimeUnix - 2 * 60 * 60 < time()) {
-            // Can't move an event into the past
-            return 0;
-        } else {
-            if ($reservationId == 0) {
-                // New event
-                return 1;
-            } else {
-                // Existing event
-                $queryTime = "SELECT UNIX_TIMESTAMP(start) as start, master_reservation_id from reservation_info where id=:reservation_id";
-                $timestmt = $db->prepare($queryTime);
-                $timestmt->execute(array(':reservation_id' => $reservationId));
-                $timeArr = $timestmt->fetch(PDO::FETCH_ASSOC);
-                if ($timeArr['start'] - 2 * 60 * 60 < time()) {
-                    // Can't move an event out of the past
-                    return 0;
-                }
-                if($timeArr['master_reservation_id'] != null){
-                    // Can't move a sub-event; move the master instead
-                    return 0;
-                }
-                return 1;
-            }
-        }
-    }
+	public static function checkEventTime($db, $startTimeUnix, $stopTimeUnix, $reservationId = 0) {
+		if ($startTimeUnix > $stopTimeUnix || $startTimeUnix - 2 * 60 * 60 < time()) {
+			// Can't move an event into the past
+			return 0;
+		} 
+		else {
+			if ($reservationId == 0) {
+				// New event
+				return 1;
+			}
+			else {
+				// Existing event
+				$sql = "SELECT UNIX_TIMESTAMP(start) as start, master_reservation_id from reservation_info where id=:reservation_id";
+				$query = $db->prepare($sql);
+				$query->execute(array(':reservation_id' => $reservationId));
+				$result = $query->fetch(PDO::FETCH_ASSOC);
+				if ($result['start'] - 2 * 60 * 60 < time()) {
+					// Can't move an event out of the past
+					return 0;
+				}
+				if($result['master_reservation_id'] != null){
+					// Can't move a sub-event; move the master instead
+					return 0;
+				}
+				return 1;
+			}
+		}
+	}
 
 	public function isInProgress() {
 		$sdt = new DateTime($this->start);
@@ -421,15 +423,16 @@ class Reservation
 
 
 	public static function getMissed($db, $id) {
-		$sql = "SELECT (case UNIX_TIMESTAMP(r.stop)<UNIX_TIMESTAMP(NOW()) ANDd.status_id!=3 when true then count(r.id) when false then 1 end) as count ";
+		$sql = "SELECT (case UNIX_TIMESTAMP(r.stop)<UNIX_TIMESTAMP(NOW()) ";
+		$sql .= "AND d.status_id!=3 when true then count(r.id) when false then 1 end) as count ";
 		$sql .= "FROM reservation_info r ";
 		$sql .= "INNER JOIN `session` s ON s.start<=r.stop AND s.stop>=r.start ";
 		$sql .= "INNER JOIN device d ON d.id=r.device_id ";
 		$sql .= "WHERE r.device_id=s.device_id AND r.user_id=s.user_id AND r.id=:id";
 		$params = array(":id" => $id);
         	$query = $db->prepare($sql);
-		$query->execute($args);
-		$result = $missed->fetch(PDO::FETCH_ASSOC);
+		$query->execute($params);
+		$result = $query->fetch(PDO::FETCH_ASSOC);
 		return $result['count'] == 0;
 	}
 

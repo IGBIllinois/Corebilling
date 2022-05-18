@@ -9,7 +9,6 @@ if(!$login_user->isAdmin()){
 $bills = new Bills($db);
 $session = new Session($db);
 $userCfop = new UserCfop($db);
-$stats = new Statistics($db);
 
 $sessionIdSelected = 0;
 
@@ -70,7 +69,7 @@ if (isset($_POST['endMonthSelected'])) {
 		</div>
 	</div>
 	<?php
-		$resUse = $stats->getReservationUsage($startyear,$startmonth,$endyear,$endmonth);
+		$resUse = Statistics::getReservationUsage($db,$startyear,$startmonth,$endyear,$endmonth);
 	?>
 	<div class="panel panel-default">
 		<div id="user_list_heading" class="panel-heading">
