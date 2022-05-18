@@ -632,6 +632,25 @@ class User
 
 	}
 
+
+	public function email_bill($year,$month) {
+		$start_date = $year . $month . "01";
+		$end_date = $year . $month . date('t',strtotime($start_date));
+
+		$subject = "Test Submit";
+		$to = $this->getEmail(); 
+		$loader = new Twig_Loader_Filesystem(settings::get_twig_dir());
+		$twig = new Twig_Environment($loader);
+		$twig_variables = array();
+
+		if (file_exists(settings::get_twig_dir() . "/custom/" . self::USER_BILL_TWIG)) {
+			$html_message = $twig->render("custom/" . self::USER_BILL_TWIG,$twig_variables);
+		}
+		else {
+			$html_message = $twig->render("default/" . self::USER_BILL_TWIG,$twig_variables);
+		}
+	}
+
 	public static function get_ldap_info($ldap,$username) {
 		$username = trim(rtrim($username));
 		$filter = "(uid=" . $username . ")";

@@ -20,7 +20,8 @@
 		"select2/select2": "4.0.2",
 		"intelogie/select2-bootstrap-theme": "dev-master",
 		"igbillinois/igbillinois-php": "1.2.1",
-		"davehensley/highcharts": "v4.2.3"
+		"davehensley/highcharts": "v4.2.3",
+		"twig/twig": "v3.4.1"
 	},
 	"scripts": {
 		"post-update-cmd": [
