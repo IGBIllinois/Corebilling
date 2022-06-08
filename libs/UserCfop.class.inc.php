@@ -48,7 +48,7 @@ class UserCfop {
 		$this->userCfopId =$this->db->lastInsertId();
 		$this->load($this->userCfopId);
 		$this->setAsDefaultCFOP();
-		$this->log_file->send_log("Added CFOP '$cfop' for user $userId");
+		$this->log_file->send_log("Added CFOP " . $cfop . " for user " . User::getUsernameByID($this->db,$userId));
 	}
 
 	/**Load User CFOP from cfop id

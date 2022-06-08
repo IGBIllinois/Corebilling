@@ -610,6 +610,18 @@ class User
 		return false;
 	}
 
+	public static function getUsernameByID($db,$id) {
+		$sql = "SELECT user_name FROM users where id=:id LIMIT 1";
+                $query = $db->prepare($sql);
+                $query->execute(array(':id'=>$id));
+                $result = $query->fetch(PDO::FETCH_ASSOC);
+                if ($result) {
+                        return $result['user_name'];
+
+                }
+                return false;
+
+	}
 	public function get_data_dir_id() {
 		$sql = "SELECT data_dir_id FROM data_dir WHERE data_dir_enabled=1 AND data_dir_user_id=:user_id LIMIT 1";
 		$query = $this->db->prepare($sql);

@@ -227,7 +227,6 @@ class Device
 	public function setDeviceId($id){
 		if($this->deviceId != $id){
 			$this->deviceId = $id;
-			$this->log_file->send_log("Set id of device '".$this->shortName."' to $id");
 		}
 	}
 
