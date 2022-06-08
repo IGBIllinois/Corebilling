@@ -202,5 +202,23 @@ class data_functions {
 
         }
 
+	public static function get_total_size($db,$start_date,$end_date,$format = 0) {
+		$sql = "SELECT SUM(data_bill_avg_bytes) as total_size ";
+                $sql .= "FROM data_bill ";
+		$sql .= "WHERE data_bill_date BETWEEN :start_date AND :end_date ";
+                $query = $db->prepare($sql);
+                $query->execute(array(':start_date'=>$start_date,':end_date'=>$end_date));
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+                $total_size = 0;
+                if (count($result)) {
+                        $total_size = self::bytes_to_terabytes($result['total_size']);
+                        if ($format) {
+                                $total_size = number_format(self::bytes_to_terabytes($result['total_size']),2);
+                        }
+                }
+                return $total_size;
+
+
+	}
 }
 ?>

@@ -71,7 +71,11 @@ else {
                 </tr>
         </thead>
         <?php echo $data_html; ?>
-
+	<tr>
+		<td>Total Size:</td>
+		<td colspan='6'><?php echo data_functions::get_total_size($db,$start_date,$end_date,1); ?> TB
+		</td>
+	</tr>
         <tr>
                 <td>Total Cost:</td>
                 <td colspan='6'>$<?php echo data_functions::get_total_cost($db,$start_date,$end_date,1); ?>
