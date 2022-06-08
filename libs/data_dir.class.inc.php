@@ -269,7 +269,7 @@ class data_dir {
 			
         	        $data_cost = new data_cost($this->db);
 			$total_cost = $data_cost->calculate_cost($bytes);
-			$billed_cost = 0;
+			$billed_cost = $total_cost;
 			if ($user->getDefaultCFOPID() != '') {
 				$billed_cost = $total_cost;
 			}

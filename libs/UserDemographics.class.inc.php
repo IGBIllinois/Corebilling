@@ -27,10 +27,6 @@ class UserDemographics {
 	 */
 	public function __construct(PDO $db, $id = null) {
 		$this->db = $db;
-		$this->user_id = 0;
-		$this->edulevel = "";
-		$this->gender = "";
-		$this->underrep = "";
 
 		if($id !== null){
 			$this->load($id);
@@ -62,17 +58,20 @@ class UserDemographics {
 	 * Updates the database with the current values stored in the object
 	 * @return bool
 	 */
-	public function update(){
+	public function update($edu_level = "",$gender = "" ,$underrep = ""){
 		$sql = "INSERT INTO user_demographics (user_id,edu_level,gender,underrepresented) ";
 		$sql .= "VALUES(:id,:edu_level,:gender,:underrep) ";
 		$sql .= "ON DUPLICATE KEY UPDATE user_id=:id, edu_level=:edu_level, gender=:gender, underrepresented=:underrep";
 
 		$params = array(':id'=>$this->user_id, 
-			':edu_level'=>$this->edulevel, 
-			':gender'=>$this->gender, 
-			':underrep'=>$this->underrep);
+			':edu_level'=>$edulevel, 
+			':gender'=>$gender, 
+			':underrep'=>$underrep);
 		$query = $this->db->prepare($sql);
-		return $query->execute($params);
+		$result = $query->execute($params);
+		if ($result) {
+			$this->load($this->user_id);
+		}
 	}
 
 	
@@ -91,12 +90,6 @@ class UserDemographics {
 		return $this->edulevel;
 	}
 
-	/**
-	* @param string $edulevel
-	*/
-	public function setEdulevel($edulevel) {
-		$this->edulevel = $edulevel;
-	}
 
 	/**
 	* @return string
@@ -106,24 +99,10 @@ class UserDemographics {
 	}
 
 	/**
-	* @param string $gender
-	*/
-	public function setGender($gender) {
-		$this->gender = $gender;
-	}
-
-	/**
 	* @return string
 	*/
 	public function getUnderrep() {
 		return $this->underrep;
-	}
-
-	/**
-	* @param string $underrep
-	*/
-	public function setUnderrep($underrep) {
-		$this->underrep = $underrep;
 	}
 
 	public static function allEduLevels(){

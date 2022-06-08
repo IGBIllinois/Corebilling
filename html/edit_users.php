@@ -44,11 +44,8 @@ if (isset($_POST['update_user'])) {
         $selectedUser->setRoleId($_POST['user_role_id']);
         $selectedUser->setGroupIds($_POST['group'] ?? []);
         $selectedUser->setCertified(isset($_POST['safetyquiz']));
-	$demo = $selectedUser->getDemographics();
-	$demo->setEdulevel($_POST['edulevel']);
-	$demo->setGender($_POST['gender']);
-	$demo->setUnderrep($_POST['underrep']);
-	$demo->update();
+	$demographics = $selectedUser->getDemographics();
+	$demographics->update($_POST['edulevel'],$_POST['gender'],$_POST['underrep']);
 
 	$_POST['cfop_to_add'] = UserCfop::formatCfop($_POST['cfop_to_add']);
 	if ($_POST['cfop_to_add'] != "---" && $_POST['cfop_to_add'] != $userCfop->loadDefaultCfop($selectedUser->getId())) {
@@ -142,11 +139,8 @@ if (isset($_POST['create_user'])) {
 				}
 				$selectedUser->update();
 	
-				$demo = $selectedUser->getDemographics();
-				$demo->setEdulevel($_POST['edulevel']);
-				$demo->setGender($_POST['gender']);
-				$demo->setUnderrep($_POST['underrep']);
-				$demo->update();
+				$demographics = $selectedUser->getDemographics();
+				$demographics->update($_POST['edulevel'],$_POST['gender'],$_POST['underrep']);
 	
 				$_REQUEST['user_id'] = $selectedUser->getId();
 	

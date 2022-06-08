@@ -284,7 +284,8 @@ class User
 		$sql .= "LEFT JOIN user_groups ug on (u.id=ug.user_id) ";
 		$sql .= "LEFT JOIN `groups` g on (g.id=ug.group_id) ";
 		$sql .= "LEFT JOIN departments d on (d.id=u.department_id) ";
-		$sql .= "GROUP BY u.id";
+		//$sql .= "GROUP BY u.id";
+		echo $sql;
 		$query = $db->prepare($sql);
 		$query->execute(array(':status'=>self::ACTIVE));
 		$result = $query->fetchAll(PDO::FETCH_ASSOC);
@@ -639,7 +640,9 @@ class User
 		$to = $this->getEmail(); 
 		$loader = new Twig_Loader_Filesystem(settings::get_twig_dir());
 		$twig = new Twig_Environment($loader);
-		$twig_variables = array();
+		$twig_variables = array(
+			'css'=>settings::get_email_css_contents()
+		);
 
 		if (file_exists(settings::get_twig_dir() . "/custom/" . self::USER_BILL_TWIG)) {
 			$html_message = $twig->render("custom/" . self::USER_BILL_TWIG,$twig_variables);
@@ -647,6 +650,15 @@ class User
 		else {
 			$html_message = $twig->render("default/" . self::USER_BILL_TWIG,$twig_variables);
 		}
+		$email = new \IGBIllinois\email(settings::get_smtp_host(),settings::get_smtp_port(),settings::get_smtp_username(),settings::get_smtp_password());
+		$email->set_to_emails($to);
+		try {
+			$result = $email->send_email(settings::get_from_email(),$subject,"",$html_message);
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	public static function get_ldap_info($ldap,$username) {

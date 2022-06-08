@@ -36,55 +36,53 @@ $longopts = array(
 $sapi_type = php_sapi_name();
 if ($sapi_type != 'cli') {
 	echo "Error: This script can only be run from the command line.";
+	exit();
 }
-else {
 
-	$options = getopt($shortopts,$longopts);
+$options = getopt($shortopts,$longopts);
 
-        if (isset($options['h']) || isset($options['help'])) {
-                echo $output_command;
-                exit;
-        }
-
-	try {
-		$db = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASSWORD);
-	} catch (PDOException $e) {
-		die("Error initializing PDO: " . $e->getMessage());
-	}
-	$log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());	
-	$start_time = microtime(true);
-	$log_file->send_log("Data Usage: Start");
-	var_dump($log_file);	
-	$directories = data_functions::get_all_directories($db);
-	foreach ($directories as $directory) {
-			$data_dir = new data_dir($db,$directory['data_dir_id']);
-			$data_usage = new \IGBIllinois\data_usage($data_dir->get_directory());
-			$size = $data_usage->get_dir_size();
-			$data_dir->update_dir_exists($data_usage->directory_exists());
-			if (!isset($options['dry-run'])) {
-				$result = $data_dir->add_usage($size);
-			}
-			else {
-				$result = true;
-			}	
-			if (($result) && (!isset($options['dry-run']))) {
-				$message = "Data Usage: Directory: " . $data_dir->get_directory() . " Size: " . data_functions::bytes_to_gigabytes($size) . "GB sucessfully added";
-				
-			}
-			elseif (isset($options['dry-run'])) {
-				$message = "DRY-RUN: Data Usage: Directory: " . $data_dir->get_directory() . " Size: " . data_functions::bytes_to_gigabytes($size) . "GB sucessfully added.";
-
-			}
-			else {
-				$message = "ERROR: Data Usage: Directory: " . $data_dir->get_directory() . " failed adding to database";
-			}
-			$log_file->send_log($message);
-	}
-	$end_time = microtime(true);
-	$elapsed_time = round($end_time - $start_time,2);
-	$log_file->send_log("Data Usage: Finished. Elapsed Time: " . $elapsed_time . " seconds");
-
+if (isset($options['h']) || isset($options['help'])) {
+	echo $output_command;
+	exit;
 }
+
+try {
+	$db = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASSWORD);
+} catch (PDOException $e) {
+	die("Error initializing PDO: " . $e->getMessage());
+}
+
+$log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());	
+$start_time = microtime(true);
+$log_file->send_log("Data Usage: Start");
+$directories = data_functions::get_all_directories($db);
+foreach ($directories as $directory) {
+	$data_dir = new data_dir($db,$directory['data_dir_id']);
+	$data_usage = new \IGBIllinois\data_usage($data_dir->get_directory());
+	$size = $data_usage->get_dir_size();
+	$data_dir->update_dir_exists($data_usage->directory_exists());
+	if (!isset($options['dry-run'])) {
+		$result = $data_dir->add_usage($size);
+	}
+	else {
+		$result = true;
+	}	
+	if (($result) && (!isset($options['dry-run']))) {
+		$message = "Data Usage: Directory: " . $data_dir->get_directory() . " Size: " . data_functions::bytes_to_gigabytes($size) . "GB sucessfully added";
+	}
+	elseif (isset($options['dry-run'])) {
+		$message = "DRY-RUN: Data Usage: Directory: " . $data_dir->get_directory() . " Size: " . data_functions::bytes_to_gigabytes($size) . "GB sucessfully added.";
+	}
+	else {
+		$message = "ERROR: Data Usage: Directory: " . $data_dir->get_directory() . " failed adding to database";
+	}
+	$log_file->send_log($message);
+}
+
+$end_time = microtime(true);
+$elapsed_time = round($end_time - $start_time,2);
+$log_file->send_log("Data Usage: Finished. Elapsed Time: " . $elapsed_time . " seconds");
+
 
 ?>
 
