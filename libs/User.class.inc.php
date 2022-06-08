@@ -274,6 +274,7 @@ class User
 	*/
 	public static function getAllUsersFullInfo($db) {
 		$sql = "SELECT u.first, u.last, u.email, u.department_id, ";
+		$sql .= "GROUP_CONCAT(g.group_name separator ', ') as group_name, ";
 		$sql .= "uc.cfop, d.department_name, u.time_created as date_added, ";
 		$sql .= "(select max(`stop`) from `session` where user_id=u.`id`) as last_login, ";
 		$sql .= "CONCAT(u.last, ', ', u.first) as full_name, ";
@@ -282,7 +283,11 @@ class User
 		$sql .= "FROM users u ";
 		$sql .= "LEFT JOIN user_roles ON user_roles.id=u.user_role_id ";
 		$sql .= "LEFT JOIN user_cfop uc on (uc.user_id = u.id and uc.default_cfop=1) ";
+		$sql .= "LEFT JOIN user_groups ug on (u.id=ug.user_id) ";
+		$sql .= "LEFT JOIN `groups` g on (g.id=ug.group_id) ";
 		$sql .= "LEFT JOIN departments d on (d.id=u.department_id) ";
+		$sql .= "GROUP BY u.id";
+
 		$query = $db->prepare($sql);
 		$query->execute(array(':status'=>self::ACTIVE));
 		$result = $query->fetchAll(PDO::FETCH_ASSOC);
