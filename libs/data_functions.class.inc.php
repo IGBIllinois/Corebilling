@@ -113,7 +113,11 @@ class data_functions {
 				':month'=>$month,
 				':minimum_bill'=>$minimum_bill)
 			);
-		return $query->fetchAll(PDO::FETCH_ASSOC);
+		$result = $query->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($result as &$record) {
+			$record['CFOP'] = UserCfop::formatCFOP($record['CFOP']);
+		}
+		return $result;
 	}
 
 	public static function get_existing_dirs() {
