@@ -31,7 +31,7 @@ else {
 ?>
 <h3>Data Cost</h3>
 <form class='form' method='post' action='<?php echo $_SERVER['PHP_SELF']; ?>'>
-<table class='table table-bordered table-striped table-sm'>
+<table class='table table-bordered table-striped table-condensed'>
 <thead><th>Cost (per TB)</th><th>Time Set</th></thead>
 <?php echo $data_costs_html; ?>
 

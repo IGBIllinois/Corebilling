@@ -77,11 +77,15 @@ $log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_f
 
 $user_list = User::getSupervisors($db,User::ACTIVE);
 
-foreach ($user_list as $user) {
-	$user_object = new user($db,$ldap);
-	$user_object->,$user['user_id']);
-	//$user_object->email_bill(__ADMIN_EMAIL__,$year,$month);
-}
+$user_object = new user($db,$ldap);
+$user_object->load('2379');
+$user_object->email_bill($month,$year);
+
+//foreach ($user_list as $user) {
+//	$user_object = new user($db,$ldap);
+//	$user_object->load($user['id']);
+//	$user_object->email_bill($month,$year);
+//}
 
 
 

@@ -58,7 +58,7 @@ else {
         ?>
 </ul>
 
-<table class='table table-striped table-sm table-bordered'>
+<table class='table table-striped table-condensed table-bordered'>
         <thead>
                 <tr>
                         <th>Directory</th>

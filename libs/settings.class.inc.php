@@ -164,7 +164,12 @@ class settings {
 		if (defined("FROM")) {
 			return FROM;
 		}
-		
+	}
+	public static function get_from_name() {
+		if (defined("FROM_NAME")) {
+			return FROM_NAME;
+		}
+		return "";
 
 	}
 	public static function get_smtp_host() {
@@ -198,13 +203,13 @@ class settings {
 	}
 
 	public static function get_twig_dir() {
-		$dir = dirname(__DIR__) . "/" . __TWIG_DIR__;
+		$dir = dirname(__DIR__) . "/" . TWIG_DIR;
 		return $dir;
 	}
 
 	public static function get_email_css() {
 
-		$file_path = dirname(__DIR__) . "/" . __EMAIL_CSS__;
+		$file_path = dirname(__DIR__) . "/" . EMAIL_CSS;
 		return $file_path;
 	}
 
@@ -214,5 +219,11 @@ class settings {
 
 	}
 
+	public static function get_website_url() {
+		if (defined("WEBSITE_URL")) {
+			return WEBSITE_URL;
+		}
+		return false;
+	}
 }
 ?>

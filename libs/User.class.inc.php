@@ -9,7 +9,9 @@ class User
 	const ROLE_ADMIN = 1;
 	const ROLE_SUPERVISOR = 2;
 	const ROLE_USER = 3;
-	const LDAP_ATTRIBUTES = array('uid','cn','sn','givenName','mail');	
+	const LDAP_ATTRIBUTES = array('uid','cn','sn','givenName','mail');
+	const USER_BILL_TWIG = "user_bill.html.twig";
+
 	private $userId = 0;
 	private $username = "";
 	private $first = "";
@@ -443,6 +445,9 @@ class User
 		}
 	}
 
+	public function getFullName() {
+		return $this->getFirstName() . " " . $this->getLastName();
+	}
 	public function getEmail() {
 		return $this->email;
 	}
@@ -646,16 +651,24 @@ class User
 	}
 
 
-	public function email_bill($year,$month) {
-		$start_date = $year . $month . "01";
-		$end_date = $year . $month . date('t',strtotime($start_date));
+	public function email_bill($month,$year) {
+		$start_date = $year . "-" . $month . "-01";
+		$end_date = $year . "-" . $month . "-" . date('t',strtotime($start_date));
 
-		$subject = "Test Submit";
-		$to = $this->getEmail(); 
-		$loader = new Twig_Loader_Filesystem(settings::get_twig_dir());
-		$twig = new Twig_Environment($loader);
+		$subject = settings::get_title();
+		$to = $this->getEmail();
+		$start_date = $year . $month . "01";
+		$end_date = $year . $month . date('t',strtotime($start_date));	
+		$loader = new \Twig\Loader\FilesystemLoader(settings::get_twig_dir());
+		$twig = new \Twig\Environment($loader);
 		$twig_variables = array(
-			'css'=>settings::get_email_css_contents()
+			'css'=>settings::get_email_css_contents(),
+			'website_url'=>settings::get_website_url(),
+			'full_name'=>$this->getFullName(),
+			'username'=>$this->getUsername(),
+			'start_date'=>$start_date,
+			'end_date'=>$end_date,
+			'data_table'=>$this->get_data_table($month,$year)
 		);
 
 		if (file_exists(settings::get_twig_dir() . "/custom/" . self::USER_BILL_TWIG)) {
@@ -667,12 +680,37 @@ class User
 		$email = new \IGBIllinois\email(settings::get_smtp_host(),settings::get_smtp_port(),settings::get_smtp_username(),settings::get_smtp_password());
 		$email->set_to_emails($to);
 		try {
-			$result = $email->send_email(settings::get_from_email(),$subject,"",$html_message);
+			$result = $email->send_email(settings::get_from_email(),$subject,"",$html_message,settings::get_from_name());
 		} catch (Exception $e) {
 			error_log($e->getMessage());
 			return false;
 		}
+
 		return true;
+	}
+
+	public function get_data_table($month,$year) {
+		$data_dir_id = $this->get_data_dir_id();
+		$data_html = "";
+		if ($data_dir_id) {
+			$data_dir = new data_dir($this->db,$data_dir_id);
+			$data_bill = $data_dir->get_data_bill($month,$year);
+			$data_html .= "<tr>";
+			$data_html .= "<td>" . htmlentities($data_dir->get_directory()) . "</td>";
+			$data_html .= "<td>" . $data_dir->get_group() . "</td>";
+			$data_html .= "<td>" . data_functions::bytes_to_terabytes($data_bill['data_bill_avg_bytes']) . "</td>";
+			$data_html .= "<td>$" . number_format($data_bill['cost'],2) . "</td>";
+			$data_html .= "<td>$" . number_format($data_bill['data_bill_billed_cost'],2) . "</td>";
+			$data_html .= "<td>" . UserCfop::formatCfop($data_bill['cfop']) . "</td>";
+			$data_html .= "</tr>";
+
+
+                }
+                else {
+                        $data_html = "<tr><td colspan='6'>No Data Usage</td></tr>";
+		}
+		return $data_html;	
+	
 	}
 
 	public static function get_ldap_info($ldap,$username) {

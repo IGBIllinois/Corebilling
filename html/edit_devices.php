@@ -313,7 +313,7 @@ if (count($harddrives)) {
 					<tr><td>Last Seen</td><td><?php echo $device->getLastTick(); ?></td></tr>
 				</table>
 				<table class='table table-condensed'>
-					<thead><th>Drive</th><th>Used/Total Size</th><th>Percent Full</th></thead>
+					<thead><tr><th>Drive</th><th>Used/Total Size</th><th>Percent Full</th></tr></thead>
 					<tbody>
 						<?php echo $harddrives_html; ?>
 					</tbody>

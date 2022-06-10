@@ -201,7 +201,7 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 				</div>
 				<div class="panel-body">
 					<table class="table table-striped table-hover table-bordered table-condensed">
-						<thead><th>NetId</th><th>Full Name</th></thead>
+						<thead><tr><th>NetId</th><th>Full Name</th></tr></thead>
 						<tbody>
 						<?php echo $members_html; ?>
 						</tbody>
