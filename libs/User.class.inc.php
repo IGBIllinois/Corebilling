@@ -656,8 +656,7 @@ class User
 		$end_date = $year . "-" . $month . "-" . date('t',strtotime($start_date));
 
 		$subject = settings::get_title();
-		//$to = $this->getEmail();
-		$to = "dslater@igb.illinois.edu";
+		$to = $this->getEmail();
 		$loader = new \Twig\Loader\FilesystemLoader(settings::get_twig_dir());
 		$twig = new \Twig\Environment($loader);
 		$twig_variables = array(
