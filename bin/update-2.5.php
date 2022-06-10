@@ -73,9 +73,8 @@ if ($sapi_type != 'cli') {
 		$result = $query->execute($params);
 		if ($result) {
 			echo "Updated user " . $user_id . " to active\n";
-		}
-	
-	
+		}	
 	}
+
 ?>
 
