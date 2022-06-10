@@ -656,9 +656,8 @@ class User
 		$end_date = $year . "-" . $month . "-" . date('t',strtotime($start_date));
 
 		$subject = settings::get_title();
-		$to = $this->getEmail();
-		$start_date = $year . $month . "01";
-		$end_date = $year . $month . date('t',strtotime($start_date));	
+		//$to = $this->getEmail();
+		$to = "dslater@igb.illinois.edu";
 		$loader = new \Twig\Loader\FilesystemLoader(settings::get_twig_dir());
 		$twig = new \Twig\Environment($loader);
 		$twig_variables = array(
@@ -682,7 +681,7 @@ class User
 		try {
 			$result = $email->send_email(settings::get_from_email(),$subject,"",$html_message,settings::get_from_name());
 		} catch (Exception $e) {
-			error_log($e->getMessage());
+			throw $e;
 			return false;
 		}
 

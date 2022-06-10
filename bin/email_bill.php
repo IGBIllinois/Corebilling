@@ -77,15 +77,20 @@ $log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_f
 
 $user_list = User::getSupervisors($db,User::ACTIVE);
 
-$user_object = new user($db,$ldap);
-$user_object->load('2379');
-$user_object->email_bill($month,$year);
+foreach ($user_list as $user) {
+	$user_object = new user($db,$ldap);
+	$user_object->load($user['id']);
+	try {
+	$result = $user_object->email_bill($month,$year);
+	if ($result) {
+		$log_file->send_log("Successfully emailed bill to " . $user_object->getEmail());	
+	}
+	}
+	catch (Exception $e) {
+		$log_file->send_log("Error emailing bill to " . $user_object->getEmail() . " Message: " . $e->getMessage(),\IGBIllinois\log::ERROR);
+	}
 
-//foreach ($user_list as $user) {
-//	$user_object = new user($db,$ldap);
-//	$user_object->load($user['id']);
-//	$user_object->email_bill($month,$year);
-//}
+}
 
 
 
