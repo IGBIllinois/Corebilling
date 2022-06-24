@@ -84,6 +84,10 @@ class User
 			return false;
 		}
 
+		if (!self::verify_email($email)) {
+			throw new Exception("Please specify an email address");
+			return false;
+		}	
 		try {
 			$sql = "INSERT INTO users (user_name, first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
 			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified,:supervisor_id)";
@@ -736,6 +740,18 @@ class User
 
 		}
 		return $formatted_info;
+
+	}
+
+	private static function verify_email($email) {
+		$valid = 1;
+		if ($email == "") {
+			$valid = 0;
+		}
+		elseif (filter_var($email,FILTER_VALIDATE_EMAIL) === FALSE) {
+			$valid = 0;
+		}
+		return $valid;
 
 	}
 }
