@@ -219,10 +219,10 @@ class Group {
 					throw new Exception("Error adding group " . $gid . " to ldap");
 					return false;	
 				}
-				if (!$ldapman->addGroupMember($gid, $this->netid)) {
-					throw new Exception("Error adding user " . $this->netid . " to ldap group " . $gid);
-					return false;
-				}
+				//if (!$ldapman->addGroupMember($gid, $this->netid)) {
+				//	throw new Exception("Error adding user " . $this->netid . " to ldap group " . $gid);
+				//	return false;
+				//}
 				foreach($this->getMembers() as $member) {
 					if (!$ldapman->addGroupMember($gid, $member['user_name'])) {
 						throw new Exception("Error adding user " . $this->netid . " to ldap group " . $gid);
