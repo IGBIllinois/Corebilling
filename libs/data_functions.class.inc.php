@@ -7,14 +7,15 @@ class data_functions {
 
 	public static function get_directories($db,$start = 0,$count = 0) {
 		$sql = "SELECT data_dir.*, groups.group_name, groups.id as group_id, groups.netid as owner, users.id as owner_id, ";
-		$sql .= "uc.cfop as cfop ";
+		$sql .= "uc.cfop as cfop, ROUND(du.data_usage_bytes / 1099511627776,3) as terabytes ";
 		$sql .= "FROM data_dir ";
 		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
 		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
 		$sql .= "LEFT JOIN (SELECT * FROM user_cfop WHERE default_cfop=1) as uc ON uc.user_id=users.id ";
+		$sql .= "LEFT JOIN (SELECT MAX(data_usage_time), data_usage.data_usage_data_dir_id, data_usage.data_usage_bytes FROM data_usage GROUP BY data_usage.data_usage_data_dir_id) as du ";
+		$sql .= "ON du.data_usage_data_dir_id=data_dir.data_dir_id ";
 		$sql .= "WHERE data_dir.data_dir_enabled='1' ";
 		$sql .= "ORDER BY data_dir.data_dir_path ASC ";
-		
 		if ($count) {
 			$sql .= "LIMIT " . $start . "," . $count;
 		}
@@ -56,13 +57,17 @@ class data_functions {
 		$sql .= "users.user_name as 'Owner', ";
 		$sql .= "users.email as 'Email', ";
 		$sql .= "uc.cfop as 'CFOP', ";
+		$sql .= "ROUND(du.data_usage_bytes / 1099511627776,3) as 'Terabytes', ";
 		$sql .= "data_dir_time as 'Time Created' ";
                 $sql .= "FROM data_dir ";
                 $sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
 		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
 		$sql .= "LEFT JOIN (SELECT * FROM user_cfop WHERE default_cfop=1) as uc ON uc.user_id=users.id ";
+		$sql .= "LEFT JOIN (SELECT MAX(data_usage_time), data_usage.data_usage_data_dir_id, data_usage.data_usage_bytes FROM data_usage GROUP BY data_usage.data_usage_data_dir_id) as du ";
+		$sql .= "ON du.data_usage_data_dir_id=data_dir.data_dir_id ";
                 $sql .= "WHERE data_dir.data_dir_enabled='1' ";
-                $sql .= "ORDER BY data_dir.data_dir_path ASC ";
+		$sql .= "ORDER BY data_dir.data_dir_path ASC ";
+		error_log($sql);
 		$query = $db->prepare($sql);
 		$query->execute();
 		$result = $query->fetchAll(PDO::FETCH_ASSOC);
