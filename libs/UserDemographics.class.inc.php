@@ -45,7 +45,7 @@ class UserDemographics {
 
 		if($query->execute($params)) {
 			$result = $query->fetch(PDO::FETCH_ASSOC);
-			$this->user_id = $result['user_id'];
+			$this->user_id = $id;
 			$this->edulevel = $result['edu_level'];
 			$this->gender = $result['gender'];
 			$this->underrep = $result['underrepresented'];
@@ -62,9 +62,8 @@ class UserDemographics {
 		$sql = "INSERT INTO user_demographics (user_id,edu_level,gender,underrepresented) ";
 		$sql .= "VALUES(:id,:edu_level,:gender,:underrep) ";
 		$sql .= "ON DUPLICATE KEY UPDATE user_id=:id, edu_level=:edu_level, gender=:gender, underrepresented=:underrep";
-
 		$params = array(':id'=>$this->user_id, 
-			':edu_level'=>$edulevel, 
+			':edu_level'=>$edu_level, 
 			':gender'=>$gender, 
 			':underrep'=>$underrep);
 		$query = $this->db->prepare($sql);
