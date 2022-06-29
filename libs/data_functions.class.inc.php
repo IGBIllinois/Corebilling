@@ -6,10 +6,12 @@ class data_functions {
         const convert_gigabytes = 1073741824;
 
 	public static function get_directories($db,$start = 0,$count = 0) {
-		$sql = "SELECT data_dir.*, groups.group_name, groups.id as group_id, groups.netid as owner, users.id as owner_id ";
+		$sql = "SELECT data_dir.*, groups.group_name, groups.id as group_id, groups.netid as owner, users.id as owner_id, ";
+		$sql .= "uc.cfop as cfop ";
 		$sql .= "FROM data_dir ";
 		$sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
 		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
+		$sql .= "LEFT JOIN (SELECT * FROM user_cfop WHERE default_cfop=1) as uc ON uc.user_id=users.id ";
 		$sql .= "WHERE data_dir.data_dir_enabled='1' ";
 		$sql .= "ORDER BY data_dir.data_dir_path ASC ";
 		
@@ -19,6 +21,10 @@ class data_functions {
 		$query = $db->prepare($sql);
                 $query->execute();
 		$result = $query->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($result as &$record) {
+                        $record['cfop'] = UserCfop::formatCFOP($record['cfop']);
+                }
+
 		return $result;
 	}
 
@@ -49,15 +55,21 @@ class data_functions {
 		$sql .= "groups.group_name as 'Group', ";
 		$sql .= "users.user_name as 'Owner', ";
 		$sql .= "users.email as 'Email', ";
+		$sql .= "uc.cfop as 'CFOP', ";
 		$sql .= "data_dir_time as 'Time Created' ";
                 $sql .= "FROM data_dir ";
                 $sql .= "LEFT JOIN groups ON groups.id=data_dir.data_dir_group_id ";
-                $sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
+		$sql .= "LEFT JOIN users ON users.user_name=groups.netid ";
+		$sql .= "LEFT JOIN (SELECT * FROM user_cfop WHERE default_cfop=1) as uc ON uc.user_id=users.id ";
                 $sql .= "WHERE data_dir.data_dir_enabled='1' ";
                 $sql .= "ORDER BY data_dir.data_dir_path ASC ";
 		$query = $db->prepare($sql);
 		$query->execute();
-		return $query->fetchAll(PDO::FETCH_ASSOC);
+		$result = $query->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($result as &$record) {
+                        $record['CFOP'] = UserCfop::formatCFOP($record['CFOP']);
+                }
+		return $result;
 
 
 
