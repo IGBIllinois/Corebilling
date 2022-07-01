@@ -70,7 +70,7 @@ class User
 		if (($userRoleId == self::ROLE_USER) && $supervisorId != 0) {
 			$this->supervisor_id = $supervisorId;
 		}
-		elseif ($userRoleID == self::ROLE_USER && $superisorId == 0) {
+		elseif ($userRoleId == self::ROLE_USER && $supervisorId == 0) {
 			throw new Exception("Please specify a supervisor");
 			return false;
 		}

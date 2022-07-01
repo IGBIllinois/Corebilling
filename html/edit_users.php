@@ -127,7 +127,9 @@ if (isset($_POST['create_user'])) {
 				$supervisor_id);
 
 			if ($result) {
-        			$selectedUser->setGroupIds($_POST['group']);
+				if (isset($_POST['group'])) {
+					$selectedUser->setGroupIds($_POST['group']);
+				}
 		        	$selectedUser->addCFOP($_POST['cfop_to_add']);
 	        		if (isset($_POST['access'])) {
 					$deviceList = Device::getAllDevices($db);
