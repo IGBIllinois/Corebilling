@@ -35,6 +35,12 @@ class Authenticate {
 	* @return bool
 	*/
 	public function Login($username, $password) {
+		if (filter_var($username,FILTER_VALIDATE_EMAIL)) {
+                        echo "here";
+                        throw new Exception("Invalid username.  Please remove the email part of your username");
+                        return false;
+                }
+
 		$userId = User::exists($this->db,$username);
 		if ($userId) {
 			$this->user_id = $userId;
@@ -45,11 +51,11 @@ class Authenticate {
 			throw new Exception('You do not have permissions to login'); 
 			return false;
 		}
+
 		if ($this->authenticatedUser->getStatus() != $this->authenticatedUser::ACTIVE) {
                         throw new Exception('You do not have permissions to login');
                         return false;
                 }
-	
 		if (!$this->ldap->authenticate($username,$password)) {
 			throw new Exception('Invalid Username or Password');
 			return false;
