@@ -36,7 +36,6 @@ class Authenticate {
 	*/
 	public function Login($username, $password) {
 		if (filter_var($username,FILTER_VALIDATE_EMAIL)) {
-                        echo "here";
                         throw new Exception("Invalid username.  Please remove the email part of your username");
                         return false;
                 }
