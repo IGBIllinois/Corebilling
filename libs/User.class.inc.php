@@ -91,23 +91,23 @@ class User
 		try {
 			$sql = "INSERT INTO users (user_name, first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
 			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified,:supervisor_id)";
-				$query = $this->db->prepare($sql);
+			$query = $this->db->prepare($sql);
 			
-				$parameters = array(':user_name' => $this->username,
-					':first' => $this->first,
-					':last' => $this->last,
-					':email' => $this->email,
-					':department_id' => $this->departmentId,
-					':rate_id' => $rateId,
-					':status' => $status,
-					':user_role_id' => $this->userRoleId,
-					':certified' => $this->certified ? 1 : 0,
-					':supervisor_id' => $this->supervisor_id
-				);
-				$result = $query->execute($parameters);
-				$this->userId = $this->db->lastInsertId();
-				$this->log_file->send_log("Successfully added user " . $username);
-				return $this->userId;
+			$parameters = array(':user_name' => $this->username,
+				':first' => $this->first,
+				':last' => $this->last,
+				':email' => $this->email,
+				':department_id' => $this->departmentId,
+				':rate_id' => $rateId,
+				':status' => $status,
+				':user_role_id' => $this->userRoleId,
+				':certified' => $this->certified ? 1 : 0,
+				':supervisor_id' => $this->supervisor_id
+			);
+			$result = $query->execute($parameters);
+			$this->userId = $this->db->lastInsertId();
+			$this->log_file->send_log("Successfully added user " . $username);
+			return $this->userId;
 		}
 		catch (PDOException $e) {
 			throw new Exception("Error adding user: " . $e->getMessage());
