@@ -6,21 +6,27 @@ if(!$login_user->isAdmin()){
 	exit;
 }
 $device = new Device($db);
+$start_date = new DateTime(date('Y-m-d') . " 00:00:00");
+$end_date = new DateTime(date('Y-m-d') . " 23:59:59");
+$default_device = 43; // Load the NMR by default TODO find a better way to grab the default
 
 if (isset ($_GET['device'])) {
 	$device->load($_GET['device']);
 } else {
-	$device->load(43); // Load the NMR by default TODO find a better way to grab the default
+	$device->load($default_device);
 }
-$date = new DateTime();
-if(isset($_GET['date'])){
-	$date = DateTime::createFromFormat("Y-m-d",$_GET['date']);
+
+if(isset($_GET['start_date'])){
+	$start_date = DateTime::createFromFormat("Y-m-d H:i:s",$_GET['start_date'] . " 00:00:00");
 }
-$reservations = Reservation::getEventsInRange($db,$date->format("Y-m-d")." 00:00:00", $date->format("Y-m-d")." 23:59:59", null, $device->getId(), false);
-$sessions = Session::getSessions($db, $date->format("Y-m-d"), $device->getId());
+if(isset($_GET['end_date'])) {
+	$end_date = DateTime::createFromFormat("Y-m-d H:i:s",$_GET['end_date'] . " 00:00:00");
+}
+$reservations = Reservation::getEventsInRange($db,$start_date->format("Y-m-d H:i:s"), $end_date->format("Y-m-d H:i:s"), null, $device->getId(), false);
+$sessions = Session::getSessions($db, $start_date, $end_date,$device->getId());
 ?>
 
-<h3>Usage Comparison<?php if($device->getId()!=0){echo " - ".$device->getFullName();} ?> - <?php echo $date->format("m/d/Y"); ?></h3>
+	<h3>Usage Comparison<?php if($device->getId()!=0){echo " - ".$device->getFullName();} ?> - <?php echo $start_date->format("m/d/Y"); ?> - <?php echo $end_date->format("m/d/Y"); ?></h3>
 <div class="well">
 	<form method="GET" name="calform" class="form-inline">
 		<div class="form-group">
@@ -31,7 +37,7 @@ $sessions = Session::getSessions($db, $date->format("Y-m-d"), $device->getId());
 					if (($availDevices['status_id']==Device::STATUS_ONLINE || $availDevices['status_id']==Device::STATUS_DONOTTRACK)) {
 						echo "<option value=" . $availDevices ['id'];
 						if ($availDevices['id'] == $device->getId()) {
-							echo " SELECTED";
+							echo " selected";
 						}
 						echo ">" . $availDevices ['full_device_name'] . "</option>";
 					}
@@ -40,7 +46,8 @@ $sessions = Session::getSessions($db, $date->format("Y-m-d"), $device->getId());
 			</select>
 		</div>
 		<div class="form-group">
-			<input type="text" id="date" name="date" class="form-control" onChange='document.calform.submit();' value="<?php echo $date->format("Y-m-d"); ?>" />
+			<input type="text" id="start_date" name="start_date" class="form-control" onChange='document.calform.submit();' value="<?php echo $start_date->format("Y-m-d"); ?>" />
+			<input type="text" id="end_date" name="end_date" class="form-control" onChange='document.calform.submit();' value="<?php echo $end_date->format("Y-m-d"); ?>" />
 		</div>
 	</form>
 </div>
@@ -55,7 +62,7 @@ $sessions = Session::getSessions($db, $date->format("Y-m-d"), $device->getId());
 			for($i = 0; $i<count($reservations); $i++){
 				$start = strtotime($reservations[$i]['starttime']);
 				$stop = strtotime($reservations[$i]['stoptime']);
-				$startofday = strtotime($date->format("Y-m-d")." 00:00:00");
+				$startofday = strtotime($start_date->format("Y-m-d")." 00:00:00");
 				$width = ($stop - $start) / (24*60*60) * 100;
 				$left = ($start - $startofday) / (24*60*60) * 100;
 				$startstr = DateTime::createFromFormat("Y-m-d H:i:s",$reservations[$i]['starttime'])->format("g:i a");
@@ -72,8 +79,8 @@ $sessions = Session::getSessions($db, $date->format("Y-m-d"), $device->getId());
 			for($i = 0; $i<count($sessions); $i++){
 				$start = strtotime($sessions[$i]['start']);
 				$stop = strtotime($sessions[$i]['stop']);
-				$startofday = strtotime($date->format("Y-m-d")." 00:00:00");
-				$endofday = strtotime($date->format("Y-m-d")." 23:59:59");
+				$startofday = strtotime($start_date->format("Y-m-d H:i:s"));
+				$endofday = strtotime($end_date->format("Y-m-d H:i:s"));
 				$right = ($endofday - $stop) / (24*60*60) * 100;
 				$left = ($start - $startofday) / (24*60*60) * 100;
 				$style = "";
@@ -99,9 +106,13 @@ $sessions = Session::getSessions($db, $date->format("Y-m-d"), $device->getId());
 	$(function(){
 		$('[data-toggle="popover"]').popover({html:true});
 		$('select').select2({'width':'element'});
-		$('#date').datepicker({
+		start_date = $('#start_date').datepicker({
+			dateFormat: "yy-mm-dd"
+		}).datepicker("setDate",$('#start_date').val());
+		end_date = $('#end_date').datepicker({
+			defaultDate: "+1w",
 			dateFormat: "yy-mm-dd",
-		}).datepicker("setDate",$('#date').val());
+		}).datepicker("setDate",$('#end_date').val());
 	});
 </script>
 <?php

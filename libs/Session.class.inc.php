@@ -175,15 +175,18 @@ class Session {
 	 * @param $device
 	 * @return mixed
 	 */
-	public static function getSessions($db, $date, $device) {
+	public static function getSessions($db, $start_date,$end_date,$device_id) {
 		$sql = "SELECT u.user_name, g.group_name, s.device_id, d.device_name, s.start, s.stop ";
 		$sql .= "FROM session s inner join users u on u.id=s.user_id ";
 		$sql .= "INNER JOIN device d on d.id=s.device_id ";
 		$sql .= "LEFT JOIN user_groups ug on u.id=ug.user_id ";
 		$sql .= "LEFT JOIN `groups` g on g.id=ug.group_id ";
-		$sql .= "WHERE d.id=:device and (DATE(s.start)=:date or DATE(s.stop)=:date)";
+		$sql .= "WHERE d.id=:device_id and (DATE(s.start)=:start_date or DATE(s.stop)=:end_date)";
 		$query = $db->prepare($sql);
-		$query->execute(array(":date" => $date, ":device" => $device));
+		$parameters = array(":start_date" => $start_date->format("Y-m-d H:i:s"), 
+			":end_date" => $end_date->format("Y-m-d H:i:s"),
+			":device_id" => $device_id);
+		$query->execute($parameters);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
     }
 

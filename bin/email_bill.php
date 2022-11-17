@@ -38,8 +38,7 @@ $longopts = array(
 
 //Following code is to test if the script is being run from the command line or the apache server.
 if (php_sapi_name() != 'cli') {
-	echo "Error: This script can only be run from the command line.";
-	exit();
+	exit("Error: This script can only be run from the command line.");
 }
 
 $year = date('Y',strtotime(date('Y-m')." -1 month"));
