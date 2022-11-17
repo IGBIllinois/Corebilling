@@ -20,10 +20,23 @@ if(isset($_GET['start_date'])){
 	$start_date = DateTime::createFromFormat("Y-m-d H:i:s",$_GET['start_date'] . " 00:00:00");
 }
 if(isset($_GET['end_date'])) {
-	$end_date = DateTime::createFromFormat("Y-m-d H:i:s",$_GET['end_date'] . " 00:00:00");
+	$end_date = DateTime::createFromFormat("Y-m-d H:i:s",$_GET['end_date'] . " 23:59:59");
 }
-$reservations = Reservation::getEventsInRange($db,$start_date->format("Y-m-d H:i:s"), $end_date->format("Y-m-d H:i:s"), null, $device->getId(), false);
-$sessions = Session::getSessions($db, $start_date, $end_date,$device->getId());
+$message = "";
+$error = false;
+if ($start_date > $end_date) {
+	$message .= "<div class='alert alert-danger'>Start Date is after End Date</div>";
+	$error = true;
+}
+$date_diff = $start_date->diff($end_date);
+if ($date_diff->format("%D") > 7) {
+	$message .= "<div class='alert alert-danger'>Date Range is greater than 7 days</div>";
+	$error = true;
+}
+if (!$error) {
+	$reservations = Reservation::getEventsInRange($db,$start_date->format("Y-m-d H:i:s"), $end_date->format("Y-m-d H:i:s"), null, $device->getId(), false);
+	$sessions = Session::getSessions($db, $start_date, $end_date,$device->getId());
+}
 ?>
 
 	<h3>Usage Comparison<?php if($device->getId()!=0){echo " - ".$device->getFullName();} ?> - <?php echo $start_date->format("m/d/Y"); ?> - <?php echo $end_date->format("m/d/Y"); ?></h3>
@@ -58,31 +71,32 @@ $sessions = Session::getSessions($db, $start_date, $end_date,$device->getId());
 	</div>
 	<div class="col-xs-9 col-sm-10 col-lg-11">
 		<div class="comprow" id="resrow">
-			<?php
+<?php
+				$num_secs = $end_date->getTimestamp() - $start_date->getTimestamp();
 			for($i = 0; $i<count($reservations); $i++){
 				$start = strtotime($reservations[$i]['starttime']);
 				$stop = strtotime($reservations[$i]['stoptime']);
 				$startofday = strtotime($start_date->format("Y-m-d")." 00:00:00");
-				$width = ($stop - $start) / (24*60*60) * 100;
-				$left = ($start - $startofday) / (24*60*60) * 100;
-				$startstr = DateTime::createFromFormat("Y-m-d H:i:s",$reservations[$i]['starttime'])->format("g:i a");
-				$stopstr = DateTime::createFromFormat("Y-m-d H:i:s",$reservations[$i]['stoptime'])->format("g:i a");
+				$width = ($stop - $start) / $num_secs * 100;
+				$left = ($start - $startofday) / $num_secs * 100;
+				$startstr = DateTime::createFromFormat("Y-m-d H:i:s",$reservations[$i]['starttime'])->format("M d g:i a");
+				$stopstr = DateTime::createFromFormat("Y-m-d H:i:s",$reservations[$i]['stoptime'])->format("M d g:i a");
 				$username = $reservations[$i]['user_name'];
 				$group = $reservations[$i]['group_name'];
-				
-				echo "<div class='compcell' style='width: $width%; left: $left%' data-container='body' data-toggle='popover' data-placement='top' title='$username' data-content='$startstr - $stopstr<br/>Group: $group'>$username<br/>$startstr - $stopstr<br/>Group: $group</div>";
-			}
-			?>
+				echo "<div class='compcell' style='width: $width%; left: $left%' data-container='body' data-toggle='popover' data-placement='top' title='$username' data-content='$startstr - $stopstr<br/>Group: $group'>";
+				echo "$username<br/>$startstr - $stopstr<br/>Group: $group</div>";
+		}
+		?>
 		</div>
 		<div class="comprow" id="sessrow">
-			<?php
+		<?php
 			for($i = 0; $i<count($sessions); $i++){
 				$start = strtotime($sessions[$i]['start']);
 				$stop = strtotime($sessions[$i]['stop']);
 				$startofday = strtotime($start_date->format("Y-m-d H:i:s"));
 				$endofday = strtotime($end_date->format("Y-m-d H:i:s"));
-				$right = ($endofday - $stop) / (24*60*60) * 100;
-				$left = ($start - $startofday) / (24*60*60) * 100;
+				$right = ($endofday - $stop) / $num_secs * 100;
+				$left = ($start - $startofday) / $num_secs * 100;
 				$style = "";
 				if($right < 0){
 					$right = 0;
@@ -92,29 +106,39 @@ $sessions = Session::getSessions($db, $start_date, $end_date,$device->getId());
 					$left = 0;
 					$style .= " border-left: none; border-top-left-radius: 0; border-bottom-left-radius: 0;";
 				}
-				$startstr = DateTime::createFromFormat("Y-m-d H:i:s",$sessions[$i]['start'])->format("g:i a");
-				$stopstr = DateTime::createFromFormat("Y-m-d H:i:s",$sessions[$i]['stop'])->format("g:i a");
+				$startstr = DateTime::createFromFormat("Y-m-d H:i:s",$sessions[$i]['start'])->format("M d g:i a");
+				$stopstr = DateTime::createFromFormat("Y-m-d H:i:s",$sessions[$i]['stop'])->format("M d g:i a");
 				$username = $sessions[$i]['user_name'];
 				$group = $sessions[$i]['group_name'];
-				echo "<div class='compcell' style='right: $right%; left: $left%;$style' data-container='body' data-toggle='popover' data-placement='bottom' title='$username' data-content='$startstr - $stopstr<br/>Group: $group'>$username<br/>$startstr - $stopstr<br/>Group: $group</div>";
+				echo "<div class='compcell' style='right: $right%; left: $left%;$style' data-container='body' data-toggle='popover' data-placement='bottom' title='$username' data-content='$startstr - $stopstr<br/>Group: $group'>";
+				echo "$username<br/>$startstr - $stopstr<br/>Group: $group</div>";
 			}
 			?>
 		</div>
 	</div>
 </div>
-<script type="text/javascript">
-	$(function(){
-		$('[data-toggle="popover"]').popover({html:true});
-		$('select').select2({'width':'element'});
-		start_date = $('#start_date').datepicker({
-			dateFormat: "yy-mm-dd"
-		}).datepicker("setDate",$('#start_date').val());
-		end_date = $('#end_date').datepicker({
-			defaultDate: "+1w",
-			dateFormat: "yy-mm-dd",
-		}).datepicker("setDate",$('#end_date').val());
-	});
-</script>
+
+<div class='col-xs-4 col-sm-4 col-md-4 col-lg-4 col-xl-4'>
 <?php
-	require_once 'includes/footer.inc.php';
-	?>
+
+if (isset($message)) {
+	echo $message;
+}
+?>
+</div>
+<?php 
+require_once 'includes/footer.inc.php';
+?>
+<script type="text/javascript">
+        $(function(){
+                $('[data-toggle="popover"]').popover({html:true});
+                $('select').select2({'width':'element'});
+                start_date = $('#start_date').datepicker({
+                        dateFormat: "yy-mm-dd"
+                }).datepicker("setDate",$('#start_date').val());
+                end_date = $('#end_date').datepicker({
+                        defaultDate: "+1w",
+                        dateFormat: "yy-mm-dd",
+                }).datepicker("setDate",$('#end_date').val());
+        });
+</script>

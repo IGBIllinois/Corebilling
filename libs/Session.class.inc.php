@@ -176,16 +176,21 @@ class Session {
 	 * @return mixed
 	 */
 	public static function getSessions($db, $start_date,$end_date,$device_id) {
-		$sql = "SELECT u.user_name, g.group_name, s.device_id, d.device_name, s.start, s.stop ";
-		$sql .= "FROM session s inner join users u on u.id=s.user_id ";
-		$sql .= "INNER JOIN device d on d.id=s.device_id ";
-		$sql .= "LEFT JOIN user_groups ug on u.id=ug.user_id ";
-		$sql .= "LEFT JOIN `groups` g on g.id=ug.group_id ";
-		$sql .= "WHERE d.id=:device_id and (DATE(s.start)=:start_date or DATE(s.stop)=:end_date)";
+		$sql = "SELECT users.user_name, groups.group_name, session.device_id, ";
+		$sql .= "device.device_name, session.start, session.stop ";
+		$sql .= "FROM session ";
+		$sql .= "INNER JOIN users ON users.id=session.user_id ";
+		$sql .= "INNER JOIN device ON device.id=session.device_id ";
+		$sql .= "LEFT JOIN user_groups ON users.id=user_groups.user_id ";
+		$sql .= "LEFT JOIN groups ON groups.id=user_groups.group_id ";
+		$sql .= "WHERE (DATE(session.start)>=:start_date OR DATE(session.stop)>=:start_date) ";
+		$sql .= "AND (DATE(session.start)<=:end_date OR DATE(session.stop)<=:end_date) ";
+		$sql .= "AND device.id=:device_id ";
 		$query = $db->prepare($sql);
 		$parameters = array(":start_date" => $start_date->format("Y-m-d H:i:s"), 
 			":end_date" => $end_date->format("Y-m-d H:i:s"),
 			":device_id" => $device_id);
+
 		$query->execute($parameters);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
     }
