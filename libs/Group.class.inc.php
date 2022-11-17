@@ -73,7 +73,7 @@ class Group {
 	/**
 	* Update group parameters in database
 	*/
-	public function update($groupName,$netid,$description,$enable = null) {
+	public function update($groupName,$netid,$description) {
 		$old_netid = $this->getNetid();
 		try {
 			$sql = "UPDATE `groups` SET group_name=:group_name,description=:description,netid=:netid WHERE id=:group_id LIMIT 1";
