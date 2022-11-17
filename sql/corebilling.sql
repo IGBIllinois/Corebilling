@@ -63,7 +63,8 @@ CREATE TABLE `groups` (
   `time_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `enabled` BOOLEAN DEFAULT 1,
   PRIMARY KEY (`id`),
-  UNIQUE(`netid`)
+  UNIQUE(`netid`),
+  UNIQUE(`group_name`)
 )\p;
 
 

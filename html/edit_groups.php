@@ -142,7 +142,7 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
 				<div class="form-group">
 					<label class="col-sm-3 control-label" for="editGroup">Group</label>
 					<div class="col-sm-6">
-						<select name="group_id" class="form-control">
+						<select name="group_id" class="form-control" id='group_id'>
 							<option value='0'>New Group</option>
 							<?php echo $groups_html; ?>
 						</select>
@@ -215,3 +215,10 @@ foreach (Group::getAllGroups($db) as $groupInfo) {
  if (isset($message)) { echo $message; }
 
 require_once 'includes/footer.inc.php';
+
+?>
+
+<script type="text/javascript">
+        $('#group_id').select2({'width':'element'});
+</script>
+

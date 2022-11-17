@@ -27,7 +27,8 @@ class Group {
 	*/
 	public function create($groupName, $description, $netid) {
 		$groupId = 0;
-		$sql= "INSERT INTO groups (group_name, description, netid)VALUES(:group_name,:description,:netid)";
+		$sql = "INSERT INTO groups (group_name, description, netid)VALUES(:group_name,:description,:netid) ";
+		$sql .= "ON DUPLICATE KEY UPDATE enabled=1,description=:description ";
 		$query = $this->db->prepare($sql);
 		$parameters = array(':group_name'=>$groupName,
 				':description'=>$description,
@@ -72,7 +73,7 @@ class Group {
 	/**
 	* Update group parameters in database
 	*/
-	public function update($groupName,$netid,$description) {
+	public function update($groupName,$netid,$description,$enable = null) {
 		$old_netid = $this->getNetid();
 		try {
 			$sql = "UPDATE `groups` SET group_name=:group_name,description=:description,netid=:netid WHERE id=:group_id LIMIT 1";
@@ -116,7 +117,7 @@ class Group {
 	* @return bool
 	*/
 	public static function exists($db, $groupName) {
-		$queryGroup = "SELECT COUNT(*) FROM groups WHERE group_name=:group_name";
+		$queryGroup = "SELECT COUNT(*) FROM groups WHERE group_name=:group_name AND enabled=1";
 		$group = $db->prepare($queryGroup);
 		$group->execute(array(':group_name'=>$groupName));
 		$groupCount = $group->fetchColumn();
@@ -279,6 +280,7 @@ class Group {
 		return false;
 
 	}
+
 }
 
 ?>

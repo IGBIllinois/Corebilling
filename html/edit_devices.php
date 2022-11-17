@@ -113,7 +113,7 @@ if (count($harddrives)) {
 				<div class="form-group">
 					<label class="col-sm-2 control-label" for="editDevice">Device</label>
 					<div class="col-sm-6">
-						<select name="device_option" class="form-control">
+						<select name="device_option" class="form-control" id='device_option'>
 							<option selected value='new'>New Device</option>
 							<?php
 							$devicesList = Device::getAllDevices($db);
@@ -323,8 +323,14 @@ if (count($harddrives)) {
 	</div>
 </div>
 <?php
-	if (isset($message)) {
-		echo $message;
-	}
+if (isset($message)) {
+	echo $message;
+}
 
-	require_once 'includes/footer.inc.php';
+require_once 'includes/footer.inc.php';
+
+?>
+
+<script type="text/javascript">
+        $('#device_option').select2({'width':'element'});
+</script>
