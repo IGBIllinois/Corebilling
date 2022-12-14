@@ -82,13 +82,22 @@ cp conf/log_rotate.conf.dist /etc/logrotate.d/corebilling
 ```
 composer install
 ```
-* To Enable creation of data folders, need to allow apache user have sudo rights.  Run visudo and add below.  Change the paths to the install location of Core Billing
+* To Enable creation of data folders, need to allow apache user have sudo to a local user.  This local user needs to have ssh access to the data storage machine.
+* An example sudoers file is at conf/www/sudoer_www.dist.  This can be placed in /etc/sudoers.d/
+* Change the paths to the install location of Core Billing
 ```
-Cmnd_Alias COREAPP = /var/www/corebilling/bin/*.sh
-apache ALL=NOPASSWD: COREAPP
+Cmnd_Alias COREAPP = /var/www/corebilling/bin/addCoreServerDir.sh /var/www/corebilling/bin/CoreServerDirExists.sh
+apache localhost = (coreapp) NOPASSWD: COREAPP
 Defaults:apache !requiretty
-```
 
+```
+* On The data storage machine, create a local user
+* An example sudoers files is at conf/data_sudoers.dist.  This can be placed in /etc/sudoers.d/
+```
+Cmnd_Alias COREAPP = /var/www/corebilling/bin/mkcoredir /var/www/corebilling/bin/dirExists.sh
+coreapp localhost=(root) NOPASSWD: COREAPP
+```
+* Create ssh keys between your web server and data storage machine.
 * To enable calculation of data usage, copy the example /conf/cron.dist to /etc/cron.d/corebilling and edit the paths in the file
 ```
 cp /var/www/corebilling/etc/cron.dist /etc/cron.d/corebilling
