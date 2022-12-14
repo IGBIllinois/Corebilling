@@ -17,11 +17,14 @@
 		"twbs/bootstrap": "v3.4.1",
 		"components/jquery": "1.11.1",
 		"components/jqueryui": "1.11.1",
-		"select2/select2": "4.0.2",
+		"select2/select2": "4.0.13",
 		"intelogie/select2-bootstrap-theme": "dev-master",
 		"igbillinois/igbillinois-php": "1.2.1",
 		"davehensley/highcharts": "v4.2.3",
 		"twig/twig": "v3.4.1"
+	},
+	"require-dev": {
+		"phpmd/phpmd" : "@stable"
 	},
 	"scripts": {
 		"post-update-cmd": [
