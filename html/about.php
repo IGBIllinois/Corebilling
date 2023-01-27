@@ -84,6 +84,7 @@ echo $extensions_string;
 <tr><td>SMTP_USERNAME</td><td><?php echo settings::get_smtp_username(); ?></td></tr>
 <tr><td>FROM</td><td><?php echo settings::get_from_email(); ?></td></tr>
 <tr><td>FROM_NAME</td><td><?php echo settings::get_from_name(); ?></td></tr>
+<tr><td>SU_USER</td><td><?php echo settings::get_su_user(); ?></td></tr>
 </table>
 </div>
 </div>
