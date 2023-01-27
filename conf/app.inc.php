@@ -3,7 +3,7 @@
 Stores application variables
 */
 
-define("VERSION","2.6.1");
+define("VERSION","2.6.2");
 define("CODEWEBSITE_URL","https://github.com/IGBIllinois/Corebilling");
 define("COREBILLINGSERVICE_URL","https://github.com/IGBIllinois/CoreBillingService/releases");
 define("LOG_DIR","log");
