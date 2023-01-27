@@ -225,5 +225,12 @@ class settings {
 		}
 		return false;
 	}
+
+	public static function get_su_user() {
+		if (defined("SU_USER")) {
+			return SU_USER;
+		}
+		return false;
+	}
 }
 ?>

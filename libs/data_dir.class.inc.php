@@ -17,7 +17,6 @@ class data_dir {
 
 	const precentile = 0.95;
 	const kilobytes_to_bytes = "1024";
-	const SU_USER = "coreapp";
 
 	public function __construct($db,$data_dir_id = 0) {
 		$this->db = $db;
@@ -344,7 +343,7 @@ class data_dir {
                 	$safeGid = escapeshellarg($gid);
 	                $safePi = escapeshellarg($pi);
         	        $safeUser = escapeshellarg($user);
-                	$exec = "sudo -u " . self::SU_USER . " ../bin/addCoreServerDir.sh " . $safeGid . " " . $safePi . " " . $safeUser . " 2>&1";
+                	$exec = "sudo -u " . settings::get_su_user() . " ../bin/addCoreServerDir.sh " . $safeGid . " " . $safePi . " " . $safeUser . " 2>&1";
 	                $exit_status = 1;
         	        $output_array = array();
                 	$output = exec($exec,$output_array,$exit_status);
@@ -361,7 +360,7 @@ class data_dir {
 	public static function remote_dir_exists($directory) {
 		if(settings::get_dataserver_enabled()) {
 			$safeDirectory = escapeshellarg($directory);
-			$exec = "sudo -u " . self::SU_USER . " ../bin/CoreServerDirExists.sh " . $safeDirectory . " 2>&1";
+			$exec = "sudo -u " . settings::get_su_user() . " ../bin/CoreServerDirExists.sh " . $safeDirectory . " 2>&1";
 			$exit_status = 01;
 			$output_array = array();
 			$output = exec($exec,$output_array,$exit_status);

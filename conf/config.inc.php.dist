@@ -58,3 +58,5 @@ define("SMTP_USERNAME","");
 define("SMTP_PASSWORD","");
 define("FROM","");
 define("FROM_NAME","");
+
+define("SU_USER","");
