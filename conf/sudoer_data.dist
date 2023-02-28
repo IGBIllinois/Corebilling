@@ -1,3 +1,3 @@
-Cmnd_Alias COREAPP = /var/www/corebilling/bin/mkcoredir /var/www/corebilling/bin/dirExists.sh
-coreapp localhost=(root) NOPASSWD: COREAPP
+Cmnd_Alias COREAPP = /var/www/corebilling/bin/mkcoredir, /var/www/corebilling/bin/dirExists.sh
+coreapp ALL=(root) NOPASSWD: COREAPP
 
