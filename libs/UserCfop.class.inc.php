@@ -8,7 +8,6 @@ class UserCfop {
 	private $db;
 	private $userId;
 	private $cfop;
-	private $description;
 	private $userCfopId;
 	private $active;
 	private $default;
@@ -30,21 +29,17 @@ class UserCfop {
 	/** Create CFOP to charge
 	* @param $userId
 	* @param $cfop
-	* @param $description
 	*/
-	public function create($userId, $cfop, $description) {
+	public function create($userId, $cfop) {
 		$this->userId = $userId;
 		$this->cfop = $cfop;
-		$this->description = $description;
 
-		$sql = "INSERT INTO user_cfop (user_id,cfop,description,active,default_cfop)VALUES(:user_id,:cfop,:description,:active,:default_cfop)";
+		$sql = "INSERT INTO user_cfop (user_id,cfop)VALUES(:user_id,:cfop)";
 		$query = $this->db->prepare($sql);
-		$params = array(':user_id'=>$this->userId,
-			':cfop'=>$this->cfop,
-			':description'=>$this->description,
-			':active'=>$this->active,
-			':default_cfop'=>UserCfop::DEFAULT_CFOP);
-		$query->execute($params);
+		$parameters = array(':user_id'=>$this->userId,
+			':cfop'=>$this->cfop
+		);
+		$query->execute($parameters);
 		$this->userCfopId =$this->db->lastInsertId();
 		$this->load($this->userCfopId);
 		$this->setAsDefaultCFOP();
@@ -62,7 +57,6 @@ class UserCfop {
 		if ($result) {
 			$this->userId = $result['user_id'];
 			$this->cfop = $result['cfop'];
-			$this->description = $result['description'];
 			$this->createdDate = $result['created'];
 			$this->userCfopId = $userCfopId;
 		}
@@ -76,13 +70,19 @@ class UserCfop {
 			$this->log_file->send_log("Set default CFOP for user ".$this->userId." to '".$this->cfop."'");
 		}
 		//mark all other user cfopls as not default
-		$sql_remove = "UPDATE user_cfop SET default_cfop=".UserCfop::NON_DEFAULT_CFOP." WHERE user_id=:user_id";
+		$sql_remove = "UPDATE user_cfop SET default_cfop=:default_cfop WHERE user_id=:user_id";
 		$query_remove = $this->db->prepare($sql_remove);
-		$query_remove->execute(array(':user_id'=>$this->userId));
+		$remove_parameters = array(':user_id'=>$userId,
+                                ':default_cfop'=>UserCfop::NON_DEFAULT_CFOP
+                );
+		$query_remove->execute($remove_parameters);
 
 		//mark current cfop as default
-		$sql_default = "UPDATE user_cfop SET default_cfop=".UserCfop::DEFAULT_CFOP." WHERE id=:user_cfop_id";
+		$sql_default = "UPDATE user_cfop SET default_cfop=:default_cfop WHERE id=:user_cfop_id";
 		$query_default = $this->db->prepare($sql_default);
+		$parameters = array(':user_cfop_id'=>$this->userCfopId,
+                                ':default_cfop'=>UserCfop::DEFAULT_CFOP
+                );
 		$query_default->execute(array(':user_cfop_id'=>$this->userCfopId));
 	}
 
@@ -91,9 +91,12 @@ class UserCfop {
 	* @return int
 	*/
 	public function loadDefaultCfop($userId) {
-		$sql = "SELECT id FROM user_cfop WHERE user_id=:user_id AND default_cfop=1";
+		$sql = "SELECT id FROM user_cfop WHERE user_id=:user_id AND default_cfop=:default_cfop";
 		$query = $this->db->prepare($sql);
-		$query->execute(array(':user_id'=>$userId));
+		$parameters = array(':user_id'=>$userId,
+				':default_cfop'=>UserCfop::DEFAULT_CFOP
+		);
+		$query->execute($parameters);
 		$result = $query->fetch(PDO::FETCH_ASSOC);
 		if($result) {
 			$userCfopId = $result['id'];
@@ -122,7 +125,9 @@ class UserCfop {
 	* @return mixed|string
 	*/
 	public static function formatCfop($cfop) {
-		$cfop = str_replace("-", "", $cfop);
+		if ($cfop) {
+			$cfop = str_replace("-", "", $cfop);
+		}
 		if(strlen($cfop)<=19) {
 			$cfop = substr($cfop, 0, 1) . "-" . substr($cfop, 1, 6) . "-" . substr($cfop, 7, 6) . "-" . substr($cfop, 13, 6);
 		} 
@@ -150,20 +155,6 @@ class UserCfop {
 
 	public function getCfopId() {
 		return $this->userCfopId;
-	}
-
-	/**
-	* @param mixed $description
-	*/
-	public function setDescription($description) {
-		$this->description = $description;
-	}
-
-	/**
-	* @return mixed
-	*/
-	public function getDescription() {
-		return $this->description;
 	}
 
 	/**

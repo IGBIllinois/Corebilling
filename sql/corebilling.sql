@@ -124,9 +124,8 @@ CREATE TABLE `user_cfop` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `cfop` varchar(45) NOT NULL,
-  `description` text NOT NULL,
-  `active` int(11) NOT NULL,
-  `default_cfop` int(11) DEFAULT NULL,
+  `active` BOOLEAN NOT NULL DEFAULT 1,
+  `default_cfop` BOOLEAN NOT NULL DEFAULT 1,,
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `created` (`created`)

@@ -369,7 +369,7 @@ class User
 	}
 
 	public function addCFOP($cfop) {
-		$this->userCfop->create($this->userId, $cfop, "");
+		$this->userCfop->create($this->userId, $cfop);
 	}
 
 	public function getAllCFOPs() {

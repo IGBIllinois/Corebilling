@@ -31,7 +31,11 @@ if (isset($_POST['update_user'])) {
 	$selectedUser->setFirstName($_POST['first']);
 	$selectedUser->setLastName($_POST['last']);
 	$selectedUser->setEmail($_POST['email']);
-	$selectedUser->setDepartmentId($_POST['department']);
+	$department_id = 0;
+	if (isset($_POST['department'])) {
+		$department_id = $_POST['department'];
+	}
+	$selectedUser->setDepartmentId($department_id);
 	if (($_POST['user_role_id'] == User::ROLE_SUPERVISOR) || ($_POST['user_role_id'] == User::ROLE_ADMIN)) {
 		$selectedUser->setSupervisorId(0);
 	}
@@ -219,7 +223,7 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
                                     <label class="col-sm-2 control-label" for="editUser">Depart.</label>
                                     <div class="col-sm-10">
                                         <select name="department" class="form-control" id="depart-select">
-                                            <option value=""></option>
+                                            <option value="0"></option>
                                             <?php
                                             $departmentsList = Department::getAllDepartments($db);
                                             foreach ($departmentsList as $departmentInfo) {
