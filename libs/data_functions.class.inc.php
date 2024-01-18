@@ -131,9 +131,6 @@ class data_functions {
 				':minimum_bill'=>$minimum_bill)
 			);
 		$result = $query->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($result as &$record) {
-			$record['CFOP'] = UserCfop::formatCFOP($record['CFOP']);
-		}
 		return $result;
 	}
 

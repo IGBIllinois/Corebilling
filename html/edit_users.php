@@ -242,7 +242,7 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" id="cfop" name="cfop_to_add" placeholder="1-xxxxxx-xxxxxx-xxxxxx" value="<?php
                                         if ($selectedUser->getId() > 0) {
-                                            echo UserCfop::formatCfop($selectedUser->getDefaultCFOP());
+                                            echo $selectedUser->getDefaultCFOP();
                                         } ?>">
                                     </div>
                                 </div>
@@ -251,7 +251,7 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
                         <div class="col-md-6">
                             <div class="form-horizontal">
 				<div class='form-group'>
-					<label class='col-sm-2 control-label' for='edutUser'>Supervisor</label>
+					<label class='col-sm-2 control-label' for='supervisor-select'>Supervisor</label>
 					<div class='col-sm-10'>
 						<select name="supervisor" class="form-control" id="supervisor-select" 
 							<?php if ($selectedUser->isSupervisor()) { echo 'disabled'; }?>>
@@ -288,7 +288,7 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label" for="editUser">Group</label>
+                                    <label class="col-sm-2 control-label" for="group-select">Group</label>
                                     <div class="col-sm-10">
                                         <select name="group[]" class="form-control" id="group-select" multiple>
                                             <?php

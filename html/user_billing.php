@@ -53,7 +53,7 @@ if ($data_dir_id) {
 		$data_html .= "<td>" . data_functions::bytes_to_terabytes($data_bill['data_bill_avg_bytes']) . "</td>";
 		$data_html .= "<td>" . number_format($data_bill['cost'],2) . "</td>";
 		$data_html .= "<td>$" . number_format($data_bill['data_bill_billed_cost'],2) . "</td>";
-		$data_html .= "<td>" . UserCfop::formatCfop($data_bill['cfop']) . "</td>";	
+		$data_html .= "<td>" . $data_bill['cfop'] . "</td>";	
 		$data_html .= "</tr>";
 		$data_html .= "</table>";
 		$data_html .= "</div></div>";
@@ -147,8 +147,8 @@ foreach ($rateTypesList as $rateTypeId => $rateTypeName) { ?>
 				<th>Date</th>
 				<th>CFOP</th>
 				<th>Equipment</th>
-				<th>Usage(hrs)</th>
-				<th>Rate</th>
+				<th>Usage(hours)</th>
+				<th>Rate (per hour)</th>
 				<th>Total</th>
 			</tr>
 			<?php
@@ -165,7 +165,7 @@ foreach ($rateTypesList as $rateTypeId => $rateTypeName) { ?>
 					echo "<tr>
 						<td>" . $charge['id'] . "</td>
 						<td>" . $charge['start'] . "</td>
-						<td>" . UserCfop::formatCfop($charge['cfop']) . "</td>
+						<td>" . $charge['cfop'] . "</td>
 						<td>" . $charge['full_device_name'] . "</td>
 						<td>" . round(($charge['elapsed'] / 60), 2) . "</td>
 						<td>$" . round(($rate * 60), 2) . "</td>

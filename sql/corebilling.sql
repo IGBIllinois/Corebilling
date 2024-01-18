@@ -153,7 +153,7 @@ CREATE TABLE `users` (
   `rate` varchar(45) NOT NULL DEFAULT '',
   `hidden` tinyint(1) DEFAULT 0,
   `rate_id` int(11) DEFAULT NULL,
-  `department_id` int(11) DEFAULT NULL,
+  `department_id` int(11) NOT NULL DEFAULT 0,
   `status` BOOLEAN DEFAULT NULL,
   `user_role_id` int(11) DEFAULT NULL,
   `certified` int(11) NOT NULL DEFAULT 0,

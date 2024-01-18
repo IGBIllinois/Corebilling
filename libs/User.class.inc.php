@@ -299,7 +299,6 @@ class User
 		$result = $query->fetchAll(PDO::FETCH_ASSOC);
 
 		for ( $i = 0; $i < count($result); $i++ ) {
-			$result[$i]['cfop'] = UserCfop::formatCfop($result[$i]['cfop']);
 			$result[$i]['edit'] = '<a href="edit_users.php?user_id=' . $result[$i]['id'] . '">Edit</a>';
 		}
 		return $result;
@@ -703,7 +702,7 @@ class User
 			$data_html .= "<td>" . data_functions::bytes_to_terabytes($data_bill['data_bill_avg_bytes']) . "</td>";
 			$data_html .= "<td>$" . number_format($data_bill['cost'],2) . "</td>";
 			$data_html .= "<td>$" . number_format($data_bill['data_bill_billed_cost'],2) . "</td>";
-			$data_html .= "<td>" . UserCfop::formatCfop($data_bill['cfop']) . "</td>";
+			$data_html .= "<td>" .  number_format($data_bill['cfop'],2) . "</td>";
 			$data_html .= "</tr>";
 
 

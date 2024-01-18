@@ -414,10 +414,6 @@ class Reservation
         $events->execute($queryParameters);
         $eventsArr = $events->fetchAll(PDO::FETCH_ASSOC);
 
-        for ($i = 0; $i < count($eventsArr); $i++) {
-            $eventsArr[$i]['CFOP'] = UserCfop::formatCfop($eventsArr[$i]['CFOP']);
-        }
-
         return $eventsArr;
     }
 

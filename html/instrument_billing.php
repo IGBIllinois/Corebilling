@@ -245,7 +245,7 @@ if ($sessionIdSelected > 0) {
 			//Cfop string
 			$cfopString = UserCfop::formatCfop($monthSession['cfop']);
 			$monthlyUsage[$rowId]['cfop'] = $cfopString;
-
+			//$monthlyUsage[$rowId]['cfop'] = $monthSession['cfop'];	
 			//If we want to edit this session info then load selected row with input input fields
 			if ($session->getId() == $monthSession['id']) {
 				//User options for edit session

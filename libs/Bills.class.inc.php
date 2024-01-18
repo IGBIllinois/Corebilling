@@ -3,9 +3,9 @@
 class Bills {
 
 	private $db;
-    	private $groupBy;
-	private $userId;
-	private $deviceId;
+    	private $groupBy = 0;
+	private $userId = 0;
+	private $deviceId = 0;
 
 	const CONTINUOUS_RATE = 1;
 	const MONTHLY_RATE = 2;
@@ -16,9 +16,6 @@ class Bills {
 
 	public function __construct(PDO $db) {
 		$this->db = $db;
-		$this->groupBy = 0; //Do not group by default
-		$this->userId = 0;
-		$this->deviceId = 0;
 	}
 
 	public function __destruct() {
@@ -43,7 +40,7 @@ class Bills {
 		$sql_joins .= "left join device_rate dr on dr.rate_id=u.rate_id and dr.device_id=s.device_id ";
 		$sql_joins .= "left join device d on d.id=s.device_id ";
 		$sql_joins .= "left join rates r on r.id=u.rate_id ";
-		$sql_joins .= "LEFT JOIN user_cfop uc ON (uc.id=s.cfop_id AND uc.default_cfop=1) ";
+		$sql_joins .= "LEFT JOIN user_cfop uc ON (uc.id=s.cfop_id ";
 		$sql_joins .= "left join departments de on de.id=u.department_id";
 
 		$sql_where = " WHERE MONTH(start)=:month AND YEAR(start)=:year AND dr.rate_type_id=:rate_type_id";
@@ -99,7 +96,7 @@ class Bills {
 		$sql_joins .= "left join user_groups ug on ug.user_id=u.id ";
 		$sql_joins .= "LEFT JOIN groups g ON (g.id=ug.group_id) ";
 		$sql_joins .= "left join rates r on r.id=s.rate_id ";
-		$sql_joins .= "LEFT JOIN user_cfop uc ON (uc.id=s.cfop_id AND uc.default_cfop=1) ";
+		$sql_joins .= "LEFT JOIN user_cfop uc ON uc.id=s.cfop_id ";
 		$sql_joins .= "left join departments de on de.id=u.`department_id`"; 
 
 		$sql_where = " WHERE ((MONTH(start)>=:startmonth AND YEAR(start)=:startyear) OR YEAR(start)>:startyear) AND ((MONTH(start)<=:endmonth AND YEAR(start)=:endyear) OR YEAR(start)<:endyear)";
