@@ -72,7 +72,7 @@ class UserCfop {
 		//mark all other user cfopls as not default
 		$sql_remove = "UPDATE user_cfop SET default_cfop=:default_cfop WHERE user_id=:user_id";
 		$query_remove = $this->db->prepare($sql_remove);
-		$remove_parameters = array(':user_id'=>$userId,
+		$remove_parameters = array(':user_id'=>$this->userId,
                                 ':default_cfop'=>UserCfop::NON_DEFAULT_CFOP
                 );
 		$query_remove->execute($remove_parameters);
@@ -83,7 +83,7 @@ class UserCfop {
 		$parameters = array(':user_cfop_id'=>$this->userCfopId,
                                 ':default_cfop'=>UserCfop::DEFAULT_CFOP
                 );
-		$query_default->execute(array(':user_cfop_id'=>$this->userCfopId));
+		$query_default->execute($parameters);
 	}
 
 	/**Load default CFOPfor given user id
