@@ -25,10 +25,10 @@ if (isset($_POST['create'])) {
 		$message .= html::error_message("Group name already exists.");
 	} 
 	elseif ($netid == "") {
-		$message .= html::error_message("No netID specified");
+		$message .= html::error_message("No PI Username specified");
 	}
 	elseif (!User::exists($db,$netid)) {
-		$message .= html::error_message("netID " . $netid . " does not exist");
+		$message .= html::error_message("Username " . $netid . " does not exist");
 	}
 	else {
 		try {
@@ -61,7 +61,7 @@ if (isset($_POST['modify'])) {
                 $message .= html::error_message("No group name specified");
         }
 	elseif ($netid == "") {
-                $message .= html::error_message("No netID specified");
+                $message .= html::error_message("No PI username specified");
         }
         elseif (!User::exists($db,$netid)) {
                 $message .= html::error_message("User " . $netid . " does not exist.  Please add user first before updating group.");

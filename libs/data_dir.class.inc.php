@@ -17,7 +17,8 @@ class data_dir {
 
 	const precentile = 0.95;
 	const kilobytes_to_bytes = "1024";
-
+	const DIR_ENABLED = 1;
+	const DIR_DISABLED = 0;
 	public function __construct($db,$data_dir_id = 0) {
 		$this->db = $db;
 		$this->log_file = new \IGBIllinois\log(settings::get_log_enabled(),settings::get_log_file());
@@ -34,31 +35,22 @@ class data_dir {
 		$directory = self::format_directory($directory);
 		$error = false;
 
-		if (self::data_dir_exists($db,$directory)) {
-			$error = true;
-			throw new Exception("Directory " . $directory . " is already in the database");
-			
+		$user_id = User::getIDByUsername($db,$netid);
+		$sql = "INSERT INTO data_dir(data_dir_group_id,data_dir_path,data_dir_user_id) ";
+		$sql .= "VALUES(:group_id,:directory,:user_id) ";
+		$sql .= "ON DUPLICATE KEY UPDATE data_dir_enabled=:status ";
+		$parameters = array(':group_id'=>$group_id,
+				':directory'=>$directory,
+				':user_id'=>$user_id,
+				':status'=>self::DIR_ENABLED
+		);
+		$query = $db->prepare($sql);
+		$query->execute($parameters);
+		$id = $db->lastInsertId();
+		if ($id) {
+			return $id;
 		}
-
-		if ($error) {
-			return array('RESULT'=>false,"MESSAGE"=>$message);
-		}
-		else {
-			$user_id = User::getIDByUsername($db,$netid);
-			$sql = "INSERT INTO data_dir(data_dir_group_id,data_dir_path,data_dir_user_id) ";
-			$sql .= "VALUES(:group_id,:directory,:user_id)";
-			$parameters = array(':group_id'=>$group_id,
-					':directory'=>$directory,
-					':user_id'=>$user_id,
-					);
-			$query = $db->prepare($sql);
-			$query->execute($parameters);
-			$id = $db->lastInsertId();
-			if ($id) {
-				return $id;
-			}
-			return false;	
-		}
+		return false;	
 	}
 	
 	public function get_data_dir_id() {
@@ -94,9 +86,10 @@ class data_dir {
 	}
 
 	public function enable() {
-                $sql = "UPDATE data_dir SET data_dir_enabled='1' ";
-                $sql .= "WHERE data_dir_id='" . $this->get_data_dir_id() . "' LIMIT 1";
-                $result = $this->db->non_select_query($sql);
+                $sql = "UPDATE data_dir SET data_dir_enabled=:status ";
+		$sql .= "WHERE data_dir_id='" . $this->get_data_dir_id() . "' LIMIT 1";
+		$parameters = array(':status'=>self::DIR_ENABLED);
+                $result = $this->db->non_select_query($sql,$parameters);
                 if ($result) {
                         $this->enabled = 1;
                 }
@@ -119,10 +112,13 @@ class data_dir {
                         throw new Exception("Unable to delete directory.  Directory " . $this->get_directory() . " still exists.");
                 }
 		else {
-			$sql = "UPDATE data_dir SET data_dir_enabled='0',data_dir_exists='0' ";
+			$sql = "UPDATE data_dir SET data_dir_enabled=:status,data_dir_exists='0' ";
 			$sql .= "WHERE data_dir_id=:data_dir_id LIMIT 1";
 			$query = $this->db->prepare($sql);
-			$result = $query->execute(array(':data_dir_id'=>$this->get_data_dir_id()));
+			$parameters = array(
+				':data_dir_id'=>$this->get_data_dir_id(),
+				':status'=>self::DIR_DISABLED);
+			$result = $query->execute($parameters);
 			
 			if ($result) {
 				$this->enabled = 0;
@@ -171,9 +167,11 @@ class data_dir {
 	private static function data_dir_exists($db, $directory) {
 		$sql = "SELECT count(1) as count FROM data_dir ";
 		$sql .= "WHERE data_dir_path=:directory ";
-		$sql .= "AND data_dir_enabled='1'i LIMIT 1";
+		$sql .= "AND data_dir_enabled=:status LIMIT 1";
 		$query = $db->prepare($sql);
-		$query->execute(array(':directory'=>$directory));	
+		$parameters = array(':directory'=>$directory,
+				':status'=>self::DIR_ENABLED);
+		$query->execute($parameters);	
 		$result = $query->fetch(PDO::FETCH_ASSOC);
 
 		if ($result['count']) {
@@ -361,7 +359,7 @@ class data_dir {
 		if(settings::get_dataserver_enabled()) {
 			$safeDirectory = escapeshellarg($directory);
 			$exec = "sudo -u " . settings::get_su_user() . " ../bin/CoreServerDirExists.sh " . $safeDirectory . " 2>&1";
-			$exit_status = 01;
+			$exit_status = 1;
 			$output_array = array();
 			$output = exec($exec,$output_array,$exit_status);
 			if ($exit_status) {

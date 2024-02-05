@@ -212,18 +212,10 @@ class Group {
 			global $ldapman;
 			try {
 				$gid = $this->getLdapGroupName();
-				if ($ldapman->getGroup($gid) != null) {
-					throw new Exception("Error ldap group " . $gid . " already exists");
-					return false;
-				}
-				if (!$ldapman->addGroup($gid, "Core $this->netid PI group")) {
+				if (($ldapman->getGroup($gid) == null) && !$ldapman->addGroup($gid, "Core $this->netid PI group")) {
 					throw new Exception("Error adding group " . $gid . " to ldap");
 					return false;	
 				}
-				//if (!$ldapman->addGroupMember($gid, $this->netid)) {
-				//	throw new Exception("Error adding user " . $this->netid . " to ldap group " . $gid);
-				//	return false;
-				//}
 				foreach($this->getMembers() as $member) {
 					if (!$ldapman->addGroupMember($gid, $member['user_name'])) {
 						throw new Exception("Error adding user " . $this->netid . " to ldap group " . $gid);
@@ -244,6 +236,7 @@ class Group {
 
 
 	public function delete() {
+		global $ldapman;
 		if ($this->getId() && $this->getEnabled()) {
 			$members = $this->getMembers();
 			if (count($members)) {
@@ -265,6 +258,13 @@ class Group {
 					}
 				}
                         }
+			if(LDAPMAN_API_ENABLED){
+                                try {
+                                        $gid = $this->getLdapGroupName();
+                                        if (($ldapman->getGroup($gid) == null) {
+                                                throw new Exception("Error removing group " . $this->getName() . ". LDAP Group " . $gid . " still exists.");
+                                                return false;
+                                }
 	
 			$sql = "UPDATE groups SET enabled=0 WHERE id=:group_id LIMIT 1";
 			$query = $this->db->prepare($sql);
