@@ -14,7 +14,7 @@ class settings {
 	private const LDAP_TLS = false;
 	private const LDAP_BIND_USER = "";
 	private const LDAP_BIND_PASS = "";
-	private const SESSION_TIMEOUT = 300;
+	private const SESSION_TIMEOUT = 14400;
 	private const SMTP_PORT = 25;
 	private const SMTP_HOST = "localhost";
 

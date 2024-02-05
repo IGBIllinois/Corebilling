@@ -22,7 +22,7 @@ date_default_timezone_set(settings::get_timezone());
 $output_command = "disable_users.php Removes access for users who are disabled\n";
 $output_command .= "Usage: php disable_users.php \n";
 $output_command .= "	--dry-run	Do dry run, output only\n";
-$output_command .= "    -h, --help              Display help menu\n";
+$output_command .= "	-h, --help              Display help menu\n";
 
 //Parameters
 $shortopts = "h";

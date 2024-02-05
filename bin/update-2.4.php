@@ -19,7 +19,7 @@ require_once '../vendor/autoload.php';
 date_default_timezone_set(settings::get_timezone());
 
 //Command parameters
-$output_command = "data.php Inserts data usage into database\n";
+$output_command = "update-2.4.php Script to update to version 2.4\n";
 $output_command .= "Usage: php data.php \n";
 $output_command .= "	--dry-run	Do dry run, do not add to database\n";
 $output_command .= "    -h, --help              Display help menu\n";

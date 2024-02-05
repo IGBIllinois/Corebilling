@@ -34,7 +34,7 @@ define('DB_NAME','corebilling');
 define('TITLE', '');
 
 // Authentication timeout
-define('SESSION_TIMEOUT', 8*60*60);
+define('SESSION_TIMEOUT', 14400);
 define('SESSION_NAME','corebilling');
 
 define('CAL_DEFAULT_COLOR','#3a87ad');

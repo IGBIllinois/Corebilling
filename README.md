@@ -94,7 +94,7 @@ Defaults:apache !requiretty
 * On The data storage machine, create a local user
 * An example sudoers files is at conf/data_sudoers.dist.  This can be placed in /etc/sudoers.d/
 ```
-Cmnd_Alias COREAPP = /var/www/corebilling/bin/mkcoredir /var/www/corebilling/bin/dirExists.sh
+Cmnd_Alias COREAPP = /var/www/corebilling/bin/mkcoredir.sh /var/www/corebilling/bin/dirExists.sh
 coreapp localhost=(root) NOPASSWD: COREAPP
 ```
 * Create ssh keys between your web server and data storage machine.
