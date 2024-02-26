@@ -54,7 +54,7 @@ class User
 	* @param $certified
 	*/
 	public function create($username,$first,$last,$email,
-		$departmentId = 0,$rateId,$status,$userRoleId,$certified,$supervisorId = 0) {
+		$rateId,$status,$userRoleId,$certified,$departmentId = 0,$supervisorId = 0) {
 
 		$this->username = $username;
 		$this->first = $first;

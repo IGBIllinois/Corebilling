@@ -14,6 +14,7 @@ usage() {
 	echo "	-g	Group Name"
 	echo "	-p	PI Username"
 	echo "	-u	Username"
+	echo "	-v	Verbose"
 	echo "	-h	Output this help menu"
 }
 
@@ -33,7 +34,7 @@ while getopts ":hvg:p:u:" opt; do
       username=$OPTARG
       ;;
     v)
-      ((verbose++))
+      verbose=1
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2

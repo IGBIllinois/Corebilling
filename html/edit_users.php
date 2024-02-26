@@ -123,11 +123,11 @@ if (isset($_POST['create_user'])) {
 			$result = $selectedUser->create($_POST['user_name'],
 				$_POST['first'],$_POST['last'],
 				$_POST['email'],
-				$_POST['department'],
 				$_POST['rate'],
 				$_POST['status'],
 				$_POST['user_role_id'],
 				$safetyquiz,
+				$_POST['department'],
 				$supervisor_id);
 
 			if ($result) {
