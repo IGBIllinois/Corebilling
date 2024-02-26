@@ -10,28 +10,25 @@ require_once(__DIR__ . '/authenticate.inc.php');
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
 		<link rel='stylesheet' type='text/css' href='vendor/twbs/bootstrap/dist/css/bootstrap.min.css'>
-			
-		<link href="css/fullcalendar.css" rel='stylesheet' />
-		<link href="css/fullcalendar.print.css" rel='stylesheet' media='print' />
-		<link rel="stylesheet" href="css/datatables.min.css">
-		<link rel="stylesheet" href="vendor/select2/select2/dist/css/select2.min.css" type="text/css" />
-		<link rel="stylesheet" href="vendor/intelogie/select2-bootstrap-theme/dist/select2-bootstrap.min.css" type="text/css" />
-		<link href="css/jquery-ui.css" rel="stylesheet" />
-		<link href="css/jquery-ui.theme.css" rel="stylesheet" />
-		<link href="css/main.inc.css" rel="stylesheet" />
-	
+                <link rel='stylesheet' type='text/css' href="css/fullcalendar.css">
+                <link rel='stylesheet' type='text/css' href="css/fullcalendar.print.css" media='print'>
+                <link rel="stylesheet" type='text/css' href="css/datatables.min.css">
+                <link rel="stylesheet" type='text/css' href="vendor/select2/select2/dist/css/select2.min.css">
+                <link rel="stylesheet" type='text/css' href="vendor/intelogie/select2-bootstrap-theme/dist/select2-bootstrap.min.css">
+                <link rel='stylesheet' type='text/css' href='vendor/components/jqueryui/themes/base/jquery-ui.css'>
+		<link rel="stylesheet" type='text/css' href="css/main.inc.css">
+
 		<script type='text/javascript' src='vendor/components/jquery/jquery.min.js'></script>
 		<script type='text/javascript' src='vendor/components/jqueryui/jquery-ui.min.js'></script>
+		<script type='text/javascript' src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src='vendor/select2/select2/dist/js/select2.min.js'></script>
-		<script type='text/javascript' src='js/datatables.min.js'></script>
+		<script type='text/javascript' src='js/datatables.min.js'></script>	
+		<script type="text/javascript" src='js/full_calendar/moment.min.js'></script>
+		<script type="text/javascript" src='js/full_calendar/fullcalendar.min.js'></script>
+		<script type="text/javascript" src='vendor/davehensley/highcharts/js/highcharts.src.js'></script>
+		<script type="text/javascript" src='vendor/davehensley/highcharts/js/modules/exporting.src.js'></script>
+		<script type="text/javascript" src='js/main.inc.js'></script>
 		
-		<script src='js/full_calendar/moment.min.js' type="text/javascript"></script>
-		<script src='js/full_calendar/fullcalendar.min.js' type="text/javascript"></script>
-		<script type='text/javascript' src='vendor/twbs/bootstrap/dist/js/bootstrap.min.js'></script>
-		<script src='vendor/davehensley/highcharts/js/highcharts.src.js'></script>
-		<script src='vendor/davehensley/highcharts/js/modules/exporting.src.js'></script>
-		<script src='js/main.inc.js' type="text/javascript"></script>
-	
 		<title><?php echo settings::get_title(); ?></title>
 	</head>
 	<body>

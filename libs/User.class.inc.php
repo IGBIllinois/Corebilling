@@ -293,9 +293,9 @@ class User
 		$sql .= "LEFT JOIN `groups` g on (g.id=ug.group_id) ";
 		$sql .= "LEFT JOIN departments d on (d.id=u.department_id) ";
 		$sql .= "GROUP BY u.id";
-
+		$params = array(':status'=>self::ACTIVE);
 		$query = $db->prepare($sql);
-		$query->execute(array(':status'=>self::ACTIVE));
+		$query->execute($params);
 		$result = $query->fetchAll(PDO::FETCH_ASSOC);
 
 		for ( $i = 0; $i < count($result); $i++ ) {
