@@ -15,7 +15,6 @@ class Session {
 	private $status = "";
 	private $deviceId = 0;
 	private $elapsed = 0;
-	private $rateId = 0;
 	private $description = "";
 	private $cfopId = 0;
 	private $rate;
@@ -73,7 +72,6 @@ class Session {
                 $startSession = $db->prepare($queryStartSession);
                 $startSession->execute(
                     array(':user_id' => $userId, ':device_id' => $deviceId, ':default_cfop_id' => $defaultCfopId));
-                $sessionId = $db->lastInsertId();
             }
 
             $queryUpdateDeviceUser = "update device set loggeduser=:loggeduser, lasttick=NOW(), ipaddress=:ipaddress, json=:json where id=:id";
@@ -120,7 +118,7 @@ class Session {
 		);
 
 		$query = $this->db->prepare($sql);
-		$query->execute($paramaters);
+		$query->execute($parameters);
 		return $this->db->lastInsertId();
 	}
 

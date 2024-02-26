@@ -47,7 +47,7 @@ class Reservation
 		$this->training = $training;
 		$this->masterReservationId = $masterReservationId;
 
-		if (self::checkEventConflicts($this->db, $this->deviceId, $this->userId, $this->start, $this->stop) == 1) {
+		if (self::checkEventConflicts($this->db, $this->deviceId, $this->start, $this->stop) == 1) {
 			$sql = "INSERT INTO reservation_info (device_id,user_id,start,stop,description,training,date_created,master_reservation_id) ";
 			$sql .= "VALUES(:device_id,:user_id,:start,:stop,:description,:training,NOW(),:master)";
 			$query = $this->db->prepare($sql);
@@ -110,7 +110,7 @@ class Reservation
 	*/
 	public function update() {
 		//No update feature needed yet
-		if (self::checkEventConflicts($this->db, $this->deviceId, $this->userId, $this->start, $this->stop, $this->reservationId) == 1) {
+		if (self::checkEventConflicts($this->db, $this->deviceId, $this->start, $this->stop, $this->reservationId) == 1) {
 			$sql = "UPDATE reservation_info SET start=:start, stop=:stop, description=:description, ";
 			$sql .= "training=:training, staff_notes=:staffNotes WHERE id=:reservation_id";
 			$query = $this->db->prepare($sql);
@@ -145,7 +145,7 @@ class Reservation
 	* @param int $reservationId
 	* @return int
 	*/
-	public static function checkEventConflicts($db, $deviceId, $userId, $startTimeUnix, $stopTimeUnix, $reservationId = 0) {
+	public static function checkEventConflicts($db, $deviceId, $startTimeUnix, $stopTimeUnix, $reservationId = 0) {
 		$sql = "SELECT COUNT(*) AS num_conflicts FROM reservation_info ";
 		$sql .= "WHERE device_id=:device_id AND deleted = 0 ";
 		$sql .= "AND ((UNIX_TIMESTAMP(start) < UNIX_TIMESTAMP(:start_time_unix) AND UNIX_TIMESTAMP(stop) > UNIX_TIMESTAMP(:start_time_unix)) ";
@@ -232,7 +232,7 @@ class Reservation
         $eventsArr = array();
         $events = self::getEventsInRange($db, $start, $end, $userId, $deviceId, $training);
 
-        foreach ($events as $id => $event) {
+        foreach ($events as $event) {
             $missed = self::getMissed($db, $event['id']);
 
             $color = CAL_DEFAULT_COLOR;

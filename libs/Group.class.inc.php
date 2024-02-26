@@ -45,7 +45,7 @@ class Group {
 		catch (Exception $e) {
 			$this->db->rollBack();
 			throw $e;
-			$result = false;
+			return 0;
 		}
 		$this->db->commit();
 		$this->log_file->send_log("Added group " . $groupName . " with owner " . $netid);
@@ -278,7 +278,7 @@ class Group {
 			$result = $query->execute(array(':group_id'=>$this->getId()));
 			$this->log_file->send_log("Group " . $this->getName() . " successfully deleted");
 			$this->enabled = false;	
-			return true;
+			return $result;
 
 		}
 		return false;

@@ -55,7 +55,7 @@ class VisualizeData {
         $tableString .= "</tr>
                            </thead>
                             <tbody>";
-        foreach($tableData as $id=>$sessionInfo)
+        foreach($tableData as $sessionInfo)
         {
             $tableString .= "<tr>";
 
@@ -149,7 +149,7 @@ class VisualizeData {
         $tableString .= "</tr>
                            </thead>
                             <tbody>";
-        foreach($tableData as $id=>$sessionInfo)
+        foreach($tableData as $sessionInfo)
         {
             $tableString .= "<tr>";
 

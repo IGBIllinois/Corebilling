@@ -88,7 +88,7 @@ class Bills {
 		$sql .= "dr.min_use_time, GROUP_CONCAT(g.group_name separator ', ') as group_name, dr.rate_type_id, de.department_name ";
 
 		
-		$sql_joins = "FROM `session` s ";
+		$sql_joins = " FROM `session` s ";
 		$sql_joins .= "left join users u on u.id=s.user_id ";
 		$sql_joins .= "left join device d on d.id=s.device_id ";
 		$sql_joins .= "left join device_rate dr on (dr.device_id=d.id and dr.rate_id=u.rate_id) ";
@@ -228,7 +228,10 @@ class Bills {
 	* @return mixed
 	*/
 	private function CalcMonthly($elapsed, $rate, $min_use_time) {
-		return $rate * 60;
+		if ($min_use_time > $elapsed) {
+			$elapsed = $min_use_time;
+		}
+		return $elapsed * $rate;
 	}
 
 	/**Set which column you would like to group the bills by

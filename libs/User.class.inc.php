@@ -684,10 +684,10 @@ class User
 			$result = $email->send_email(settings::get_from_email(),$subject,"",$html_message,settings::get_from_name());
 		} catch (Exception $e) {
 			throw $e;
-			return false;
+		
 		}
 
-		return true;
+		return $result;
 	}
 
 	public function get_data_table($month,$year) {

@@ -121,7 +121,7 @@ if (isset($_REQUEST['action']) && isset($_REQUEST['user_id']) && isset($_REQUEST
 				case 'check_conflicts':
 					$dateStart = new DateTime($_REQUEST['start']);
                     $dateEnd = new DateTime($_REQUEST['end']);
-					echo Reservation::checkEventConflicts($db,$_REQUEST['device_id'],$_REQUEST['res_user_id'],$dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s'),isset($_REQUEST['id'])?$_REQUEST['id']:0);
+					echo Reservation::checkEventConflicts($db,$_REQUEST['device_id'],$dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s'),isset($_REQUEST['id'])?$_REQUEST['id']:0);
 					break;
             }
         }

@@ -1,7 +1,7 @@
 <?php
-#ini_set('display_errors', 1);
-#ini_set('display_startup_errors', 1);
-#error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // setting up the web root and server root for
 require_once(__DIR__ . '/../../conf/app.inc.php');
