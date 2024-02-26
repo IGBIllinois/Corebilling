@@ -33,7 +33,6 @@ class data_dir {
 	
 	public function create($db,$group_id,$directory,$netid) {
 		$directory = self::format_directory($directory);
-		$error = false;
 
 		$user_id = User::getIDByUsername($db,$netid);
 		$sql = "INSERT INTO data_dir(data_dir_group_id,data_dir_path,data_dir_user_id) ";
@@ -98,8 +97,6 @@ class data_dir {
 
 	}
 	public function disable() {
-		$error = false;
-		$message = "";
 		$exists = false;
 		try {
 			$exists = self::remote_dir_exists($this->get_directory());
@@ -201,7 +198,6 @@ class data_dir {
 	
 	public function add_usage($bytes) {
 
-                $data_cost = new data_cost($this->db);
 		$sql = "INSERT INTO data_usage(data_usage_data_dir_id,data_usage_bytes) ";
 		$sql .= "VALUES(:data_usage_data_dir_id,:data_usage_bytes) ";
                 $parameters = array(':data_usage_data_dir_id'=>$this->get_data_dir_id(),
@@ -255,11 +251,9 @@ class data_dir {
 		$query = $this->db->prepare($sql);
 		$query->execute($parameters);
 		$check_exists = $query->fetch(PDO::FETCH_ASSOC);
-		$result = true;
-		$insert_id = 0;
 		if ($check_exists['count']) {
-			$result = false;
-			$message = "Data Bill: Directory: " . $this->get_directory() . " Bill already calculated";
+			throw new Exception("Data Bill: Directory: " . $this->get_directory() . " Bill already calculated");
+			return false;
 		}
 		else {
 			$user = new User($this->db);
@@ -288,7 +282,7 @@ class data_dir {
 			$query = $this->db->prepare($insert_sql);
 			$query->execute($parameters);
         	        $insert_id = $this->db->lastInsertId();
-			return true;
+			return $insert_id;
 		}
 		return false;
 	}
@@ -344,7 +338,7 @@ class data_dir {
                 	$exec = "sudo -u " . settings::get_su_user() . " ../bin/addCoreServerDir.sh " . $safeGid . " " . $safePi . " " . $safeUser . " 2>&1";
 	                $exit_status = 1;
         	        $output_array = array();
-                	$output = exec($exec,$output_array,$exit_status);
+                	exec($exec,$output_array,$exit_status);
 			
 	                if ($exit_status) {
         	                throw new Exception("Error Creating directory for user " . $user . ", " . end($output_array));
@@ -361,7 +355,7 @@ class data_dir {
 			$exec = "sudo -u " . settings::get_su_user() . " ../bin/CoreServerDirExists.sh " . $safeDirectory . " 2>&1";
 			$exit_status = 1;
 			$output_array = array();
-			$output = exec($exec,$output_array,$exit_status);
+			exec($exec,$output_array,$exit_status);
 			if ($exit_status) {
 				throw new Exception("Error checking if directory exists for " . $directory . ", " . end($output_array));
 				return false;

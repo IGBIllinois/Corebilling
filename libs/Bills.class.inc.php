@@ -35,47 +35,46 @@ class Bills {
 		$sql .= "u.user_name, s.start, s.stop,CONCAT(u.first,' ',u.last) as full_name, s.description,r.rate_name, ";
 		$sql .= "dr.min_use_time, dr.rate_type_id, de.department_name ";
 
-		$sql_joins = " FROM `session` s ";
-		$sql_joins .= "left join users u on u.id=s.user_id ";
-		$sql_joins .= "left join device_rate dr on dr.rate_id=u.rate_id and dr.device_id=s.device_id ";
-		$sql_joins .= "left join device d on d.id=s.device_id ";
-		$sql_joins .= "left join rates r on r.id=u.rate_id ";
-		$sql_joins .= "LEFT JOIN user_cfop uc ON (uc.id=s.cfop_id ";
-		$sql_joins .= "left join departments de on de.id=u.department_id";
+		$sql_join = "FROM `session` s ";
+		$sql_join .= "LEFT JOIN users u on u.id=s.user_id ";
+		$sql_join .= "LEFT JOIN device_rate dr on dr.rate_id=u.rate_id and dr.device_id=s.device_id ";
+		$sql_join .= "LEFT JOIN device d on d.id=s.device_id ";
+		$sql_join .= "LEFT JOIN rates r on r.id=u.rate_id ";
+		$sql_join .= "LEFT JOIN user_cfop uc ON uc.id=s.cfop_id ";
+		$sql_join .= "LEFT JOIN departments de on de.id=u.department_id ";
 
-		$sql_where = " WHERE MONTH(start)=:month AND YEAR(start)=:year AND dr.rate_type_id=:rate_type_id";
+		$sql_where = "WHERE MONTH(start)=:month AND YEAR(start)=:year AND dr.rate_type_id=:rate_type_id ";
 		$params[':year'] = $year;
 		$params[':month'] = $month;
 		$params[':rate_type_id'] = $rateType;
 
 		if ($this->userId) {
-			$sql_where .= " AND s.user_id=:user_id";
+			$sql_where .= "AND s.user_id=:user_id ";
 			$params[':user_id'] = $this->userId;
 		}
 
 		if ($this->deviceId) {
-			$sql_where .= " AND s.device_id=:device_id";
+			$sql_where .= "AND s.device_id=:device_id ";
 			$params[':device_id'] = $this->deviceId;
 		}
 
 		switch ($this->groupBy) {
 			case self::GROUP_CFOP:
-				$sql_where .= " GROUP BY s.cfop";
+				$sql_where .= "GROUP BY s.cfop ";
 				$sql .= ", s.elapsed";
 				break;
 			case self::GROUP_DEVICE:
-				$sql .= ", SUM(s.elapsed) as elapsed";
-				$sql_where .= " GROUP BY s.device_id";
+				$sql .= ", SUM(s.elapsed) as elapsed ";
+				$sql_where .= "GROUP BY s.device_id ";
 				break;
 			case self::GROUP_USER:
-				$sql_where .= " GROUP BY s.user_id";
-				$sql .= ", s.elapsed";
+				$sql_where .= "GROUP BY s.user_id ";
+				$sql .= ", s.elapsed ";
 				break;
 			default:
-				$sql .= ", s.elapsed";
+				$sql .= ", s.elapsed ";
 		}
-		$sql = $sql . $sql_joins . $sql_where;
-
+		$sql = $sql . $sql_join . $sql_where;
 		$query = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 		$query->execute($params);
 		return $query->fetchAll(PDO::FETCH_ASSOC);
@@ -89,7 +88,7 @@ class Bills {
 		$sql .= "dr.min_use_time, GROUP_CONCAT(g.group_name separator ', ') as group_name, dr.rate_type_id, de.department_name ";
 
 		
-		$sql_joins = " FROM `session` s ";
+		$sql_joins = "FROM `session` s ";
 		$sql_joins .= "left join users u on u.id=s.user_id ";
 		$sql_joins .= "left join device d on d.id=s.device_id ";
 		$sql_joins .= "left join device_rate dr on (dr.device_id=d.id and dr.rate_id=u.rate_id) ";

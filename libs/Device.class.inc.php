@@ -62,7 +62,7 @@ class Device
 
         	//Add device rates rows to device rates table with default value of 0 for all values
 	        $ratesArr = Rate::getAllRates($this->db);
-        	foreach ($ratesArr as $id => $rateInfo) {
+        	foreach ($ratesArr as $rateInfo) {
 			$sql_rates = "INSERT INTO device_rate (rate,device_id,rate_id, min_use_time, rate_type_id) ";
 			$sql_rates .= "VALUES(0,:device_id,:rate_id,0,0)";
 			$query_rates = $this->db->prepare($sql_rates);

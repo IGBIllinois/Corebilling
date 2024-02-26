@@ -81,7 +81,7 @@ class Article
 		}
 		$sql .= "ORDER BY created DESC";
 		$query = $db->prepare($sql);
-		$result = $query->execute(array(':age'=>$age));
+		$query->execute(array(':age'=>$age));
 		return $query->fetchAll(PDO::FETCH_ASSOC);
 	}
 

@@ -30,7 +30,7 @@ class User
 	private $ldap = null;
 	private $ldap_info = array();
 	private $supervisor_id = 0;
-	private $suervisor_username = "";
+	private $supervisor_username = "";
 
 	public function __construct(PDO $db,\IGBIllinois\ldap $ldap = null) {
 		$this->db = $db;

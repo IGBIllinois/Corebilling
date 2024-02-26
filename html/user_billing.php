@@ -158,7 +158,6 @@ foreach ($rateTypesList as $rateTypeId => $rateTypeName) { ?>
 					$bills->setGroupBy(Bills::GROUP_DEVICE);
 				}
 				$monthCharges = $bills->GetMonthCharges($year, $month, $rateTypeId);
-
 				foreach ($monthCharges as $id => $charge) {
 					$rate = $charge['rate'];
 
@@ -172,7 +171,7 @@ foreach ($rateTypesList as $rateTypeId => $rateTypeName) { ?>
 						<td>$" . number_format($bills->CalcTotal($charge['elapsed'],$rateTypeId,$rate,$charge['min_use_time']),2) . "</td>
 					</tr>";
 				}
-				?>
+			?>
 		</table>
 	</div>
 </div>

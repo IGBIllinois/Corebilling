@@ -14,7 +14,6 @@ class Authenticate {
 	private $login;
 	private $verified;
 	private $user_id = null;
-	private $key = null;
 	private $timeout = null;
 	private $user_info;
 

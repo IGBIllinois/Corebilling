@@ -85,8 +85,12 @@ foreach ($directories as $directory) {
 		$sum += $usage['data_usage_bytes'];
 	}
 	$average = round($sum / $count);
-			
-	$result = $data_dir->add_data_bill($month,$year,$average);
+	try {			
+		$result = $data_dir->add_data_bill($month,$year,$average);
+	}
+	catch (Exception $e) {
+		$log_file->send_log($e->getMessage(),\IGBIllinois\log::ERROR);
+	}
 	if ($result) {
 		$log_file->send_log("Data Bill: Directory: " . $data_dir->get_directory() . " successfully added to data bill");
 	}

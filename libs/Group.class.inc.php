@@ -258,14 +258,21 @@ class Group {
 					}
 				}
                         }
-			if(LDAPMAN_API_ENABLED){
+			if (LDAPMAN_API_ENABLED) {
                                 try {
                                         $gid = $this->getLdapGroupName();
-                                        if (($ldapman->getGroup($gid) == null) {
+                                        if ($ldapman->getGroup($gid) == null) {
                                                 throw new Exception("Error removing group " . $this->getName() . ". LDAP Group " . $gid . " still exists.");
                                                 return false;
-                                }
-	
+                                	}
+				}
+				catch (Exception $e) {
+					$this->log_file->send_log($e->getMessage(),\IGBIllinois\log::ERROR);
+					throw $e;
+					return false;
+
+				}	
+			}
 			$sql = "UPDATE groups SET enabled=0 WHERE id=:group_id LIMIT 1";
 			$query = $this->db->prepare($sql);
 			$result = $query->execute(array(':group_id'=>$this->getId()));
@@ -273,14 +280,9 @@ class Group {
 			$this->enabled = false;	
 			return true;
 
-
-
-
 		}
 		return false;
-
 	}
-
 }
 
 ?>
