@@ -23,7 +23,7 @@
 		"intelogie/select2-bootstrap-theme": "dev-master",
 		"igbillinois/igbillinois-php": "1.4.0",
 		"davehensley/highcharts": "v4.2.3",
-		"twig/twig": "v3.4.3"
+		"twig/twig": "v3.14.0"
 	},
 	"require-dev": {
 		"phpmd/phpmd" : "@stable"
