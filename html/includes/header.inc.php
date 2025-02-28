@@ -59,7 +59,7 @@ require_once(__DIR__ . '/authenticate.inc.php');
 					<ul class="nav nav-pills nav-stacked">
                                         	<li><a href="index.php">Home</a></li>
 	                                        <li><a href="user_billing.php">User Bill</a></li>
-        	                                <li><a href="calendar_fullcalendar.php">Calendar</a>
+        	                                <!--<li><a href="calendar_fullcalendar.php">Calendar</a>-->
                 	                        <li><a href="in_use.php">Device Status</a></li>
                         	                <?php if ($login_user->isAdmin()){ ?>
 

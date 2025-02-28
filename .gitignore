@@ -5,3 +5,5 @@
 /components
 composer.lock
 /templates/custom/*
+.htpasswd
+/html/mailing_list/*
