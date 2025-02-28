@@ -2,3 +2,4 @@
 
 0 4 * * * root php /var/www/corebilling/bin/data.php > /dev/null 2>&1
 0 5 1 * * root php /var/www/corebilling/bin/calc_data_usage.php > /dev/null 2>&1
+0 5 * * * root php /var/www/corebilling/bin/get_users.php --email > /var/www/corebilling/html/mailing_list/users.csv 2>&1

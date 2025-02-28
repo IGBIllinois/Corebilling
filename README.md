@@ -102,4 +102,19 @@ coreapp localhost=(root) NOPASSWD: COREAPP
 ```
 cp /var/www/corebilling/etc/cron.dist /etc/cron.d/corebilling
 ```
+## Mailing List
+* To Generate Sympa Mailing List, add to cron file
+```
+0 5 * * * root php /var/www/corebilling/bin/get_users.php --email > /var/www/corebilling/html/mailing_list/users.csv 2>&1
+``` 
+* Create folder mailing_list
+```
+mkdir /var/www/corebilling/html/mailing_list
+```
+*Create .htpasswd file
+```
+htpasswd -c .htpasswd sympa
+```
+*In Sympa Mailing List, add the users.csv web address as a data source
+
 * Done
