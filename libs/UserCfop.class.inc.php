@@ -128,10 +128,10 @@ class UserCfop {
 		if ($cfop) {
 			$cfop = str_replace("-", "", $cfop);
 		}
-		if(strlen($cfop)<=19) {
+		if($cfop !== null && strlen($cfop)<=19) {
 			$cfop = substr($cfop, 0, 1) . "-" . substr($cfop, 1, 6) . "-" . substr($cfop, 7, 6) . "-" . substr($cfop, 13, 6);
 		} 
-		else {
+		elseif($cfop !== null) {
 			$cfop = substr($cfop, 0, 1) . "-" . substr($cfop, 1, 6) . "-" . substr($cfop, 7, 6) . "-" . substr($cfop, 13, 6)."-".substr($cfop, 19);
 		}
 		return $cfop;

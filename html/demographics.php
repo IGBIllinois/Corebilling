@@ -20,7 +20,6 @@ $user_demographics = UserDemographics::getDemographics($db);
 	?>
 	</div>
 	</div>
-</div>
 
 <?php
 require_once 'includes/footer.inc.php';

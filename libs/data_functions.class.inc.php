@@ -194,8 +194,11 @@ class data_functions {
                 $result = $query->fetch(PDO::FETCH_ASSOC);
                 $cost = 0;
                 if (count($result)) {
-                        $cost = $result['total_cost'];
-                        if ($format) {
+			$cost = $result['total_cost'];
+			if ($format) {
+				if ($result['total_cost'] == null) {
+					$result['total_cost'] = "0.00";
+				}
                                 $cost = number_format($result['total_cost'],2);
                         }
                 }
@@ -212,7 +215,10 @@ class data_functions {
                 $cost = 0;
                 if (count($result)) {
                         $cost = $result['billed_cost'];
-                        if ($format) {
+			if ($format) {
+				if ($result['billed_cost'] == null) {
+					$result['billed_cost'] = "0.00";
+				}
                                 $cost = number_format($result['billed_cost'],2);
                         }
                 }
