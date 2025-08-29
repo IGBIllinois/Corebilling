@@ -3,7 +3,6 @@
 /html/vendor
 /conf/config.inc.php
 /components
-composer.lock
 /templates/custom/*
 .htpasswd
 /html/mailing_list/*

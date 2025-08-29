@@ -21,7 +21,7 @@
 		"components/jqueryui": "1.12.1",
 		"select2/select2": "4.0.13",
 		"intelogie/select2-bootstrap-theme": "dev-master",
-		"igbillinois/igbillinois-php": "1.4.3",
+		"igbillinois/igbillinois-php": "1.4.6",
 		"davehensley/highcharts": "v4.2.3",
 		"twig/twig": "v3.14.2"
 	},
