@@ -12,11 +12,11 @@ if (isset($_POST['Submit'])) {
 	$departmentName = $_POST['department_name'];
 	$description = $_POST['description'];
 	$departmentId = $_POST['department_id'];
-
+	$departmentCode = $_POST['department_code'];
 	if (Department::exists($db,$departmentName)) {
 		$warnings .= "Department name already exists.";
 	} else {
-		$department->create($departmentName,$description);
+		$department->create($departmentName,$description,$departmentCode);
 
 	}
 
@@ -86,7 +86,7 @@ if (isset($_POST['Select'])) {
 				<div class="form-group">
 					<label class="col-sm-3 control-label">Name</label>
 					<div class="col-sm-9">
-						<textarea name="department_name" type="text" class="form-control"><?php echo $department->getDepartmentName(); ?></textarea>
+						<input type='text' name="department_name" type="text" class="form-control" value='<?php echo $department->getDepartmentName(); ?>'>
 					</div>
 				</div>
 				<div class="form-group">
@@ -95,6 +95,12 @@ if (isset($_POST['Select'])) {
 						<textarea name="description" class="form-control"><?php echo $department->getDescription(); ?></textarea>
 					</div>
 				</div>
+				<div class="form-group">
+                                        <label class="col-sm-3 control-label">Department Code</label>
+                                        <div class="col-sm-9">
+                                                <input type='text' name="department_oode" class="form-control" value='<?php echo $department->getDepartmentCode(); ?>'>
+                                        </div>
+                                </div>
 			</div>
 		</div>
 		<div class="col-md-6">

@@ -4,7 +4,9 @@ class Department {
 	private $db;   
 	private $departmentName;
 	private $departmentId;
+	private $departmentCode;
 	private $description;
+
 	private $log_file = null;
 
 	public function __construct(PDO $db) {
@@ -20,10 +22,15 @@ class Department {
 	* @param $departmentName
 	* @param $description
 	*/
-	public function create($departmentName, $description) {
-	        $sql = "INSERT INTO departments (department_name, description, department_code)VALUES(:department,:description, '')";
+	public function create($departmentName, $description,$departmentCode = "") {
+		$sql = "INSERT INTO departments (department_name, description, department_code) ";
+		$sql .= "VALUES(:department,:description,:department_code)";
+		$parameters = array(':department'=>$departmentName,
+				':description'=>$description,
+				':department_code'=>$departmentCode
+		);
         	$query = $this->db->prepare($sql);
-		$query->execute(array(':department'=>$departmentName,':description'=>$description));
+		$query->execute($parameters);
         	$departmentId = $this->db->lastInsertId();
 	        $this->departmentName = $departmentName;
         	$this->description = $description;
@@ -131,4 +138,7 @@ class Department {
 		return $this->departmentName;
 	}
 
+	public function getDepartmentCode() {
+		return $this->departmentCode;
+	}
 } 
