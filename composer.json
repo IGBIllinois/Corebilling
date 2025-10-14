@@ -17,7 +17,7 @@
 		"ext-ldap": "*",
 		"ext-mysqlnd": "*",
 		"twbs/bootstrap": "v3.4.1",
-		"components/jquery": "1.11.1",
+		"components/jquery": "3.6.0",
 		"components/jqueryui": "1.12.1",
 		"select2/select2": "4.0.13",
 		"intelogie/select2-bootstrap-theme": "dev-master",
