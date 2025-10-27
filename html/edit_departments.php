@@ -6,9 +6,10 @@ if(!$login_user->isAdmin()){
 	exit;
 }
 
+$message = "";
 $department = new Department($db);
 
-if (isset($_POST['Submit'])) {
+if (isset($_POST['submit'])) {
 	$departmentName = $_POST['department_name'];
 	$description = $_POST['description'];
 	$departmentId = $_POST['department_id'];
@@ -16,13 +17,17 @@ if (isset($_POST['Submit'])) {
 	if (Department::exists($db,$departmentName)) {
 		$warnings .= "Department name already exists.";
 	} else {
-		$department->create($departmentName,$description,$departmentCode);
+		$result = $department->create($departmentName,$description,$departmentCode);
+		if ($result) {
+			$message = html::success_message("Department " . $departmentName . " successfully created");
+		}
+		
 
 	}
 
 }
 
-if (isset($_POST['Modify'])) {
+if (isset($_POST['modify'])) {
 	$departmentName = $_POST['department_name'];
 	$departmentId = $_POST['department_id'];
 	$description = $_POST['description'];
@@ -30,32 +35,27 @@ if (isset($_POST['Modify'])) {
 	$department->load($departmentId);
 	$department->setDepartmentName($departmentName);
 	$department->setDescription($description);
-	$department->update();
+	$result = $department->update();
+	if ($result) {
+		$message =  html::success_message("Department " . $departmentName . " successfully updated");
+
+	}
 }
 
 
-if (isset($_POST['Select'])) {
+if (isset($_POST['select'])) {
 	$departmentId = $_POST['selectDepartment'];
 	$department->load($departmentId);
-
-	$announce = "<h4>Modify Department:</h4>Modify department details, click modify to apply changes.";
-	$newDepartmentBtn = ' <input name="Reset" type="submit" class="btn btn-primary" id="reset" value="Reset" >';
 }
 ?>
 
 <h3>Edit Departments</h3>
 
 <form action="edit_departments.php" method="POST">
-	<div class="form-group">
-		<?php
-		echo "<input name=\"department_id\" type=\"hidden\" value=\"" . $department->getDepartmentId() . "\">";
-		if ($department->getDepartmentId() != 0) {
-			echo '<input name="Modify" type="submit" class="btn btn-primary" id="Modify" value="Modify">';
-		} else {
-			echo '<input name="Submit" type="submit" class="btn btn-primary" id="Submit" value="Create" >  <input name="Reset" type="submit" class="btn btn-primary" id="reset" value="Reset" >';
-		}
+	
+	<?php
+	echo "<input name=\"department_id\" type=\"hidden\" value=\"" . $department->getDepartmentId() . "\">";
 		?>
-	</div>
 	<div class="row">
 		<div class="col-md-6">
 			<div class="well form-horizontal">
@@ -78,7 +78,7 @@ if (isset($_POST['Select'])) {
 						</select>
 					</div>
 					<div class="col-sm-3">
-						<input name="Select" type="submit" class="btn btn-primary" id="Select" Value="Select"/>
+						<input name="select" type="submit" class="btn btn-primary" id="Select" Value="Select"/>
 					</div>
 				</div>
 			</div>
@@ -99,6 +99,19 @@ if (isset($_POST['Select'])) {
                                         <label class="col-sm-3 control-label">Department Code</label>
                                         <div class="col-sm-9">
                                                 <input type='text' name="department_oode" class="form-control" value='<?php echo $department->getDepartmentCode(); ?>'>
+                                        </div>
+				</div>
+
+				<div class="form-group">
+                                        <div class="col-sm-9 col-sm-offset-3">
+					<?php
+                                                if ($department->getDepartmentId() != 0 && $department->getDepartmentId() != null) {
+                                                        echo '<input name="modify" type="submit" class="btn btn-primary" id="Modify" value="Modify">';
+                                                } else {
+                                                        echo '<input name="create" type="submit" class="btn btn-primary" id="Submit" value="Create">';
+                                                        echo '&nbsp<input name="reset" type="submit" class="btn btn-primary" id="reset" value="Reset">';
+                                                }
+                                                ?>
                                         </div>
                                 </div>
 			</div>
@@ -132,4 +145,7 @@ if (isset($_POST['Select'])) {
 	</div>
 </form>
 <?php
-	require_once 'includes/footer.inc.php';
+if (isset($message)) { echo $message; }
+
+require_once 'includes/footer.inc.php';
+

@@ -44,8 +44,14 @@ class Department {
 	public function update() {
 		$sql = "UPDATE departments SET department_name=:departmentName,description=:description ";
 		$sql .= "WHERE id=:id LIMIT 1";
+		echo $sql;
+		$parameters = array(':departmentName'=>$this->departmentName,
+			':description'=>$this->description,
+			':id'=>$this->departmentId
+		);
+		print_r($parameters);
 		$query = $this->db->prepare($sql);
-		$result = $query->execute(array(':departmentName'=>$this->departmentName,':description'=>$this->description,':id'=>$this->departmentId));
+		$result = $query->execute($parameters);
 		return $result;
 	}
 
@@ -53,13 +59,16 @@ class Department {
 	* @param $id
 	*/
 	public function load($id) {
-		$sql= "SELECT department_name,id,department_code FROM departments WHERE id=:id LIMIT 1";
+		$sql= "SELECT * FROM departments WHERE id=:id LIMIT 1";
 		$query = $this->db->prepare($sql);
 		$query->execute(array(':id'=>$id));
 		$result = $query->fetch(PDO::FETCH_ASSOC);
-		$this->departmentName = $result["department_name"];
-		$this->departmentCode = $result["department_code"];
-		$this->departmentId = $result["id"];
+		if ($result) {
+			$this->departmentName = $result["department_name"];
+			$this->departmentCode = $result["department_code"];
+			$this->description = $result["description"];
+			$this->departmentId = $result["id"];
+		}
 	}
 
 	/** Get a list of available departments
