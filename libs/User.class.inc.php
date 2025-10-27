@@ -91,7 +91,11 @@ class User
 		if (!self::verify_username($username)) {
 			throw new Exception("Username can contain only lowercase letters and numbers");
 			return false;
-		}	
+		}
+		if (!self::is_ldap_user($username)) {
+			throw new Exception("User does not exist in LDAP");
+			return false;
+		}
 		try {
 			$sql = "INSERT INTO users (user_name,first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
 			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified,:supervisor_id)";
