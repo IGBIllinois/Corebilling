@@ -87,9 +87,13 @@ class User
 		if (!self::verify_email($email)) {
 			throw new Exception("Please specify an email address");
 			return false;
+		}
+		if (!self::verify_username($username)) {
+			throw new Exception("Username can contain only lowercase letters and numbers");
+			return false;
 		}	
 		try {
-			$sql = "INSERT INTO users (user_name, first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
+			$sql = "INSERT INTO users (user_name,first,last,email,department_id,rate_id,status,user_role_id,certified,supervisor_id) ";
 			$sql .= "VALUES(:user_name,:first,:last,:email,:department_id,:rate_id,:status,:user_role_id,:certified,:supervisor_id)";
 			$query = $this->db->prepare($sql);
 			
@@ -173,18 +177,18 @@ class User
 
 	/**Check if a user exists by netid
 	* @param PDO $db
-	* @param     $username
-	* @return int
+	* @param $username
+	* @return boolean
 	*/
 	public static function exists($db, $username) {
 		$sql = "SELECT id FROM users WHERE user_name=:user_name LIMIT 1";
 		$query = $db->prepare($sql);
 		$query->execute(array(":user_name" => $username));
 		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if ($result['id']) {
-			return $result["id"];
+		if (!$result) {
+			return false;
 		} 
-		return 0;
+		return true;
 
 	}
 
@@ -749,6 +753,15 @@ class User
 		}
 		elseif (filter_var($email,FILTER_VALIDATE_EMAIL) === FALSE) {
 			$valid = 0;
+		}
+		return $valid;
+
+	}
+
+	private static function verify_username($username) {
+		$valid = 1;
+		if (!ctype_alnum($username)) {
+			$valid = 0;	
 		}
 		return $valid;
 
