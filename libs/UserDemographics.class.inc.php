@@ -40,18 +40,19 @@ class UserDemographics {
 	 */
 	public function load($id){
 		$sql = "SELECT * FROM user_demographics WHERE user_id=:user_id LIMIT 1";
-		$params = array(":user_id"=>$id);
+		$parameters = array(":user_id"=>$id);
 		$query = $this->db->prepare($sql);
 
-		if($query->execute($params)) {
-			$result = $query->fetch(PDO::FETCH_ASSOC);
+		$query->execute($parameters);
+		$result = $query->fetch(PDO::FETCH_ASSOC);
+		if ($result) {
 			$this->user_id = $id;
 			$this->edulevel = $result['edu_level'];
 			$this->gender = $result['gender'];
 			$this->underrep = $result['underrepresented'];
-			return true; 
-		} 
-		return false;
+			return true;
+		}
+		return false; 
 	}
 
 	/**

@@ -239,7 +239,7 @@ if ($selectedUser->getId() > 0 && !$selectedUser->is_ldap_user()) {
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">CFOP</label>
-                                    <div class="col-sm-10">
+				    <div class="col-sm-10">
                                         <input type="text" class="form-control" id="cfop" name="cfop_to_add" placeholder="1-xxxxxx-xxxxxx-xxxxxx" value="<?php
                                         if ($selectedUser->getId() > 0) {
                                             echo $selectedUser->getDefaultCFOP();

@@ -156,14 +156,13 @@ class User
 	// TODO the db should be updated on *every* set function, not just when this update function is called.
 	public function update() {
 		$sql = "UPDATE users SET ";
-		$sql .= "user_name=:user_name,first=:first,last=:last,";
+		$sql .= "first=:first,last=:last,";
 		$sql .= "email=:email,department_id=:department_id,rate_id=:rate_id,";
 		$sql .= "status=:status,user_role_id=:user_role_id,certified=:certified,supervisor_id=:supervisor_id ";
 		$sql .= "WHERE id=:user_id LIMIT 1";
 
 		$query = $this->db->prepare($sql);
 		$paramters = array(
-			':user_name' => $this->username,
 			':first' => $this->first,
 			':last' => $this->last,
 			':email' => $this->email,
