@@ -181,17 +181,17 @@ class User
 	/**Check if a user exists by netid
 	* @param PDO $db
 	* @param $username
-	* @return boolean
+	* @return int
 	*/
 	public static function exists($db, $username) {
 		$sql = "SELECT id FROM users WHERE user_name=:user_name LIMIT 1";
 		$query = $db->prepare($sql);
 		$query->execute(array(":user_name" => $username));
 		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if (!$result) {
-			return false;
+		if (count($result)) {
+			return $result['id'];
 		} 
-		return true;
+		return false;
 
 	}
 
