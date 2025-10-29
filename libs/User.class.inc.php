@@ -188,7 +188,7 @@ class User
 		$query = $db->prepare($sql);
 		$query->execute(array(":user_name" => $username));
 		$result = $query->fetch(PDO::FETCH_ASSOC);
-		if (count($result)) {
+		if (is_array($result) && count($result)) {
 			return $result['id'];
 		} 
 		return false;
