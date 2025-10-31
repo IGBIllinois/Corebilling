@@ -44,12 +44,10 @@ class Department {
 	public function update() {
 		$sql = "UPDATE departments SET department_name=:departmentName,description=:description ";
 		$sql .= "WHERE id=:id LIMIT 1";
-		echo $sql;
 		$parameters = array(':departmentName'=>$this->departmentName,
 			':description'=>$this->description,
 			':id'=>$this->departmentId
 		);
-		print_r($parameters);
 		$query = $this->db->prepare($sql);
 		$result = $query->execute($parameters);
 		return $result;

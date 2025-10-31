@@ -62,12 +62,10 @@ class UserDemographics {
 		$sql = "INSERT INTO user_demographics (user_id,edu_level,gender,underrepresented) ";
 		$sql .= "VALUES(:id,:edu_level,:gender,:underrep) ";
 		$sql .= "ON DUPLICATE KEY UPDATE user_id=:id, edu_level=:edu_level, gender=:gender, underrepresented=:underrep";
-		echo $sql;
 		$params = array(':id'=>$this->user_id, 
 			':edu_level'=>$edu_level, 
 			':gender'=>$gender, 
 			':underrep'=>$underrep);
-		print_r($params);
 		$query = $this->db->prepare($sql);
 		$result = $query->execute($params);
 		if ($result) {
