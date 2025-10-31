@@ -129,7 +129,6 @@ if (isset($_POST['create_user'])) {
 				$safetyquiz,
 				$_POST['department'],
 				$supervisor_id);
-
 			if ($result) {
 				if (isset($_POST['group'])) {
 					$selectedUser->setGroupIds($_POST['group']);

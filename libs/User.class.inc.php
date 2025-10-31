@@ -113,7 +113,8 @@ class User
 				':supervisor_id' => $this->supervisor_id
 			);
 			$result = $query->execute($parameters);
-			$this->userId = $this->db->lastInsertId();
+			$user_id = $this->db->lastInsertId();
+			$this->load($user_id);
 			$this->log_file->send_log("Successfully added user " . $username);
 			return $this->userId;
 		}
