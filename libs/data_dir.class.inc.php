@@ -31,7 +31,7 @@ class data_dir {
 	public function __destruct() {
 	}
 	
-	public function create($db,$group_id,$directory,$netid) {
+	public static function create($db,$group_id,$directory,$netid) {
 		$directory = self::format_directory($directory);
 
 		$user_id = User::getIDByUsername($db,$netid);
