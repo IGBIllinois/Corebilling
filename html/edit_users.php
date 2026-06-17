@@ -27,6 +27,7 @@ $message = "";
 
 //If Modified user form
 if (isset($_POST['update_user'])) {
+	$_POST = array_map('trim',$_POST);
 	//Update user info
 	$selectedUser->setFirstName($_POST['first']);
 	$selectedUser->setLastName($_POST['last']);
@@ -102,12 +103,14 @@ if (isset($_POST['update_user'])) {
 
 // Submitted new cfop
 if (isset($_POST['add_cfop'])) {
-    $selectedUser->addCFOP($_POST['cfop_to_add']);
+	$_POST = array_map('trim',$_POST);
+	$selectedUser->addCFOP($_POST['cfop_to_add']);
 }
 
 // Submitted New User
 if (isset($_POST['create_user'])) {
-	if (User::exists($db, $_POST['user_name'])) {
+	$_POST = array_map('trim',$_POST);
+	if (User::exists($db, strtolower($_POST['user_name']))) {
 		$message .= html::error_message("User " . $_POST['user_name'] . " already exists in database.");
 	}
 	else {
@@ -121,7 +124,8 @@ if (isset($_POST['create_user'])) {
 		}
 		try {
 			$result = $selectedUser->create($_POST['user_name'],
-				$_POST['first'],$_POST['last'],
+				$_POST['first'],
+				$_POST['last'],
 				$_POST['email'],
 				$_POST['rate'],
 				$_POST['status'],

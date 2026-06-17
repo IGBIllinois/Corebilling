@@ -56,10 +56,10 @@ class User
 	public function create($username,$first,$last,$email,
 		$rateId,$status,$userRoleId,$certified,$departmentId = 0,$supervisorId = 0) {
 
-		$this->username = $username;
-		$this->first = $first;
-		$this->last = $last;
-		$this->email = $email;
+		$this->username = strtolower(trim($username));
+		$this->first = ucfirst(trim($first));
+		$this->last = ucfirst(trim($last));
+		$this->email = strtolower(trim($email));
 		$this->departmentId = $departmentId;
 		$this->rateid = $rateId;
 		$this->status = $status;
@@ -157,13 +157,14 @@ class User
 	// TODO the db should be updated on *every* set function, not just when this update function is called.
 	public function update() {
 		$sql = "UPDATE users SET ";
-		$sql .= "first=:first,last=:last,";
+		$sql .= "user_name=:username,first=:first,last=:last,";
 		$sql .= "email=:email,department_id=:department_id,rate_id=:rate_id,";
 		$sql .= "status=:status,user_role_id=:user_role_id,certified=:certified,supervisor_id=:supervisor_id ";
 		$sql .= "WHERE id=:user_id LIMIT 1";
 
 		$query = $this->db->prepare($sql);
 		$paramters = array(
+			':username' => $this->username,
 			':first' => $this->first,
 			':last' => $this->last,
 			':email' => $this->email,
@@ -428,6 +429,7 @@ class User
 	}
 
 	public function setUsername($username) {
+		$username = strtolower($username);
 		if ( $this->username != $username ) {
 			$this->log_file->send_log("Set username of user '" . $this->username . "' to '$username'");
 			$this->username = $username;
@@ -439,6 +441,7 @@ class User
 	}
 
 	public function setFirstName($first) {
+		$first = ucfirst($first);
 		if ( $this->first != $first ) {
 			$this->first = $first;
 			$this->log_file->send_log("Set first name of user '" . $this->username . "' to '$first'");
@@ -450,6 +453,7 @@ class User
 	}
 
 	public function setLastName($last) {
+		$last = ucfirst($last);
 		if ( $this->last != $last ) {
 			$this->last = $last;
 			$this->log_file->send_log("Set last name of user '" . $this->username . "' to '$last'");
