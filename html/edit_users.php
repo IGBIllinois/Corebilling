@@ -27,7 +27,11 @@ $message = "";
 
 //If Modified user form
 if (isset($_POST['update_user'])) {
-	$_POST = array_map('trim',$_POST);
+	array_walk_recursive($_POST, function (&$value) {
+		if (is_string($value)) {
+			$value = trim($value);
+		}
+	});
 	//Update user info
 	$selectedUser->setFirstName($_POST['first']);
 	$selectedUser->setLastName($_POST['last']);
@@ -103,13 +107,21 @@ if (isset($_POST['update_user'])) {
 
 // Submitted new cfop
 if (isset($_POST['add_cfop'])) {
-	$_POST = array_map('trim',$_POST);
+	array_walk_recursive($_POST, function (&$value) {
+		if (is_string($value)) {
+			$value = trim($value);
+		}
+	});
 	$selectedUser->addCFOP($_POST['cfop_to_add']);
 }
 
 // Submitted New User
 if (isset($_POST['create_user'])) {
-	$_POST = array_map('trim',$_POST);
+	array_walk_recursive($_POST, function (&$value) {
+		if (is_string($value)) {
+			$value = trim($value);
+		}
+	});
 	if (User::exists($db, strtolower($_POST['user_name']))) {
 		$message .= html::error_message("User " . $_POST['user_name'] . " already exists in database.");
 	}
